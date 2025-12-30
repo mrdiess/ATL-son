@@ -5,6 +5,11 @@ import { type NextRequest, NextResponse } from "next/server"
 
 export async function GET(request: NextRequest) {
   try {
+    if (!process.env.NEXT_PUBLIC_SUPABASE_URL || !process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY) {
+      console.warn("[v0] Supabase environment variables not configured, returning empty sponsors list")
+      return NextResponse.json([])
+    }
+
     const supabase = await createClient()
 
     const { data, error } = await supabase.from("sponsors").select("*").order("sort_order", { ascending: true })
@@ -16,7 +21,7 @@ export async function GET(request: NextRequest) {
 
     return NextResponse.json(Array.isArray(data) ? data : [])
   } catch (error) {
-    console.error("[v0] Sponsors API error:", error instanceof Error ? error.message : String(error))
+    console.warn("[v0] Sponsors API error:", error instanceof Error ? error.message : String(error))
     return NextResponse.json([])
   }
 }

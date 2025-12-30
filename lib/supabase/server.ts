@@ -12,6 +12,7 @@ export async function createClient() {
   console.log("[v0] NEXT_PUBLIC_SUPABASE_ANON_KEY:", supabaseAnonKey ? "✓ exists" : "✗ missing")
 
   if (!supabaseUrl || !supabaseAnonKey) {
+    console.warn("[v0] Supabase environment variables not found - using fallback client")
     throw new Error(
       "Missing Supabase environment variables. Please check NEXT_PUBLIC_SUPABASE_URL and NEXT_PUBLIC_SUPABASE_ANON_KEY",
     )
@@ -44,6 +45,7 @@ export async function createAdminClient() {
   console.log("[v0] SUPABASE_SERVICE_ROLE_KEY:", supabaseServiceKey ? "✓ exists" : "✗ missing")
 
   if (!supabaseUrl || !supabaseServiceKey) {
+    console.warn("[v0] Supabase admin environment variables not found - using fallback client")
     throw new Error(
       "Missing Supabase admin environment variables. Please check NEXT_PUBLIC_SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY",
     )
