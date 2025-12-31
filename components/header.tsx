@@ -35,12 +35,57 @@ export function Header() {
       <div className="container mx-auto px-4">
         <div className="flex items-center justify-between h-20">
           <Link href="/" className="flex-shrink-0">
-            <img
-              src="/logo.svg"
+            <svg
               alt="ATL Çelik Yapı - Düzce Çelik Ev ve Dorse Kasa Yapımı"
-              className="h-12 md:h-16 w-auto"
-              style={{ maxWidth: "200px" }}
-            />
+              className="h-12 md:h-16 w-auto text-foreground"
+              style={{ maxWidth: "200px", color: "currentColor" }}
+              viewBox="0 0 1200 400"
+              width="1200"
+              height="400"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <defs>
+                <filter id="blue-glow" x="-50%" y="-50%" width="200%" height="200%">
+                  <feGaussianBlur stdDeviation="3" result="blur" />
+                  <feMerge>
+                    <feMergeNode in="blur" />
+                    <feMergeNode in="SourceGraphic" />
+                  </feMerge>
+                </filter>
+              </defs>
+
+              <g transform="translate(80,60)">
+                <polygon points="0,0 120,0 150,60 30,60" fill="currentColor" opacity="0.9" />
+                <polygon points="0,80 120,80 150,140 30,140" fill="currentColor" opacity="0.9" />
+                <polygon points="0,160 120,160 150,220 30,220" fill="currentColor" opacity="0.9" />
+                <g filter="url(#blue-glow)">
+                  <polygon points="170,160 290,160 320,220 200,220" fill="#1E6BFF" />
+                  <polygon points="170,240 290,240 320,300 200,300" fill="#1E6BFF" />
+                </g>
+              </g>
+
+              <g transform="translate(440,210)">
+                <text
+                  fontSize="92"
+                  fill="currentColor"
+                  dominantBaseline="middle"
+                  fontFamily="Segoe UI, Arial, sans-serif"
+                  fontWeight="700"
+                >
+                  ATL
+                </text>
+                <text
+                  x="0"
+                  y="110"
+                  fontSize="72"
+                  fill="currentColor"
+                  fontFamily="Segoe UI, Arial, sans-serif"
+                  fontWeight="700"
+                >
+                  ÇELİK YAPI
+                </text>
+              </g>
+            </svg>
           </Link>
 
           {/* Desktop Navigation */}
