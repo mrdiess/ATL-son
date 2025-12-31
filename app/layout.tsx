@@ -54,9 +54,9 @@ export const metadata: Metadata = {
       "Düzce'nin lider çelik yapı firması. Çelik ev, çelik yapı, dorse kasa yapımı ve tamiri, çelik konstrüksiyon hizmetleri.",
     images: [
       {
-        url: "/logo.png",
+        url: "/logo.svg",
         width: 1200,
-        height: 630,
+        height: 400,
         alt: "ATL Çelik Yapı - Düzce Çelik Ev ve Dorse Kasa Yapımı",
       },
     ],
@@ -65,7 +65,7 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: "ATL Çelik Yapı | Düzce Çelik Ev, Dorse Kasa Yapımı",
     description: "Düzce'nin lider çelik yapı firması. Çelik ev, dorse kasa yapımı ve tamiri hizmetleri.",
-    images: ["/logo.png"],
+    images: ["/logo.svg"],
   },
   alternates: {
     canonical: "https://atlcelikyapi.com",
@@ -75,7 +75,7 @@ export const metadata: Metadata = {
     apple: "/favicon.png",
   },
   verification: {
-    google: "google-site-verification-code", // Google Search Console'dan alınacak
+    google: "google-site-verification-code",
   },
     generator: 'v0.app'
 }
@@ -112,7 +112,7 @@ export default function RootLayout({
               },
               openingHours: "Mo-Sa 08:00-18:00",
               priceRange: "$$",
-              image: "https://atlcelikyapi.com/logo.png",
+              image: "https://atlcelikyapi.com/logo.svg",
               sameAs: [],
               serviceArea: {
                 "@type": "Place",

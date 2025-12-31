@@ -2,7 +2,6 @@
 
 import { useState, useEffect } from "react"
 import Link from "next/link"
-import Image from "next/image"
 import { Menu, X, Phone } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { ThemeToggle } from "@/components/theme-toggle"
@@ -36,16 +35,12 @@ export function Header() {
       <div className="container mx-auto px-4">
         <div className="flex items-center justify-between h-20">
           <Link href="/" className="flex-shrink-0">
-            <div className="relative">
-              <Image
-                src="/logo.png"
-                alt="ATL Çelik Yapı - Düzce Çelik Ev ve Dorse Kasa Yapımı"
-                width={200}
-                height={60}
-                className="h-12 md:h-16 w-auto object-contain"
-                priority
-              />
-            </div>
+            <img
+              src="/logo.svg"
+              alt="ATL Çelik Yapı - Düzce Çelik Ev ve Dorse Kasa Yapımı"
+              className="h-12 md:h-16 w-auto"
+              style={{ maxWidth: "200px" }}
+            />
           </Link>
 
           {/* Desktop Navigation */}
