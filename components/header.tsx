@@ -38,14 +38,11 @@ export function Header() {
           <Link href="/" className="flex-shrink-0">
             <div className="relative">
               <Image
-                src="/logo.svg"
-                alt="ATL Çelik Yapı"
-                width={320}
-                height={110}
-                className="h-16 md:h-20 w-auto"
-                style={{
-                  filter: "drop-shadow(0 2px 4px rgba(0,0,0,0.2))",
-                }}
+                src="/logo.png"
+                alt="ATL Çelik Yapı - Düzce Çelik Ev ve Dorse Kasa Yapımı"
+                width={200}
+                height={60}
+                className="h-12 md:h-16 w-auto object-contain"
                 priority
               />
             </div>

@@ -12,10 +12,41 @@ function getSupabaseClient() {
   return supabaseClient
 }
 
+function sanitizeFilename(filename: string): string {
+  const turkishMap: Record<string, string> = {
+    ş: "s",
+    Ş: "S",
+    ı: "i",
+    İ: "I",
+    ü: "u",
+    Ü: "U",
+    ö: "o",
+    Ö: "O",
+    ç: "c",
+    Ç: "C",
+    ğ: "g",
+    Ğ: "G",
+  }
+
+  let sanitized = filename
+  for (const [turkish, latin] of Object.entries(turkishMap)) {
+    sanitized = sanitized.replace(new RegExp(turkish, "g"), latin)
+  }
+
+  // Boşlukları ve özel karakterleri temizle
+  sanitized = sanitized
+    .replace(/\s+/g, "-")
+    .replace(/[^a-zA-Z0-9._-]/g, "")
+    .toLowerCase()
+
+  return sanitized
+}
+
 export async function uploadImage(file: File, bucket = "media"): Promise<string | null> {
   try {
     const supabase = getSupabaseClient()
-    const filename = `${Date.now()}-${file.name}`
+    const sanitizedName = sanitizeFilename(file.name)
+    const filename = `${Date.now()}-${sanitizedName}`
 
     const { data, error } = await supabase.storage.from(bucket).upload(filename, file, {
       cacheControl: "3600",
