@@ -20,40 +20,58 @@ interface MaintenanceSettings {
 
 export default function Home() {
   const [isMaintenanceMode, setIsMaintenanceMode] = useState(false)
+  const [maintenanceNote, setMaintenanceNote] = useState("")
+  const [maintenanceEndTime, setMaintenanceEndTime] = useState<string | null>(null)
   const [mounted, setMounted] = useState(false)
 
   useEffect(() => {
     setMounted(true)
-    const checkMaintenanceMode = () => {
-      const settings = localStorage.getItem("maintenanceSettings")
-      if (settings) {
-        const parsed: MaintenanceSettings = JSON.parse(settings)
-        setIsMaintenanceMode(parsed.enabled)
+
+    const checkMaintenanceMode = async () => {
+      try {
+        const response = await fetch("/api/admin/settings")
+        const data = await response.json()
+
+        if (data.maintenance) {
+          setIsMaintenanceMode(data.maintenance.enabled || false)
+          setMaintenanceNote(data.maintenance.note || "")
+          setMaintenanceEndTime(data.maintenance.endTime || null)
+        }
+      } catch (error) {
+        console.error("Error checking maintenance mode:", error)
+        // Fallback to localStorage for development
+        const settings = localStorage.getItem("maintenanceSettings")
+        if (settings) {
+          const parsed: MaintenanceSettings = JSON.parse(settings)
+          setIsMaintenanceMode(parsed.enabled)
+          setMaintenanceNote(parsed.note || "")
+          setMaintenanceEndTime(parsed.endTime || null)
+        }
       }
     }
 
     checkMaintenanceMode()
 
-    const siteSettings = localStorage.getItem("siteSettings")
-    if (siteSettings) {
-      const parsed = JSON.parse(siteSettings)
-      const theme = parsed.defaultTheme || "light"
-      const htmlElement = document.documentElement
-      if (theme === "dark") {
-        htmlElement.classList.add("dark")
-      } else {
-        htmlElement.classList.remove("dark")
-      }
-    }
+    const loadTheme = async () => {
+      try {
+        const response = await fetch("/api/admin/settings")
+        const data = await response.json()
 
-    const handleStorageChange = (e: StorageEvent) => {
-      if (e.key === "maintenanceSettings") {
-        checkMaintenanceMode()
-      }
-      if (e.key === "siteSettings") {
-        const newSettings = e.newValue ? JSON.parse(e.newValue) : null
-        if (newSettings) {
-          const theme = newSettings.defaultTheme || "light"
+        if (data.theme?.defaultTheme) {
+          const theme = data.theme.defaultTheme
+          const htmlElement = document.documentElement
+          if (theme === "dark") {
+            htmlElement.classList.add("dark")
+          } else {
+            htmlElement.classList.remove("dark")
+          }
+        }
+      } catch (error) {
+        // Fallback to localStorage
+        const siteSettings = localStorage.getItem("siteSettings")
+        if (siteSettings) {
+          const parsed = JSON.parse(siteSettings)
+          const theme = parsed.defaultTheme || "light"
           const htmlElement = document.documentElement
           if (theme === "dark") {
             htmlElement.classList.add("dark")
@@ -64,11 +82,12 @@ export default function Home() {
       }
     }
 
-    window.addEventListener("storage", handleStorageChange)
-    const interval = setInterval(checkMaintenanceMode, 1000)
+    loadTheme()
+
+    // Poll for maintenance mode changes every 30 seconds
+    const interval = setInterval(checkMaintenanceMode, 30000)
 
     return () => {
-      window.removeEventListener("storage", handleStorageChange)
       clearInterval(interval)
     }
   }, [])
@@ -76,7 +95,7 @@ export default function Home() {
   if (!mounted) return null
 
   if (isMaintenanceMode) {
-    return <MaintenanceScreen />
+    return <MaintenanceScreen note={maintenanceNote} endTime={maintenanceEndTime} />
   }
 
   return (

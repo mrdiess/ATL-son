@@ -18,27 +18,27 @@ export function MaintenanceScreen() {
   const [timeLeft, setTimeLeft] = useState<string>("")
 
   useEffect(() => {
-    // Load settings from localStorage
-    const savedSettings = localStorage.getItem("maintenanceSettings")
-    if (savedSettings) {
-      setSettings(JSON.parse(savedSettings))
-    }
-
-    // Listen for storage changes
-    const handleStorageChange = () => {
-      const updated = localStorage.getItem("maintenanceSettings")
-      if (updated) {
-        setSettings(JSON.parse(updated))
+    const fetchSettings = async () => {
+      try {
+        const response = await fetch("/api/maintenance")
+        if (response.ok) {
+          const data = await response.json()
+          setSettings({
+            enabled: data.enabled ?? true,
+            endTime: data.end_time || null,
+            note: data.note || "",
+          })
+        }
+      } catch (error) {
+        console.error("Failed to fetch maintenance settings:", error)
       }
     }
 
-    window.addEventListener("storage", handleStorageChange)
-    const interval = setInterval(handleStorageChange, 1000)
+    fetchSettings()
+    // Poll for updates every 30 seconds
+    const interval = setInterval(fetchSettings, 30000)
 
-    return () => {
-      window.removeEventListener("storage", handleStorageChange)
-      clearInterval(interval)
-    }
+    return () => clearInterval(interval)
   }, [])
 
   useEffect(() => {
