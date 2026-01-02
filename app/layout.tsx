@@ -1,83 +1,54 @@
 import type React from "react"
-import type { Metadata } from "next"
-import { Inter } from "next/font/google"
+import type { Metadata, Viewport } from "next"
+import { Geist, Geist_Mono } from "next/font/google"
 import { Analytics } from "@vercel/analytics/next"
-import { ThemeProvider } from "@/components/theme-provider"
 import "./globals.css"
+import { ThemeProvider } from "@/components/theme-provider"
 
-const inter = Inter({ subsets: ["latin", "latin-ext"] })
+const _geist = Geist({ subsets: ["latin"] })
+const _geistMono = Geist_Mono({ subsets: ["latin"] })
+
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
+  maximumScale: 5,
+  userScalable: true,
+  themeColor: [
+    { media: "(prefers-color-scheme: light)", color: "#ffffff" },
+    { media: "(prefers-color-scheme: dark)", color: "#0f172a" },
+  ],
+}
 
 export const metadata: Metadata = {
-  title: "ATL Çelik Yapı | Düzce Çelik Ev, Çelik Yapı, Dorse Kasa Yapımı ve Tamiri",
+  title: "ATL Çelik Yapı - Düzce Çelik Konstrüksiyon ve Metal İşleme | Profesyonel Hizmetler",
   description:
-    "Düzce'nin lider çelik yapı firması. Çelik ev, çelik yapı, dorse kasa yapımı, dorse tamiri, treyler kasa imalatı, çelik konstrüksiyon, çatı sistemleri, sundurma ve metal işleme hizmetleri. Profesyonel çözümler için hemen arayın.",
-  keywords: [
-    "düzce çelik",
-    "düzce çelik ev",
-    "düzce çelik yapı",
-    "çelik ev düzce",
-    "çelik yapı düzce",
-    "dorse kasa yapımı",
-    "dorse kasa tamiri",
-    "treyler kasa imalatı",
-    "dorse tamiri düzce",
-    "çelik konstrüksiyon düzce",
-    "metal işleme düzce",
-    "çatı sistemleri düzce",
-    "sundurma düzce",
-    "prefabrik çelik yapı",
-    "hafif çelik yapı",
-    "çelik ev fiyatları",
-    "dorse kasa fiyatları",
-  ],
-  authors: [{ name: "ATL Çelik Yapı" }],
-  creator: "ATL Çelik Yapı",
-  publisher: "ATL Çelik Yapı",
-  robots: {
-    index: true,
-    follow: true,
-    googleBot: {
-      index: true,
-      follow: true,
-      "max-video-preview": -1,
-      "max-image-preview": "large",
-      "max-snippet": -1,
-    },
-  },
+    "Düzce'de çelik konstrüksiyon, sandviç panel, lazer kesim ve metal işleme alanında 12+ yıllık tecrübeli hizmet. ATL Çelik Yapı ile profesyonel çelik yapı çözümleri.",
+  keywords:
+    "düzce çelik, çelik konstrüksiyon, metal işleme, sandviç panel, lazer kesim, çelik yapı, düzce çelik konstrüksiyon",
+  metadataBase: new URL("https://v0-atldommm.vercel.app"),
   openGraph: {
-    type: "website",
-    locale: "tr_TR",
-    url: "https://atlcelikyapi.com",
+    title: "ATL Çelik Yapı - Düzce Çelik Konstrüksiyon",
+    description: "Düzce'de 12+ yıllık tecrübeyle çelik konstrüksiyon, metal işleme ve sandviç panel hizmetleri",
     siteName: "ATL Çelik Yapı",
-    title: "ATL Çelik Yapı | Düzce Çelik Ev, Çelik Yapı, Dorse Kasa Yapımı",
-    description:
-      "Düzce'nin lider çelik yapı firması. Çelik ev, çelik yapı, dorse kasa yapımı ve tamiri, çelik konstrüksiyon hizmetleri.",
-    images: [
+    locale: "tr_TR",
+    type: "website",
+  },
+  alternates: {
+    canonical: "https://v0-atldommm.vercel.app",
+  },
+  generator: "v0.app",
+  icons: {
+    icon: [
       {
-        url: "/logo.svg",
-        width: 1200,
-        height: 400,
-        alt: "ATL Çelik Yapı - Düzce Çelik Ev ve Dorse Kasa Yapımı",
+        url: "/logo.png",
+        media: "(prefers-color-scheme: light)",
+      },
+      {
+        url: "/logo.png",
+        media: "(prefers-color-scheme: dark)",
       },
     ],
   },
-  twitter: {
-    card: "summary_large_image",
-    title: "ATL Çelik Yapı | Düzce Çelik Ev, Dorse Kasa Yapımı",
-    description: "Düzce'nin lider çelik yapı firması. Çelik ev, dorse kasa yapımı ve tamiri hizmetleri.",
-    images: ["/logo.svg"],
-  },
-  alternates: {
-    canonical: "https://atlcelikyapi.com",
-  },
-  icons: {
-    icon: "/favicon.png",
-    apple: "/favicon.png",
-  },
-  verification: {
-    google: "google-site-verification-code",
-  },
-    generator: 'v0.app'
 }
 
 export default function RootLayout({
@@ -87,84 +58,11 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="tr" suppressHydrationWarning>
-      <head>
-        <script
-          type="application/ld+json"
-          dangerouslySetInnerHTML={{
-            __html: JSON.stringify({
-              "@context": "https://schema.org",
-              "@type": "LocalBusiness",
-              name: "ATL Çelik Yapı",
-              description:
-                "Düzce'nin lider çelik yapı firması. Çelik ev, çelik yapı, dorse kasa yapımı ve tamiri hizmetleri.",
-              url: "https://atlcelikyapi.com",
-              telephone: "+905373393947",
-              address: {
-                "@type": "PostalAddress",
-                addressLocality: "Düzce",
-                addressRegion: "Düzce",
-                addressCountry: "TR",
-              },
-              geo: {
-                "@type": "GeoCoordinates",
-                latitude: "40.8438",
-                longitude: "31.1565",
-              },
-              openingHours: "Mo-Sa 08:00-18:00",
-              priceRange: "$$",
-              image: "https://atlcelikyapi.com/logo.svg",
-              sameAs: [],
-              serviceArea: {
-                "@type": "Place",
-                name: "Düzce, Türkiye",
-              },
-              hasOfferCatalog: {
-                "@type": "OfferCatalog",
-                name: "Hizmetlerimiz",
-                itemListElement: [
-                  {
-                    "@type": "Offer",
-                    itemOffered: {
-                      "@type": "Service",
-                      name: "Çelik Ev Yapımı",
-                      description: "Düzce'de profesyonel çelik ev yapımı hizmetleri",
-                    },
-                  },
-                  {
-                    "@type": "Offer",
-                    itemOffered: {
-                      "@type": "Service",
-                      name: "Dorse Kasa Yapımı",
-                      description: "Dorse kasa imalatı ve montajı",
-                    },
-                  },
-                  {
-                    "@type": "Offer",
-                    itemOffered: {
-                      "@type": "Service",
-                      name: "Dorse Tamiri",
-                      description: "Profesyonel dorse kasa tamiri hizmetleri",
-                    },
-                  },
-                  {
-                    "@type": "Offer",
-                    itemOffered: {
-                      "@type": "Service",
-                      name: "Çelik Konstrüksiyon",
-                      description: "Endüstriyel çelik konstrüksiyon projeleri",
-                    },
-                  },
-                ],
-              },
-            }),
-          }}
-        />
-      </head>
-      <body className={`${inter.className} antialiased`}>
-        <ThemeProvider attribute="class" defaultTheme="dark" enableSystem disableTransitionOnChange>
+      <body className={`font-sans antialiased`}>
+        <ThemeProvider>
           {children}
+          <Analytics />
         </ThemeProvider>
-        <Analytics />
       </body>
     </html>
   )

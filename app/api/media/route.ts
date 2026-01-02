@@ -1,83 +1,89 @@
-export const dynamic = "force-dynamic"
+import { createClient } from "@/lib/supabase/server"
+import { NextResponse } from "next/server"
 
-import { createServerClient } from "@supabase/ssr"
-import { cookies } from "next/headers"
-import { type NextRequest, NextResponse } from "next/server"
-
-export async function GET(request: NextRequest) {
-  const cookieStore = await cookies()
-
-  const supabase = createServerClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL || "",
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || "",
-    {
-      cookies: {
-        getAll() {
-          return cookieStore.getAll()
-        },
-      },
-    },
-  )
-
+export async function GET() {
   try {
-    const { data, error } = await supabase.from("media").select("*").order("uploaded_at", { ascending: false })
+    const supabase = await createClient()
+
+    const { data, error } = await supabase.from("media").select("*").order("created_at", { ascending: false })
 
     if (error) {
-      console.log("[v0] Supabase returned error - table may not exist yet")
-      // Return empty array if table doesn't exist or any error occurs
-      return NextResponse.json([], { status: 200 })
+      console.error("[v0] Database error:", error)
+      return NextResponse.json({ error: error.message }, { status: 500 })
     }
 
-    // Ensure data is always an array
-    return NextResponse.json(Array.isArray(data) ? data : [], { status: 200 })
+    console.log("[v0] Media fetched successfully:", data?.length)
+    return NextResponse.json({ data, success: true })
   } catch (error) {
-    const errorMessage = error instanceof Error ? error.message : String(error)
-    console.log("[v0] Media API catch block:", errorMessage)
-
-    // If we get a JSON parse error, it means we got HTML instead of JSON
-    // This typically happens when the table doesn't exist
-    return NextResponse.json([], { status: 200 })
+    console.error("[v0] Server error:", error)
+    return NextResponse.json(
+      { error: "Sunucu hatası: " + (error instanceof Error ? error.message : "Bilinmeyen hata") },
+      { status: 500 },
+    )
   }
 }
 
-export async function POST(request: NextRequest) {
-  const cookieStore = await cookies()
-
-  const supabase = createServerClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL || "",
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || "",
-    {
-      cookies: {
-        getAll() {
-          return cookieStore.getAll()
-        },
-      },
-    },
-  )
-
+export async function DELETE(request: Request) {
   try {
-    const body = await request.json()
-    const { name, url, type, category, size, alt } = body
+    const { searchParams } = new URL(request.url)
+    const id = searchParams.get("id")
 
-    const { data, error } = await supabase
+    if (!id) {
+      return NextResponse.json({ error: "ID gerekli" }, { status: 400 })
+    }
+
+    const supabase = await createClient()
+
+    const { data: mediaItem, error: fetchError } = await supabase
       .from("media")
-      .insert([
-        {
-          name,
-          url,
-          type,
-          category,
-          size,
-          alt,
-        },
-      ])
-      .select()
+      .select("url, filename")
+      .eq("id", id)
+      .single()
 
-    if (error) throw error
+    if (fetchError) {
+      console.error("[v0] Fetch error:", fetchError)
+      return NextResponse.json({ error: "Medya bulunamadı" }, { status: 404 })
+    }
 
-    return NextResponse.json(data?.[0] || { name, url })
+    // Delete from storage if exists
+    if (mediaItem?.url) {
+      try {
+        const filePath = mediaItem.url.split("/media/")[1]
+        if (filePath) {
+          console.log("[v0] Deleting file from storage:", filePath)
+          await supabase.storage.from("media").remove([filePath])
+        }
+      } catch (storageError) {
+        console.error("[v0] Storage delete error:", storageError)
+        // Continue with DB delete even if storage delete fails
+      }
+    }
+
+    // Delete from database
+    const { error: deleteError } = await supabase.from("media").delete().eq("id", id)
+
+    if (deleteError) {
+      console.error("[v0] Database delete error:", deleteError)
+      return NextResponse.json({ error: deleteError.message }, { status: 500 })
+    }
+
+    // Log activity
+    try {
+      await supabase.from("activity_logs").insert({
+        action: "media_delete",
+        details: `Dosya silindi: ${mediaItem?.filename || id}`,
+      })
+    } catch (logError) {
+      console.error("[v0] Activity log error:", logError)
+    }
+
+    console.log("[v0] Media deleted successfully:", id)
+    return NextResponse.json({ success: true })
   } catch (error) {
-    console.error("[v0] Error creating media:", error instanceof Error ? error.message : String(error))
-    return NextResponse.json({ error: "Failed to create media" }, { status: 500 })
+    console.error("[v0] Server error:", error)
+    return NextResponse.json(
+      { error: "Sunucu hatası: " + (error instanceof Error ? error.message : "Bilinmeyen hata") },
+      { status: 500 },
+    )
   }
 }
