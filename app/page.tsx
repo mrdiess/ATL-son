@@ -2,11 +2,12 @@
 
 import { useState, useEffect } from "react"
 import Image from "next/image"
+import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { ThemeToggle } from "@/components/theme-toggle"
 import { PhotoLightbox } from "@/components/photo-lightbox"
 import { VideoModal } from "@/components/video-modal"
-import { Phone, Mail, MapPin, ChevronLeft, ChevronRight, Building2, Building, Sun, Shield } from "lucide-react"
+import { Phone, Mail, MapPin, ChevronLeft, ChevronRight, Building2, Building, Sun, Shield, Menu, X } from "lucide-react"
 
 interface MediaItem {
   id: string
@@ -36,7 +37,7 @@ interface Sponsor {
   sort_order: number
 }
 
-const GOOGLE_MAPS_EMBED = `https://www.google.com/maps/embed?pb=!1m28!1m12!1m3!1d533.4930649469135!2d31.12330817304114!3d40.85228368134695!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!4m13!3e6!4m5!1s0x409da01b6536d421%3A0xe1d0a622568cf8d7!2zRMO8emNl!3m2!1d40.838719999999995!2d31.162609!4m5!1s0x409d9f3269fc678f%3A0xcd0d2bf0971b8ae4!2zQWrEsW5sYXIsIDI1ODQtNC4gU2sgS8O8w6fDvGsgU2FuYXlpIFNpdGVzaSBWMSBCbG9rIE5vOjIzLTQ4LCA4MTAwMCBEw7x6Y2U!3m2!1d40.852255799999995!2d31.1240669!5e0!3m2!1str!2str!4v1767436074969!5m2!1str!2str`
+const GOOGLE_MAPS_EMBED = `https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d1500!2d31.1240669!3d40.852255799999995!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x409d9f3269fc678f%3A0xcd0d2bf0971b8ae4!2zQVRMIMOHZWxpayB2ZSBNZXRhbCDEsHNsZW1l!5e0!3m2!1str!2str!4v1767436074969!5m2!1str!2str`
 
 export default function HomePage() {
   const [currentSlide, setCurrentSlide] = useState(0)
@@ -54,6 +55,8 @@ export default function HomePage() {
   const [videos, setVideos] = useState<VideoItem[]>([])
   const [mediaLoading, setMediaLoading] = useState(true)
   const [videosLoading, setVideosLoading] = useState(true)
+
+  const [visibleImageCount, setVisibleImageCount] = useState(8)
 
   useEffect(() => {
     const fetchMedia = async () => {
@@ -81,7 +84,7 @@ export default function HomePage() {
           )
         }
       } catch (error) {
-        console.error("[v0] Media fetch error:", error)
+        console.error("Media fetch error:", error)
         setGalleryImages([
           "/steel-construction-industrial-factory-building.jpg",
           "/steel-construction-building-project-warehouse-.jpg",
@@ -106,8 +109,7 @@ export default function HomePage() {
           setVideos(result.data)
         }
       } catch (error) {
-        console.error("[v0] Videos fetch error:", error)
-        // Fallback to empty videos array, UI will show default videos
+        console.error("Videos fetch error:", error)
         setVideos([])
       } finally {
         setVideosLoading(false)
@@ -119,11 +121,10 @@ export default function HomePage() {
         const response = await fetch("/api/sponsors")
         if (response.ok) {
           const result = await response.json()
-          console.log("[v0] Sponsors fetched:", result.data?.length || 0)
           setSponsors(result.data || [])
         }
       } catch (error) {
-        console.error("[v0] Sponsors fetch error:", error)
+        console.error("Sponsors fetch error:", error)
         setSponsors([])
       }
     }
@@ -142,7 +143,7 @@ export default function HomePage() {
     {
       img: "/laser-cutting-metal-industrial-sparks.jpg",
       title: "Lazer\nKesim",
-      sub: "Yüksek sekasiyetli metal işleme",
+      sub: "Yüksek hassasiyetli metal işleme",
     },
     {
       img: "/sandwich-panel-building-construction-modern.jpg",
@@ -178,30 +179,103 @@ export default function HomePage() {
     setMobileMenuOpen(false)
   }
 
+  const displayedImages = galleryImages.slice(0, visibleImageCount)
+  const hasMoreImages = galleryImages.length > visibleImageCount
+
   return (
     <div className="min-h-screen bg-background text-foreground">
-      {/* Navigation */}
-      <header className="fixed top-0 left-0 right-0 z-50 bg-background/80 backdrop-blur-md border-b">
+      <header
+        className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${isScrolled ? "bg-background/95 backdrop-blur-md border-b shadow-sm" : "bg-transparent"}`}
+      >
         <div className="max-w-7xl mx-auto px-4 md:px-6">
           <div className="flex items-center justify-between h-16 md:h-20">
             {/* Logo */}
             <div className="flex-shrink-0">
-              <img src="/images/image.png" alt="ATL Çelik Yapı" className="h-10 md:h-14 dark:hidden" />
-              <img src="/darkmodelogo.png" alt="ATL Çelik Yapı" className="h-10 md:h-14 hidden dark:block" />
+              <Link href="/">
+                <img src="/images/image.png" alt="ATL Çelik Yapı" className="h-10 md:h-14 dark:hidden" />
+                <img src="/darkmodelogo.png" alt="ATL Çelik Yapı" className="h-10 md:h-14 hidden dark:block" />
+              </Link>
             </div>
 
-            {/* Right side - Phone button and theme toggle */}
+            {/* Desktop Navigation - Center */}
+            <nav className="hidden md:flex items-center gap-8">
+              <a href="#anasayfa" className="text-foreground hover:text-blue-500 transition-colors font-medium">
+                Ana Sayfa
+              </a>
+              <a href="#hizmetler" className="text-foreground hover:text-blue-500 transition-colors font-medium">
+                Hizmetler
+              </a>
+              <a href="#projeler" className="text-foreground hover:text-blue-500 transition-colors font-medium">
+                Projeler
+              </a>
+              <a href="#hakkimizda" className="text-foreground hover:text-blue-500 transition-colors font-medium">
+                Hakkımızda
+              </a>
+              <a href="#iletisim" className="text-foreground hover:text-blue-500 transition-colors font-medium">
+                İletişim
+              </a>
+            </nav>
+
+            {/* Right side - Theme toggle and Phone button */}
             <div className="flex items-center gap-2 md:gap-4">
+              <ThemeToggle />
               <a
                 href="tel:+905373393947"
                 className="flex items-center gap-2 px-3 md:px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white rounded-lg transition-colors text-sm md:text-base font-semibold"
               >
                 <Phone className="w-4 h-4" />
-                <span className="hidden md:inline">Hemen Ara</span>
+                <span className="hidden sm:inline">Hemen Ara</span>
               </a>
-              <ThemeToggle />
+
+              {/* Mobile Menu Button */}
+              <button onClick={() => setMobileMenuOpen(!mobileMenuOpen)} className="md:hidden p-2 text-foreground">
+                {mobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
+              </button>
             </div>
           </div>
+
+          {/* Mobile Navigation */}
+          {mobileMenuOpen && (
+            <nav className="md:hidden py-4 border-t bg-background/95 backdrop-blur-md">
+              <div className="flex flex-col gap-4">
+                <a
+                  href="#anasayfa"
+                  onClick={handleNavClick}
+                  className="text-foreground hover:text-blue-500 transition-colors font-medium py-2"
+                >
+                  Ana Sayfa
+                </a>
+                <a
+                  href="#hizmetler"
+                  onClick={handleNavClick}
+                  className="text-foreground hover:text-blue-500 transition-colors font-medium py-2"
+                >
+                  Hizmetler
+                </a>
+                <a
+                  href="#projeler"
+                  onClick={handleNavClick}
+                  className="text-foreground hover:text-blue-500 transition-colors font-medium py-2"
+                >
+                  Projeler
+                </a>
+                <a
+                  href="#hakkimizda"
+                  onClick={handleNavClick}
+                  className="text-foreground hover:text-blue-500 transition-colors font-medium py-2"
+                >
+                  Hakkımızda
+                </a>
+                <a
+                  href="#iletisim"
+                  onClick={handleNavClick}
+                  className="text-foreground hover:text-blue-500 transition-colors font-medium py-2"
+                >
+                  İletişim
+                </a>
+              </div>
+            </nav>
+          )}
         </div>
       </header>
 
@@ -229,14 +303,14 @@ export default function HomePage() {
           <p className="text-blue-400 text-xs mb-2 md:mb-4 tracking-wider font-bold md:text-lg">
             {slides[currentSlide].sub}
           </p>
-          <h1 className="text-3xl sm:text-5xl md:text-7xl font-bold mb-4 md:mb-8 leading-tight whitespace-pre-line text-primary-foreground">
+          <h1 className="text-3xl sm:text-5xl md:text-7xl font-bold mb-4 md:mb-8 leading-tight whitespace-pre-line text-white">
             {slides[currentSlide].title}
           </h1>
           <div className="flex gap-2 md:gap-4 flex-wrap">
             <Button className="bg-blue-500 hover:bg-blue-600 text-white px-4 md:px-8 py-3 md:py-6 text-sm md:text-lg">
               Keşfet <ChevronRight className="ml-2 w-4 md:w-5 h-4 md:h-5" />
             </Button>
-            <Button className="bg-transparent border border-blue-500 px-4 md:px-8 py-3 md:py-6 text-sm md:text-lg">
+            <Button className="bg-transparent border border-white text-white hover:bg-white/10 px-4 md:px-8 py-3 md:py-6 text-sm md:text-lg">
               İletişime Geç
             </Button>
           </div>
@@ -244,13 +318,13 @@ export default function HomePage() {
 
         <button
           onClick={prevSlide}
-          className="absolute left-2 md:left-4 top-1/2 -translate-y-1/2 z-20 p-2 md:p-3 bg-slate-900/50 hover:bg-slate-900 rounded-full transition"
+          className="absolute left-2 md:left-4 top-1/2 -translate-y-1/2 z-20 p-2 md:p-3 bg-black/50 hover:bg-black/70 rounded-full transition"
         >
-          <ChevronLeft size={20} className="md:w-6 md:h-6 text-card" />
+          <ChevronLeft size={20} className="md:w-6 md:h-6 text-white" />
         </button>
         <button
           onClick={nextSlide}
-          className="absolute right-2 md:right-4 top-1/2 -translate-y-1/2 z-20 p-2 md:p-3 bg-slate-900/50 hover:bg-slate-900 rounded-full transition"
+          className="absolute right-2 md:right-4 top-1/2 -translate-y-1/2 z-20 p-2 md:p-3 bg-black/50 hover:bg-black/70 rounded-full transition"
         >
           <ChevronRight size={20} className="md:w-6 md:h-6 text-white" />
         </button>
@@ -333,7 +407,6 @@ export default function HomePage() {
             ].map((service, idx) => (
               <div
                 key={idx}
-                // Center all content: icons, titles, descriptions
                 className="p-6 rounded-lg border border-border bg-card hover:shadow-lg transition-all duration-300 flex flex-col items-center text-center"
               >
                 <service.icon className="w-12 h-12 mb-4 text-blue-500 dark:text-blue-400" />
@@ -345,7 +418,7 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* Photo Gallery */}
+      {/* Photo Gallery - Sayfalama eklendi, sabit yükseklik */}
       <section id="projeler" className="py-12 md:py-16 px-4 md:px-6 bg-secondary/5">
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-8 md:mb-10">
@@ -374,11 +447,11 @@ export default function HomePage() {
             </div>
           </div>
 
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2 md:gap-3">
-            {galleryImages.map((img, i) => (
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-2 md:gap-3">
+            {displayedImages.map((img, i) => (
               <div
                 key={i}
-                className="relative h-24 md:h-48 group overflow-hidden rounded-lg cursor-pointer"
+                className="relative aspect-square group overflow-hidden rounded-lg cursor-pointer"
                 onClick={() => openLightbox(i)}
               >
                 <Image
@@ -391,6 +464,17 @@ export default function HomePage() {
               </div>
             ))}
           </div>
+
+          {hasMoreImages && (
+            <div className="text-center mt-6">
+              <Button
+                onClick={() => setVisibleImageCount((prev) => prev + 8)}
+                className="bg-blue-500 hover:bg-blue-600 text-white"
+              >
+                Daha Fazla Görsel ({galleryImages.length - visibleImageCount} kaldı)
+              </Button>
+            </div>
+          )}
         </div>
       </section>
 
@@ -424,10 +508,6 @@ export default function HomePage() {
                     </div>
                   </div>
                 ))}
-              </div>
-
-              <div className="flex flex-col sm:flex-row gap-4 md:gap-6 items-center justify-between">
-                <div className="text-white"></div>
               </div>
             </div>
 
@@ -552,12 +632,12 @@ export default function HomePage() {
               <ul className="space-y-1 md:space-y-2 text-white/80 text-xs md:text-sm">
                 <li>
                   <a href="tel:+905373393947" className="hover:text-white transition">
-                    📞 0537 339 39 47
+                    0537 339 39 47
                   </a>
                 </li>
                 <li>
                   <a href="mailto:info@atlcelikyapi.com" className="hover:text-white transition">
-                    📧 info@atlcelikyapi.com
+                    info@atlcelikyapi.com
                   </a>
                 </li>
               </ul>

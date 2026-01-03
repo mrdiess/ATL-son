@@ -8,14 +8,13 @@ export async function GET() {
     const { data, error } = await supabase.from("videos").select("*").order("sort_order", { ascending: true })
 
     if (error) {
-      console.error("[v0] Database error:", error)
+      console.error("Database error:", error)
       return NextResponse.json({ error: error.message }, { status: 500 })
     }
 
-    console.log("[v0] Videos fetched successfully:", data?.length)
     return NextResponse.json({ data, success: true })
   } catch (error) {
-    console.error("[v0] Server error:", error)
+    console.error("Server error:", error)
     return NextResponse.json(
       { error: "Sunucu hatası: " + (error instanceof Error ? error.message : "Bilinmeyen hata") },
       { status: 500 },
@@ -26,11 +25,20 @@ export async function GET() {
 export async function POST(request: NextRequest) {
   try {
     const supabase = createAdminClient()
-    const body = await request.json()
+
+    let body
+    try {
+      const text = await request.text()
+      if (!text || text.trim() === "") {
+        return NextResponse.json({ error: "Request body boş olamaz" }, { status: 400 })
+      }
+      body = JSON.parse(text)
+    } catch (parseError) {
+      console.error("JSON parse error:", parseError)
+      return NextResponse.json({ error: "Geçersiz JSON formatı" }, { status: 400 })
+    }
 
     const { title, youtube_url, category, sort_order, is_active } = body
-
-    console.log("[v0] Video POST received:", { title, youtube_url, category, is_active })
 
     if (!title || !youtube_url) {
       return NextResponse.json({ error: "Başlık ve YouTube URL gereklidir" }, { status: 400 })
@@ -51,14 +59,13 @@ export async function POST(request: NextRequest) {
       .select()
 
     if (error) {
-      console.error("[v0] Video insert error:", error)
+      console.error("Video insert error:", error)
       return NextResponse.json({ error: error.message }, { status: 500 })
     }
 
-    console.log("[v0] Video created successfully:", data)
     return NextResponse.json({ data, success: true }, { status: 201 })
   } catch (error) {
-    console.error("[v0] Video POST error:", error)
+    console.error("Video POST error:", error)
     return NextResponse.json(
       { error: "Sunucu hatası: " + (error instanceof Error ? error.message : "Bilinmeyen hata") },
       { status: 500 },
@@ -69,12 +76,23 @@ export async function POST(request: NextRequest) {
 export async function PUT(request: NextRequest) {
   try {
     const supabase = createAdminClient()
-    const body = await request.json()
     const url = new URL(request.url)
     const id = url.searchParams.get("id")
 
     if (!id) {
       return NextResponse.json({ error: "ID gereklidir" }, { status: 400 })
+    }
+
+    let body
+    try {
+      const text = await request.text()
+      if (!text || text.trim() === "") {
+        return NextResponse.json({ error: "Request body boş olamaz" }, { status: 400 })
+      }
+      body = JSON.parse(text)
+    } catch (parseError) {
+      console.error("JSON parse error:", parseError)
+      return NextResponse.json({ error: "Geçersiz JSON formatı" }, { status: 400 })
     }
 
     const { title, youtube_url, category, sort_order, is_active } = body
@@ -93,14 +111,13 @@ export async function PUT(request: NextRequest) {
       .select()
 
     if (error) {
-      console.error("[v0] Update error:", error)
+      console.error("Update error:", error)
       return NextResponse.json({ error: error.message }, { status: 500 })
     }
 
-    console.log("[v0] Video updated:", data)
     return NextResponse.json({ data, success: true })
   } catch (error) {
-    console.error("[v0] Server error:", error)
+    console.error("Server error:", error)
     return NextResponse.json(
       { error: "Sunucu hatası: " + (error instanceof Error ? error.message : "Bilinmeyen hata") },
       { status: 500 },
@@ -121,14 +138,13 @@ export async function DELETE(request: NextRequest) {
     const { error } = await supabase.from("videos").delete().eq("id", id)
 
     if (error) {
-      console.error("[v0] Delete error:", error)
+      console.error("Delete error:", error)
       return NextResponse.json({ error: error.message }, { status: 500 })
     }
 
-    console.log("[v0] Video deleted:", id)
     return NextResponse.json({ success: true })
   } catch (error) {
-    console.error("[v0] Server error:", error)
+    console.error("Server error:", error)
     return NextResponse.json(
       { error: "Sunucu hatası: " + (error instanceof Error ? error.message : "Bilinmeyen hata") },
       { status: 500 },
