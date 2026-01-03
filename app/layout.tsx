@@ -1,7 +1,6 @@
 import type React from "react"
 import type { Metadata, Viewport } from "next"
 import { Geist, Geist_Mono } from "next/font/google"
-import { Analytics } from "@vercel/analytics/next"
 import "./globals.css"
 import { ThemeProvider } from "@/components/theme-provider"
 
@@ -25,7 +24,7 @@ export const metadata: Metadata = {
     "Düzce'de çelik konstrüksiyon, sandviç panel, lazer kesim ve metal işleme alanında 12+ yıllık tecrübeli hizmet. ATL Çelik Yapı ile profesyonel çelik yapı çözümleri.",
   keywords:
     "düzce çelik, çelik konstrüksiyon, metal işleme, sandviç panel, lazer kesim, çelik yapı, düzce çelik konstrüksiyon",
-  metadataBase: new URL("https://v0-atldommm.vercel.app"),
+  metadataBase: new URL("https://atlcelikyapi.com"),
   openGraph: {
     title: "ATL Çelik Yapı - Düzce Çelik Konstrüksiyon",
     description: "Düzce'de 12+ yıllık tecrübeyle çelik konstrüksiyon, metal işleme ve sandviç panel hizmetleri",
@@ -34,9 +33,8 @@ export const metadata: Metadata = {
     type: "website",
   },
   alternates: {
-    canonical: "https://v0-atldommm.vercel.app",
+    canonical: "https://atlcelikyapi.com",
   },
-  generator: "v0.app",
   icons: {
     icon: [
       {
@@ -49,6 +47,7 @@ export const metadata: Metadata = {
       },
     ],
   },
+    generator: 'v0.app'
 }
 
 export default function RootLayout({
@@ -59,10 +58,7 @@ export default function RootLayout({
   return (
     <html lang="tr" suppressHydrationWarning>
       <body className={`font-sans antialiased`}>
-        <ThemeProvider>
-          {children}
-          <Analytics />
-        </ThemeProvider>
+        <ThemeProvider>{children}</ThemeProvider>
       </body>
     </html>
   )

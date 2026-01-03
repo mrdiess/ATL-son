@@ -6,21 +6,7 @@ import { Button } from "@/components/ui/button"
 import { ThemeToggle } from "@/components/theme-toggle"
 import { PhotoLightbox } from "@/components/photo-lightbox"
 import { VideoModal } from "@/components/video-modal"
-import {
-  Phone,
-  Mail,
-  MapPin,
-  ChevronLeft,
-  ChevronRight,
-  Settings,
-  Award,
-  Package,
-  Users,
-  Building2,
-  Building,
-  Sun,
-  Shield,
-} from "lucide-react"
+import { Phone, Mail, MapPin, ChevronLeft, ChevronRight, Building2, Building, Sun, Shield } from "lucide-react"
 
 interface MediaItem {
   id: string
@@ -49,6 +35,8 @@ interface Sponsor {
   website_url?: string
   sort_order: number
 }
+
+const GOOGLE_MAPS_EMBED = `https://www.google.com/maps/embed?pb=!1m28!1m12!1m3!1d533.4930649469135!2d31.12330817304114!3d40.85228368134695!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!4m13!3e6!4m5!1s0x409da01b6536d421%3A0xe1d0a622568cf8d7!2zRMO8emNl!3m2!1d40.838719999999995!2d31.162609!4m5!1s0x409d9f3269fc678f%3A0xcd0d2bf0971b8ae4!2zQWrEsW5sYXIsIDI1ODQtNC4gU2sgS8O8w6fDvGsgU2FuYXlpIFNpdGVzaSBWMSBCbG9rIE5vOjIzLTQ4LCA4MTAwMCBEw7x6Y2U!3m2!1d40.852255799999995!2d31.1240669!5e0!3m2!1str!2str!4v1767436074969!5m2!1str!2str`
 
 export default function HomePage() {
   const [currentSlide, setCurrentSlide] = useState(0)
@@ -357,67 +345,19 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* Why ATL Section */}
-      <section id="neden-atl" className="py-16 md:py-24 bg-secondary/30">
-        <div className="max-w-7xl mx-auto">
-          <h2 className="text-3xl md:text-4xl font-bold mb-4 text-center text-blue-500 text-balance">
-            Neden ATL Çelik Yapı?
-          </h2>
-          <p className="text-gray-600 dark:text-gray-400 mb-12 text-center max-w-3xl mx-auto">
-            Biz, kaliteyi en ön planda tutarak, işinizi başarıya taşıyoruz.
-          </p>
-
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3 md:gap-6">
-            {[
-              {
-                icon: Settings,
-                title: "Gelişmiş Makina Parkuru",
-                desc: "Üretimlerimizi ileri teknoloji makine parkurumuzda yapıyoruz.",
-              },
-              {
-                icon: Award,
-                title: "Yüksek Kalite",
-                desc: "Tüm üretimlerimizi başlangıçtan bitimine kadar hassasiyetle kontrol ediyoruz.",
-              },
-              {
-                icon: Package,
-                title: "Kaliteli Malzemeler",
-                desc: "Birinci kalite malzemeler kullanıp hızlı ve yaratıcı çözümler sunuyoruz.",
-              },
-              {
-                icon: Users,
-                title: "Tecrübeli Ekip",
-                desc: "Mühendislerimiz ve teknik ekibimiz alanında uzmanlar arasında yer almaktadır.",
-              },
-            ].map((item, i) => (
-              <div
-                key={i}
-                className="bg-card border border-border rounded-xl p-6 md:p-8 text-center hover:border-blue-500/50 transition group"
-              >
-                <div className="w-14 md:w-16 h-14 md:h-16 bg-blue-500/10 rounded-xl flex items-center justify-center mx-auto mb-4 md:mb-6 group-hover:bg-blue-500/20 transition">
-                  <item.icon className="w-7 md:w-8 h-7 md:h-8 text-blue-400" />
-                </div>
-                <h3 className="text-lg md:text-xl font-bold mb-2 md:mb-3">{item.title}</h3>
-                <p className="text-muted-foreground text-xs md:text-sm">{item.desc}</p>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
       {/* Photo Gallery */}
-      <section id="projeler" className="py-12 md:py-20 px-4 md:px-6">
+      <section id="projeler" className="py-12 md:py-16 px-4 md:px-6 bg-secondary/5">
         <div className="max-w-7xl mx-auto">
-          <div className="text-center mb-8 md:mb-12">
+          <div className="text-center mb-8 md:mb-10">
             <p className="text-blue-400 mb-2 md:mb-4 tracking-widest uppercase font-bold text-xl">
               Projelerimizden Kareler
             </p>
             <h2 className="text-2xl sm:text-3xl md:text-5xl font-bold mb-2 md:mb-4">Foto Galeri</h2>
-            <p className="text-muted-foreground mb-4 md:mb-8 max-w-2xl mx-auto text-xs md:text-base">
+            <p className="text-muted-foreground mb-4 md:mb-6 max-w-2xl mx-auto text-xs md:text-base">
               Tamamladığımız projelerin fotoğraflarını inceleyerek işçiliğimiz hakkında fikir edinin.
             </p>
 
-            <div className="flex flex-wrap items-center justify-center gap-2 md:gap-3 mb-6 md:mb-8">
+            <div className="flex flex-wrap items-center justify-center gap-2 md:gap-3 mb-6">
               {["Tümü", "Depo", "Fabrika", "Hangar", "Ticari", "Tarımsal", "Spor"].map((tab) => (
                 <button
                   key={tab}
@@ -434,11 +374,11 @@ export default function HomePage() {
             </div>
           </div>
 
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2 md:gap-4">
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2 md:gap-3">
             {galleryImages.map((img, i) => (
               <div
                 key={i}
-                className="relative h-32 md:h-64 group overflow-hidden rounded-xl cursor-pointer"
+                className="relative h-24 md:h-48 group overflow-hidden rounded-lg cursor-pointer"
                 onClick={() => openLightbox(i)}
               >
                 <Image
@@ -487,10 +427,7 @@ export default function HomePage() {
               </div>
 
               <div className="flex flex-col sm:flex-row gap-4 md:gap-6 items-center justify-between">
-                <div className="text-white">
-                  
-                  
-                </div>
+                <div className="text-white"></div>
               </div>
             </div>
 
@@ -552,10 +489,11 @@ export default function HomePage() {
                 width="100%"
                 height="100%"
                 frameBorder="0"
-                src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3068.5524394047!2d31.18!3d40.84!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2zNDDCsDUwJzI0LjAiTiAzMcKwMTAnNDguMCJF!5e0!3m2!1sen!2str!4v1234567890"
+                src={GOOGLE_MAPS_EMBED}
                 allowFullScreen
                 loading="lazy"
                 referrerPolicy="no-referrer-when-downgrade"
+                title="ATL Çelik Yapı Konum Haritası"
               ></iframe>
             </div>
           </div>
@@ -626,6 +564,7 @@ export default function HomePage() {
             </div>
           </div>
 
+          {/* Footer Bottom Section */}
           <div className="pt-6 md:pt-8 border-t border-white/20 flex flex-col md:flex-row items-center justify-between gap-3 md:gap-4 text-xs md:text-sm text-white/80 text-center md:text-left">
             <p>© 2025 ATL Çelik Yapı. Tüm hakları saklıdır.</p>
             <div className="flex items-center gap-3 md:gap-6 flex-wrap justify-center">
@@ -635,13 +574,6 @@ export default function HomePage() {
               <a href="#" className="hover:text-white transition">
                 Kullanım Şartları
               </a>
-              <span className="hidden md:inline">|</span>
-              <span>
-                Designed by{" "}
-                <a href="#" className="text-blue-300 hover:text-blue-200">
-                  @rootbarann
-                </a>
-              </span>
             </div>
           </div>
         </div>
