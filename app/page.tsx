@@ -192,7 +192,7 @@ export default function HomePage() {
             {/* Logo */}
             <div className="flex-shrink-0">
               <Link href="/">
-                <img src="/images/image.png" alt="ATL Çelik Yapı" className="h-10 md:h-14 dark:hidden" />
+                <img src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/logo-VNzrrWVfDUzzdoNdbbskgTM5OymsVE.png" alt="ATL Çelik Yapı" className="h-10 md:h-14 dark:hidden" />
                 <img src="/darkmodelogo.png" alt="ATL Çelik Yapı" className="h-10 md:h-14 hidden dark:block" />
               </Link>
             </div>
