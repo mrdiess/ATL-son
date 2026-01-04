@@ -19,7 +19,6 @@ import {
   X,
   ArrowRight,
   Wrench,
-  Clock,
 } from "lucide-react"
 
 interface MediaItem {
@@ -73,6 +72,58 @@ export default function HomePage() {
   const [visibleImageCount, setVisibleImageCount] = useState(8)
   const [projects, setProjects] = useState<Project[]>([])
   const [projectsLoading, setProjectsLoading] = useState(true)
+  const [phaseModalOpen, setPhaseModalOpen] = useState(false)
+  const [phaseModalIndex, setPhaseModalIndex] = useState(0)
+  const [currentPhaseImages, setCurrentPhaseImages] = useState<string[]>([])
+
+  const constructionPhases = [
+    {
+      id: 1,
+      title: "Temel & Saha Hazırlığı",
+      description: "Zemin etüdü, temel kazısı ve ankraj montajı ile projenin sağlam temelleri atılır.",
+      images: [
+        "/placeholder.svg?height=400&width=600",
+        "/placeholder.svg?height=400&width=600",
+        "/placeholder.svg?height=400&width=600",
+      ],
+    },
+    {
+      id: 2,
+      title: "Çelik Kolon & Kiriş Montajı",
+      description: "Prefabrik çelik kolonlar ve ana taşıyıcı kirişler vinç yardımıyla monte edilir.",
+      images: [
+        "/placeholder.svg?height=400&width=600",
+        "/placeholder.svg?height=400&width=600",
+        "/placeholder.svg?height=400&width=600",
+      ],
+    },
+    {
+      id: 3,
+      title: "Çatı & Duvar Panelleri",
+      description: "Sandviç panel çatı ve duvar kaplamaları ile yapı dış etkilerden korunur.",
+      images: [
+        "/placeholder.svg?height=400&width=600",
+        "/placeholder.svg?height=400&width=600",
+        "/placeholder.svg?height=400&width=600",
+      ],
+    },
+    {
+      id: 4,
+      title: "Tamamlama & Teslim",
+      description: "Son kontroller, boya işleri ve kalite testleri ile proje müşteriye teslim edilir.",
+      images: [
+        "/placeholder.svg?height=400&width=600",
+        "/placeholder.svg?height=400&width=600",
+        "/placeholder.svg?height=400&width=600",
+      ],
+    },
+  ]
+
+  const openPhaseModal = (images: string[], index: number) => {
+    setCurrentPhaseImages(images)
+    setPhaseModalIndex(index)
+    setPhaseModalOpen(true)
+  }
 
   useEffect(() => {
     const fetchMedia = async () => {
@@ -384,74 +435,108 @@ export default function HomePage() {
 
       {/* Projects - Construction Process Showcase */}
       <section id="projeler" className="py-16 md:py-24 px-4 md:px-6 bg-secondary/5">
-        <div className="max-w-6xl mx-auto">
-          <div className="text-center mb-12">
-            <span className="text-blue-500 font-semibold text-sm uppercase tracking-wider">Projelerimiz</span>
-            <h2 className="text-3xl md:text-4xl font-bold mt-2 mb-4">Tamamlanmış Projeler</h2>
+        <div className="max-w-5xl mx-auto">
+          {/* Section Header */}
+          <div className="text-center mb-16">
+            <span className="text-blue-500 font-semibold text-sm uppercase tracking-wider">Yapım Süreci</span>
+            <h2 className="text-3xl md:text-4xl font-bold mt-2 mb-4">Projelerimiz Nasıl Hayata Geçiyor?</h2>
             <p className="text-muted-foreground max-w-2xl mx-auto">
-              Her proje, temelden teslimata kadar profesyonel yapım aşamalarıyla gerçekleştirilir.
+              Her projemiz 4 ana aşamadan geçerek profesyonel standartlarda tamamlanır.
             </p>
           </div>
 
-          {projectsLoading ? (
-            <div className="text-center text-muted-foreground">Projeler yükleniyor...</div>
-          ) : featuredProjects.length > 0 ? (
-            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-              {featuredProjects.map((project) => (
-                <Link key={project.id} href={`/projeler/${project.id}`} className="group">
-                  <div className="bg-card border rounded-xl overflow-hidden hover:shadow-2xl transition-all duration-300">
-                    <div className="relative h-56 overflow-hidden">
-                      <Image
-                        src={
-                          project.featured_image_url ||
-                          "/placeholder.svg?height=400&width=600&query=steel construction project"
-                        }
-                        alt={project.title}
-                        fill
-                        className="object-cover group-hover:scale-105 transition-transform duration-500"
-                      />
-                      <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
-                      <div className="absolute bottom-4 left-4 right-4">
-                        <span className="inline-block bg-blue-500 text-white text-xs px-3 py-1 rounded-full font-medium mb-2">
-                          {project.category}
-                        </span>
-                        <h3 className="text-xl font-bold text-white">{project.title}</h3>
-                      </div>
-                    </div>
-                    <div className="p-5">
-                      <div className="flex items-center gap-3 text-sm text-muted-foreground mb-3">
-                        <div className="flex items-center gap-1">
-                          <MapPin className="w-4 h-4" />
-                          <span>{project.location}</span>
-                        </div>
-                        {project.project_duration && (
-                          <div className="flex items-center gap-1">
-                            <Clock className="w-4 h-4" />
-                            <span>{project.project_duration}</span>
-                          </div>
-                        )}
-                      </div>
-                      <p className="text-sm text-muted-foreground line-clamp-2 mb-4">{project.description}</p>
-                      <div className="flex items-center justify-between">
-                        <span className="text-blue-500 font-semibold text-sm group-hover:underline flex items-center gap-1">
-                          Yapım Aşamalarını Gör <ArrowRight className="w-4 h-4" />
-                        </span>
-                      </div>
+          {/* Construction Phases Timeline */}
+          <div className="relative">
+            {/* Vertical Timeline Line */}
+            <div className="absolute left-8 md:left-12 top-0 bottom-0 w-0.5 bg-blue-500/20" />
+
+            {/* Phases */}
+            <div className="space-y-12">
+              {constructionPhases.map((phase, phaseIndex) => (
+                <div key={phase.id} className="relative pl-20 md:pl-28">
+                  {/* Phase Number Circle */}
+                  <div className="absolute left-4 md:left-8 top-0 w-8 h-8 md:w-10 md:h-10 bg-blue-500 rounded-full flex items-center justify-center text-white font-bold text-sm md:text-base z-10">
+                    {phase.id}
+                  </div>
+
+                  {/* Phase Content */}
+                  <div className="bg-card border rounded-xl p-6 shadow-sm">
+                    {/* Phase Title & Description */}
+                    <h3 className="text-xl md:text-2xl font-bold mb-2">{phase.title}</h3>
+                    <p className="text-muted-foreground mb-6">{phase.description}</p>
+
+                    {/* Phase Images Grid */}
+                    <div className="grid grid-cols-3 gap-3">
+                      {phase.images.map((img, imgIndex) => (
+                        <button
+                          key={imgIndex}
+                          onClick={() => openPhaseModal(phase.images, imgIndex)}
+                          className="relative aspect-[4/3] rounded-lg overflow-hidden group cursor-pointer"
+                        >
+                          <Image
+                            src={img || "/placeholder.svg"}
+                            alt={`${phase.title} - Görsel ${imgIndex + 1}`}
+                            fill
+                            className="object-cover group-hover:scale-105 transition-transform duration-300"
+                          />
+                          <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors" />
+                        </button>
+                      ))}
                     </div>
                   </div>
-                </Link>
+                </div>
               ))}
             </div>
-          ) : (
-            <div className="text-center py-12">
-              <div className="w-16 h-16 bg-secondary rounded-full flex items-center justify-center mx-auto mb-4">
-                <Building className="w-8 h-8 text-muted-foreground" />
-              </div>
-              <p className="text-muted-foreground">Projeler yakında eklenecek</p>
-            </div>
-          )}
+          </div>
+
+          {/* CTA */}
+          <div className="text-center mt-12">
+            <p className="text-muted-foreground mb-4">Sizin projeniz için de aynı kaliteyi sunmak istiyoruz.</p>
+            <Button asChild className="bg-blue-500 hover:bg-blue-600">
+              <a href="#iletisim">Ücretsiz Keşif Talep Et</a>
+            </Button>
+          </div>
         </div>
       </section>
+
+      {/* Phase Images Lightbox Modal */}
+      {phaseModalOpen && (
+        <div className="fixed inset-0 z-50 bg-black/90 flex items-center justify-center p-4">
+          <button
+            onClick={() => setPhaseModalOpen(false)}
+            className="absolute top-4 right-4 text-white hover:text-gray-300 z-50"
+          >
+            <X className="w-8 h-8" />
+          </button>
+
+          <button
+            onClick={() => setPhaseModalIndex((prev) => (prev > 0 ? prev - 1 : currentPhaseImages.length - 1))}
+            className="absolute left-4 text-white hover:text-gray-300"
+          >
+            <ChevronLeft className="w-10 h-10" />
+          </button>
+
+          <div className="relative w-full max-w-4xl aspect-video">
+            <Image
+              src={currentPhaseImages[phaseModalIndex] || "/placeholder.svg"}
+              alt="Yapım aşaması görseli"
+              fill
+              className="object-contain"
+            />
+          </div>
+
+          <button
+            onClick={() => setPhaseModalIndex((prev) => (prev < currentPhaseImages.length - 1 ? prev + 1 : 0))}
+            className="absolute right-4 text-white hover:text-gray-300"
+          >
+            <ChevronRight className="w-10 h-10" />
+          </button>
+
+          <div className="absolute bottom-4 left-1/2 -translate-x-1/2 text-white text-sm">
+            {phaseModalIndex + 1} / {currentPhaseImages.length}
+          </div>
+        </div>
+      )}
 
       {/* About */}
       <section id="hakkimizda" className="py-16 md:py-24 px-4 md:px-6">
