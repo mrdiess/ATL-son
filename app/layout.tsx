@@ -19,15 +19,15 @@ export const viewport: Viewport = {
 }
 
 export const metadata: Metadata = {
-  title: "ATL Çelik Yapı - Düzce Çelik Konstrüksiyon ve Metal İşleme | Profesyonel Hizmetler",
+  title: "ATL Çelik Yapı - Düzce Çelik Konstrüksiyon ve Metal İşleme | 81 İle Hizmet",
   description:
-    "Düzce'de çelik konstrüksiyon, sandviç panel, lazer kesim ve metal işleme alanında 12+ yıllık tecrübeli hizmet. ATL Çelik Yapı ile profesyonel çelik yapı çözümleri.",
+    "Düzce merkezli, 81 ile çelik konstrüksiyon, sandviç panel ve metal işleme alanında 12+ yıllık tecrübeli hizmet. ATL Çelik Yapı ile profesyonel çelik yapı çözümleri.",
   keywords:
-    "düzce çelik, çelik konstrüksiyon, metal işleme, sandviç panel, lazer kesim, çelik yapı, düzce çelik konstrüksiyon",
+    "düzce çelik, çelik konstrüksiyon, metal işleme, sandviç panel, çelik yapı, düzce çelik konstrüksiyon, özel üretim",
   metadataBase: new URL("https://atlcelikyapi.com"),
   openGraph: {
     title: "ATL Çelik Yapı - Düzce Çelik Konstrüksiyon",
-    description: "Düzce'de 12+ yıllık tecrübeyle çelik konstrüksiyon, metal işleme ve sandviç panel hizmetleri",
+    description: "Düzce'de 12+ yıllık tecrübeyle 81 ile çelik konstrüksiyon, metal işleme ve sandviç panel hizmetleri",
     siteName: "ATL Çelik Yapı",
     locale: "tr_TR",
     type: "website",

@@ -74,18 +74,25 @@
   --sidebar-ring: oklch(0.539 0 0);
 }
 
-/* Built with badge gizlendi */
+/* Vercel Toolbar ve v0 badge'leri gizle */
+#vercel-live-feedback-button,
+[data-vercel-toolbar],
+[class*="vercel-toolbar"],
+iframe[src*="vercel.live"],
 [class*="built-with"],
 [data-built-with],
 .vercel-badge,
 a[href*="v0.app"],
 div[class*="v0-badge"],
 [class*="vercel-watermark"],
-button[class*="v0"] {
+button[class*="v0"],
+[id*="vercel-toolbar"] {
   display: none !important;
   visibility: hidden !important;
   opacity: 0 !important;
   pointer-events: none !important;
+  position: absolute !important;
+  left: -9999px !important;
 }
 
 @theme inline {
