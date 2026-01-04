@@ -75,47 +75,50 @@ export default function HomePage() {
   const [phaseModalOpen, setPhaseModalOpen] = useState(false)
   const [phaseModalIndex, setPhaseModalIndex] = useState(0)
   const [currentPhaseImages, setCurrentPhaseImages] = useState<string[]>([])
+  const [activePhase, setActivePhase] = useState(0)
 
   const constructionPhases = [
     {
       id: 1,
-      title: "Temel & Saha Hazırlığı",
-      description: "Zemin etüdü, temel kazısı ve ankraj montajı ile projenin sağlam temelleri atılır.",
-      images: [
-        "/placeholder.svg?height=400&width=600",
-        "/placeholder.svg?height=400&width=600",
-        "/placeholder.svg?height=400&width=600",
-      ],
+      step: "01",
+      title: "Proje Planlama & Mühendislik",
+      description: "Detaylı analiz, 3D modelleme ve mühendislik hesapları ile projenin temeli atılır.",
+      image: "/placeholder.svg?height=400&width=600",
     },
     {
       id: 2,
-      title: "Çelik Kolon & Kiriş Montajı",
-      description: "Prefabrik çelik kolonlar ve ana taşıyıcı kirişler vinç yardımıyla monte edilir.",
-      images: [
-        "/placeholder.svg?height=400&width=600",
-        "/placeholder.svg?height=400&width=600",
-        "/placeholder.svg?height=400&width=600",
-      ],
+      step: "02",
+      title: "Saha Hazırlığı & Temel",
+      description: "Zemin etüdü, kazı çalışmaları ve betonarme temel imalatı gerçekleştirilir.",
+      image: "/placeholder.svg?height=400&width=600",
     },
     {
       id: 3,
-      title: "Çatı & Duvar Panelleri",
-      description: "Sandviç panel çatı ve duvar kaplamaları ile yapı dış etkilerden korunur.",
-      images: [
-        "/placeholder.svg?height=400&width=600",
-        "/placeholder.svg?height=400&width=600",
-        "/placeholder.svg?height=400&width=600",
-      ],
+      step: "03",
+      title: "Çelik İmalat",
+      description: "Fabrikamızda çelik profillerin kesimi, kaynak ve yüzey işlemleri yapılır.",
+      image: "/placeholder.svg?height=400&width=600",
     },
     {
       id: 4,
-      title: "Tamamlama & Teslim",
-      description: "Son kontroller, boya işleri ve kalite testleri ile proje müşteriye teslim edilir.",
-      images: [
-        "/placeholder.svg?height=400&width=600",
-        "/placeholder.svg?height=400&width=600",
-        "/placeholder.svg?height=400&width=600",
-      ],
+      step: "04",
+      title: "Çelik Strüktür Montajı",
+      description: "Prefabrik çelik elemanlar sahada vinç yardımıyla monte edilir.",
+      image: "/placeholder.svg?height=400&width=600",
+    },
+    {
+      id: 5,
+      step: "05",
+      title: "Çatı & Cephe Sistemleri",
+      description: "Sandviç panel, trapez sac ve cephe kaplamaları ile yapı tamamlanır.",
+      image: "/placeholder.svg?height=400&width=600",
+    },
+    {
+      id: 6,
+      step: "06",
+      title: "Teslim & Garanti",
+      description: "Kalite kontrol, final testler ve anahtar teslim ile proje sonlandırılır.",
+      image: "/placeholder.svg?height=400&width=600",
     },
   ]
 
@@ -246,8 +249,7 @@ export default function HomePage() {
   const displayedImages = filteredImages.slice(0, visibleImageCount)
   const hasMoreImages = filteredImages.length > visibleImageCount
 
-  const featuredProjects = projects.slice(0, 3)
-
+  const featuredProjects = projects.filter((p) => p.is_featured).slice(0, 3)
 
   return (
     <div className="min-h-screen bg-background text-foreground">
@@ -435,65 +437,101 @@ export default function HomePage() {
       </section>
 
       {/* Projects - Construction Process Showcase */}
-      <section id="projeler" className="py-16 md:py-24 px-4 md:px-6 bg-secondary/5">
-        <div className="max-w-5xl mx-auto">
+      <section
+        id="projeler"
+        className="py-16 md:py-24 bg-gradient-to-b from-slate-900 to-slate-800 text-white overflow-hidden"
+      >
+        <div className="max-w-7xl mx-auto px-4 md:px-6">
           {/* Section Header */}
-          <div className="text-center mb-16">
-            <span className="text-blue-500 font-semibold text-sm uppercase tracking-wider">Yapım Süreci</span>
+          <div className="text-center mb-12">
+            <span className="text-blue-400 font-semibold text-sm uppercase tracking-wider">Yapım Süreci</span>
             <h2 className="text-3xl md:text-4xl font-bold mt-2 mb-4">Projelerimiz Nasıl Hayata Geçiyor?</h2>
-            <p className="text-muted-foreground max-w-2xl mx-auto">
-              Her projemiz 4 ana aşamadan geçerek profesyonel standartlarda tamamlanır.
+            <p className="text-slate-300 max-w-2xl mx-auto">
+              Her projemiz 6 ana aşamadan geçerek profesyonel standartlarda tamamlanır.
             </p>
           </div>
 
-          {/* Construction Phases Timeline */}
+          {/* Horizontal Carousel */}
           <div className="relative">
-            {/* Vertical Timeline Line */}
-            <div className="absolute left-8 md:left-12 top-0 bottom-0 w-0.5 bg-blue-500/20" />
+            {/* Navigation Arrows */}
+            <button
+              onClick={() => setActivePhase((prev) => (prev > 0 ? prev - 1 : constructionPhases.length - 1))}
+              className="absolute left-0 top-1/2 -translate-y-1/2 z-10 bg-blue-500/80 hover:bg-blue-500 text-white p-3 rounded-full shadow-lg transition-all -ml-4 md:ml-0"
+              aria-label="Önceki aşama"
+            >
+              <ChevronLeft className="w-6 h-6" />
+            </button>
 
-            {/* Phases */}
-            <div className="space-y-12">
-              {constructionPhases.map((phase, phaseIndex) => (
-                <div key={phase.id} className="relative pl-20 md:pl-28">
-                  {/* Phase Number Circle */}
-                  <div className="absolute left-4 md:left-8 top-0 w-8 h-8 md:w-10 md:h-10 bg-blue-500 rounded-full flex items-center justify-center text-white font-bold text-sm md:text-base z-10">
-                    {phase.id}
-                  </div>
+            <button
+              onClick={() => setActivePhase((prev) => (prev < constructionPhases.length - 1 ? prev + 1 : 0))}
+              className="absolute right-0 top-1/2 -translate-y-1/2 z-10 bg-blue-500/80 hover:bg-blue-500 text-white p-3 rounded-full shadow-lg transition-all -mr-4 md:mr-0"
+              aria-label="Sonraki aşama"
+            >
+              <ChevronRight className="w-6 h-6" />
+            </button>
 
-                  {/* Phase Content */}
-                  <div className="bg-card border rounded-xl p-6 shadow-sm">
-                    {/* Phase Title & Description */}
-                    <h3 className="text-xl md:text-2xl font-bold mb-2">{phase.title}</h3>
-                    <p className="text-muted-foreground mb-6">{phase.description}</p>
-
-                    {/* Phase Images Grid */}
-                    <div className="grid grid-cols-3 gap-3">
-                      {phase.images.map((img, imgIndex) => (
-                        <button
-                          key={imgIndex}
-                          onClick={() => openPhaseModal(phase.images, imgIndex)}
-                          className="relative aspect-[4/3] rounded-lg overflow-hidden group cursor-pointer"
-                        >
+            {/* Cards Container */}
+            <div className="overflow-hidden mx-8 md:mx-16">
+              <div
+                className="flex transition-transform duration-500 ease-out"
+                style={{ transform: `translateX(-${activePhase * 100}%)` }}
+              >
+                {constructionPhases.map((phase) => (
+                  <div key={phase.id} className="w-full flex-shrink-0 px-2">
+                    <div className="bg-slate-800/50 backdrop-blur border border-slate-700 rounded-2xl overflow-hidden shadow-xl max-w-4xl mx-auto">
+                      <div className="grid md:grid-cols-2 gap-0">
+                        {/* Image Side */}
+                        <div className="relative aspect-[4/3] md:aspect-auto md:h-80">
                           <Image
-                            src={img || "/placeholder.svg"}
-                            alt={`${phase.title} - Görsel ${imgIndex + 1}`}
+                            src={phase.image || "/placeholder.svg"}
+                            alt={phase.title}
                             fill
-                            className="object-cover group-hover:scale-105 transition-transform duration-300"
+                            className="object-cover"
                           />
-                          <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors" />
-                        </button>
-                      ))}
+                          {/* Step Badge */}
+                          <div className="absolute top-4 left-4 bg-blue-500 text-white px-4 py-2 rounded-lg font-bold text-2xl shadow-lg">
+                            {phase.step}
+                          </div>
+                        </div>
+
+                        {/* Content Side */}
+                        <div className="p-6 md:p-8 flex flex-col justify-center">
+                          <h3 className="text-2xl md:text-3xl font-bold mb-4 text-white">{phase.title}</h3>
+                          <p className="text-slate-300 text-lg leading-relaxed mb-6">{phase.description}</p>
+
+                          {/* Progress Indicator */}
+                          <div className="flex items-center gap-2 text-sm text-slate-400">
+                            <span>Aşama {phase.id}</span>
+                            <span>/</span>
+                            <span>{constructionPhases.length}</span>
+                          </div>
+                        </div>
+                      </div>
                     </div>
                   </div>
-                </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Pagination Dots */}
+            <div className="flex justify-center gap-2 mt-8">
+              {constructionPhases.map((_, index) => (
+                <button
+                  key={index}
+                  onClick={() => setActivePhase(index)}
+                  className={`w-3 h-3 rounded-full transition-all ${
+                    index === activePhase ? "bg-blue-500 w-8" : "bg-slate-600 hover:bg-slate-500"
+                  }`}
+                  aria-label={`Aşama ${index + 1}'e git`}
+                />
               ))}
             </div>
           </div>
 
           {/* CTA */}
           <div className="text-center mt-12">
-            <p className="text-muted-foreground mb-4">Sizin projeniz için de aynı kaliteyi sunmak istiyoruz.</p>
-            <Button asChild className="bg-blue-500 hover:bg-blue-600">
+            <p className="text-slate-300 mb-4">Sizin projeniz için de aynı kaliteyi sunmak istiyoruz.</p>
+            <Button asChild className="bg-blue-500 hover:bg-blue-600 text-white px-8 py-3">
               <a href="#iletisim">Ücretsiz Keşif Talep Et</a>
             </Button>
           </div>
@@ -737,7 +775,7 @@ export default function HomePage() {
                 className="text-white hover:text-blue-400"
               >
                 <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
-                  <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.073-1.689-.073-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073z" />
+                  <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919-.058 1.265-.069 1.645-.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.281-.073-1.689-.073-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073z" />
                 </svg>
               </a>
               <a
