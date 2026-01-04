@@ -21,9 +21,6 @@ import {
   Wrench,
 } from "lucide-react"
 
-export const dynamic = "force-dynamic";
-
-
 interface MediaItem {
   id: string
   filename: string
