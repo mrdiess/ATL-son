@@ -19,6 +19,7 @@ import {
   X,
   ArrowRight,
   Wrench,
+  Clock,
 } from "lucide-react"
 
 interface MediaItem {
@@ -381,48 +382,60 @@ export default function HomePage() {
         </div>
       </section>
 
-      <section id="projeler" className="py-16 md:py-24 bg-secondary/5">
-        <div className="max-w-7xl mx-auto px-4 md:px-6">
+      {/* Projects - Construction Process Showcase */}
+      <section id="projeler" className="py-16 md:py-24 px-4 md:px-6 bg-secondary/5">
+        <div className="max-w-6xl mx-auto">
           <div className="text-center mb-12">
-            <p className="text-blue-500 font-bold uppercase tracking-wider mb-2">Projelerimiz</p>
-            <h2 className="text-3xl md:text-4xl font-bold mb-4">Tamamlanan Projeler</h2>
+            <span className="text-blue-500 font-semibold text-sm uppercase tracking-wider">Projelerimiz</span>
+            <h2 className="text-3xl md:text-4xl font-bold mt-2 mb-4">Tamamlanmış Projeler</h2>
             <p className="text-muted-foreground max-w-2xl mx-auto">
-              Her projeyi adım adım, detaylı yapım aşamalarıyla sunuyoruz
+              Her proje, temelden teslimata kadar profesyonel yapım aşamalarıyla gerçekleştirilir.
             </p>
           </div>
 
           {projectsLoading ? (
             <div className="text-center text-muted-foreground">Projeler yükleniyor...</div>
           ) : featuredProjects.length > 0 ? (
-            <div className="grid md:grid-cols-3 gap-6 mb-8">
+            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
               {featuredProjects.map((project) => (
                 <Link key={project.id} href={`/projeler/${project.id}`} className="group">
-                  <div className="bg-card border rounded-xl overflow-hidden hover:shadow-xl transition-all">
-                    <div className="relative h-48 overflow-hidden">
+                  <div className="bg-card border rounded-xl overflow-hidden hover:shadow-2xl transition-all duration-300">
+                    <div className="relative h-56 overflow-hidden">
                       <Image
-                        src={project.featured_image_url || "/steel-construction-industrial-factory-building.jpg"}
+                        src={
+                          project.featured_image_url ||
+                          "/placeholder.svg?height=400&width=600&query=steel construction project"
+                        }
                         alt={project.title}
                         fill
-                        className="object-cover group-hover:scale-105 transition-transform duration-300"
+                        className="object-cover group-hover:scale-105 transition-transform duration-500"
                       />
-                      <div className="absolute top-4 left-4">
-                        <span className="bg-blue-500 text-white text-xs px-3 py-1 rounded-full font-medium">
+                      <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
+                      <div className="absolute bottom-4 left-4 right-4">
+                        <span className="inline-block bg-blue-500 text-white text-xs px-3 py-1 rounded-full font-medium mb-2">
                           {project.category}
                         </span>
+                        <h3 className="text-xl font-bold text-white">{project.title}</h3>
                       </div>
                     </div>
                     <div className="p-5">
-                      <h3 className="text-xl font-bold mb-2 group-hover:text-blue-500 transition-colors">
-                        {project.title}
-                      </h3>
-                      <div className="flex items-center gap-2 text-sm text-muted-foreground mb-3">
-                        <MapPin className="w-4 h-4" />
-                        <span>{project.location}</span>
-                        {project.project_duration && <span>• {project.project_duration}</span>}
+                      <div className="flex items-center gap-3 text-sm text-muted-foreground mb-3">
+                        <div className="flex items-center gap-1">
+                          <MapPin className="w-4 h-4" />
+                          <span>{project.location}</span>
+                        </div>
+                        {project.project_duration && (
+                          <div className="flex items-center gap-1">
+                            <Clock className="w-4 h-4" />
+                            <span>{project.project_duration}</span>
+                          </div>
+                        )}
                       </div>
-                      <p className="text-sm text-muted-foreground line-clamp-2">{project.description}</p>
-                      <div className="mt-4 flex items-center text-blue-500 font-medium text-sm">
-                        Yapım Aşamalarını Gör <ArrowRight className="w-4 h-4 ml-1" />
+                      <p className="text-sm text-muted-foreground line-clamp-2 mb-4">{project.description}</p>
+                      <div className="flex items-center justify-between">
+                        <span className="text-blue-500 font-semibold text-sm group-hover:underline flex items-center gap-1">
+                          Yapım Aşamalarını Gör <ArrowRight className="w-4 h-4" />
+                        </span>
                       </div>
                     </div>
                   </div>
@@ -430,54 +443,13 @@ export default function HomePage() {
               ))}
             </div>
           ) : (
-            <div className="text-center text-muted-foreground mb-8">Henüz proje eklenmemiş</div>
-          )}
-
-          {/* Photo Gallery */}
-          <div className="mt-16">
-            <h3 className="text-2xl font-bold text-center mb-6">Foto Galeri</h3>
-            <div className="flex flex-wrap justify-center gap-2 mb-6">
-              {mediaCategories.map((tab) => (
-                <button
-                  key={tab}
-                  onClick={() => setActivePhotoTab(tab)}
-                  className={`px-4 py-2 rounded-full text-sm font-medium transition ${
-                    activePhotoTab === tab
-                      ? "bg-blue-500 text-white"
-                      : "bg-secondary text-muted-foreground hover:bg-secondary/80"
-                  }`}
-                >
-                  {tab}
-                </button>
-              ))}
-            </div>
-
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-              {displayedImages.map((img, i) => (
-                <div
-                  key={i}
-                  className="relative aspect-square group overflow-hidden rounded-lg cursor-pointer"
-                  onClick={() => openLightbox(i)}
-                >
-                  <Image
-                    src={img || "/placeholder.svg"}
-                    alt={`Project ${i + 1}`}
-                    fill
-                    className="object-cover group-hover:scale-110 transition duration-500"
-                  />
-                  <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition" />
-                </div>
-              ))}
-            </div>
-
-            {hasMoreImages && (
-              <div className="text-center mt-6">
-                <Button onClick={() => setVisibleImageCount((prev) => prev + 8)} variant="outline">
-                  Daha Fazla Görsel ({filteredImages.length - visibleImageCount} kaldı)
-                </Button>
+            <div className="text-center py-12">
+              <div className="w-16 h-16 bg-secondary rounded-full flex items-center justify-center mx-auto mb-4">
+                <Building className="w-8 h-8 text-muted-foreground" />
               </div>
-            )}
-          </div>
+              <p className="text-muted-foreground">Projeler yakında eklenecek</p>
+            </div>
+          )}
         </div>
       </section>
 
