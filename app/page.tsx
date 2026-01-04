@@ -246,8 +246,7 @@ export default function HomePage() {
   const displayedImages = filteredImages.slice(0, visibleImageCount)
   const hasMoreImages = filteredImages.length > visibleImageCount
 
-  const featuredProjects = projects.slice(0, 3)
-
+  const featuredProjects = projects.filter((p) => p.is_featured).slice(0, 3)
 
   return (
     <div className="min-h-screen bg-background text-foreground">
