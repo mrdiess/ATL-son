@@ -74,13 +74,14 @@
   --sidebar-ring: oklch(0.539 0 0);
 }
 
-/* "Built with v0" badge'i tamamen gizlendi */
+/* Built with badge gizlendi */
 [class*="built-with"],
 [data-built-with],
 .vercel-badge,
 a[href*="v0.app"],
 div[class*="v0-badge"],
-[class*="vercel-watermark"] {
+[class*="vercel-watermark"],
+button[class*="v0"] {
   display: none !important;
   visibility: hidden !important;
   opacity: 0 !important;

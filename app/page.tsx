@@ -17,6 +17,9 @@ interface MediaItem {
   category: string
   size: number
   created_at: string
+  title?: string
+  stage?: string
+  project_slug?: string
 }
 
 interface VideoItem {
@@ -37,7 +40,7 @@ interface Sponsor {
   sort_order: number
 }
 
-const GOOGLE_MAPS_EMBED = `https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d1500!2d31.1240669!3d40.852255799999995!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x409d9f3269fc678f%3A0xcd0d2bf0971b8ae4!2zQVRMIMOHZWxpayB2ZSBNZXRhbCDEsHNsZW1l!5e0!3m2!1str!2str!4v1767436074969!5m2!1str!2str`
+const GOOGLE_MAPS_EMBED = `https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d753!2d31.1240669!3d40.8522558!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x409d9f3269fc678f%3A0xcd0d2bf0971b8ae4!2sATL%20%C3%87elik%20ve%20Metal%20%C4%B0%C5%9Fleme!5e0!3m2!1str!2str!4v1736012345678!5m2!1str!2str`
 
 export default function HomePage() {
   const [currentSlide, setCurrentSlide] = useState(0)
@@ -192,7 +195,7 @@ export default function HomePage() {
             {/* Logo */}
             <div className="flex-shrink-0">
               <Link href="/">
-                <img src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/logo-VNzrrWVfDUzzdoNdbbskgTM5OymsVE.png" alt="ATL Çelik Yapı" className="h-10 md:h-14 dark:hidden" />
+                <img src="/images/logo.png" alt="ATL Çelik Yapı" className="h-10 md:h-14 dark:hidden" />
                 <img src="/darkmodelogo.png" alt="ATL Çelik Yapı" className="h-10 md:h-14 hidden dark:block" />
               </Link>
             </div>

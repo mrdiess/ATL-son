@@ -7,6 +7,9 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button"
 import { Upload, Trash2, Eye, ImageIcon, Film, X, Grid, List } from "lucide-react"
 import Image from "next/image"
+import { Input } from "@/components/ui/input"
+import { Label } from "@/components/ui/label"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 
 interface MediaItem {
   id: string
@@ -16,6 +19,9 @@ interface MediaItem {
   category: string
   size: number
   created_at: string
+  title?: string
+  stage?: string
+  project_slug?: string
 }
 
 interface VideoItem {
@@ -72,7 +78,13 @@ export default function MediaPage() {
   })
   const [editingSponsorId, setEditingSponsorId] = useState<string | null>(null)
 
+  const [uploadTitle, setUploadTitle] = useState("")
+  const [uploadStage, setUploadStage] = useState("Son Hali")
+  const [uploadProjectSlug, setUploadProjectSlug] = useState("")
+
   const mediaCategories = ["Tümü", "Depo", "Fabrika", "Hangar", "Ticari", "Tarımsal", "Spor", "Diğer"]
+
+  const constructionStages = ["Öncesi", "Aşama 1", "Aşama 2", "Aşama 3", "Son Hali"]
 
   const [uploadCategory, setUploadCategory] = useState("Depo")
 
@@ -132,6 +144,11 @@ export default function MediaPage() {
   const handleFileUpload = async (files: FileList) => {
     if (!files || files.length === 0) return
 
+    if (!uploadTitle.trim()) {
+      setUploadMessage({ type: "error", text: "Lütfen fotoğraf başlığı girin" })
+      return
+    }
+
     setUploading(true)
     setUploadMessage(null)
     let successCount = 0
@@ -140,7 +157,12 @@ export default function MediaPage() {
     for (const file of Array.from(files)) {
       const formData = new FormData()
       formData.append("file", file)
-      formData.append("category", uploadCategory) // selectedCategory yerine uploadCategory
+      formData.append("category", uploadCategory)
+      formData.append("title", uploadTitle)
+      formData.append("stage", uploadStage)
+      if (uploadProjectSlug.trim()) {
+        formData.append("project_slug", uploadProjectSlug)
+      }
 
       try {
         console.log("[v0] Uploading file:", file.name)
@@ -174,6 +196,9 @@ export default function MediaPage() {
         type: "success",
         text: `${successCount} dosya başarıyla yüklendi${errorCount > 0 ? `, ${errorCount} hata` : ""}`,
       })
+      setUploadTitle("")
+      setUploadStage("Son Hali")
+      setUploadProjectSlug("")
       setTimeout(() => {
         fetchMedia()
       }, 1000)
@@ -490,6 +515,74 @@ export default function MediaPage() {
               </CardDescription>
             </CardHeader>
             <CardContent>
+              <div className="space-y-4 mb-6">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="upload-title" className="text-white text-sm">
+                      Fotoğraf Başlığı *
+                    </Label>
+                    <Input
+                      id="upload-title"
+                      type="text"
+                      placeholder="ör: Fabrika İnşaatı"
+                      value={uploadTitle}
+                      onChange={(e) => setUploadTitle(e.target.value)}
+                      className="bg-slate-800 border-slate-700 text-white"
+                    />
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label htmlFor="upload-project-slug" className="text-white text-sm">
+                      Proje Kodu (Opsiyonel)
+                    </Label>
+                    <Input
+                      id="upload-project-slug"
+                      type="text"
+                      placeholder="ör: fabrika-insaati-2024"
+                      value={uploadProjectSlug}
+                      onChange={(e) => setUploadProjectSlug(e.target.value.toLowerCase().replace(/\s+/g, "-"))}
+                      className="bg-slate-800 border-slate-700 text-white"
+                    />
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <Label className="text-white text-sm">Kategori *</Label>
+                    <Select value={uploadCategory} onValueChange={setUploadCategory}>
+                      <SelectTrigger className="bg-slate-800 border-slate-700 text-white">
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent className="bg-slate-800 border-slate-700">
+                        {mediaCategories
+                          .filter((cat) => cat !== "Tümü")
+                          .map((cat) => (
+                            <SelectItem key={cat} value={cat} className="text-white hover:bg-slate-700">
+                              {cat}
+                            </SelectItem>
+                          ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label className="text-white text-sm">Yapım Aşaması *</Label>
+                    <Select value={uploadStage} onValueChange={setUploadStage}>
+                      <SelectTrigger className="bg-slate-800 border-slate-700 text-white">
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent className="bg-slate-800 border-slate-700">
+                        {constructionStages.map((stage) => (
+                          <SelectItem key={stage} value={stage} className="text-white hover:bg-slate-700">
+                            {stage}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                </div>
+              </div>
+
               <div
                 onDragEnter={handleDrag}
                 onDragLeave={handleDrag}
@@ -559,103 +652,118 @@ export default function MediaPage() {
                 </div>
               ) : filteredMedia.length === 0 ? (
                 <div className="text-center py-12 text-slate-400">
-                  <ImageIcon className="w-12 md:w-16 h-12 md:h-16 mx-auto mb-3 md:mb-4 opacity-50" />
-                  <p className="text-sm md:text-base">Henüz medya dosyası yüklenmemiş</p>
-                </div>
-              ) : viewMode === "grid" ? (
-                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-2 md:gap-4">
-                  {filteredMedia.map((item) => (
-                    <div
-                      key={item.id}
-                      className="group relative bg-slate-800 rounded-lg overflow-hidden hover:ring-2 hover:ring-blue-500 transition-all"
-                    >
-                      <div className="aspect-square relative">
-                        {item.file_type.startsWith("video") ? (
-                          <div className="w-full h-full bg-slate-700 flex items-center justify-center">
-                            <Film className="w-8 md:w-12 h-8 md:h-12 text-slate-400" />
-                          </div>
-                        ) : (
-                          <Image
-                            src={item.url || "/placeholder.svg"}
-                            alt={item.filename}
-                            fill
-                            className="object-cover"
-                            sizes="(max-width: 640px) 50vw, (max-width: 768px) 33vw, 25vw"
-                          />
-                        )}
-                        <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-1 md:gap-2">
-                          <Button
-                            size="icon"
-                            variant="secondary"
-                            className="h-8 w-8 md:h-9 md:w-9"
-                            onClick={() => setPreviewItem(item)}
-                          >
-                            <Eye className="w-3 md:w-4 h-3 md:h-4" />
-                          </Button>
-                          <Button
-                            size="icon"
-                            variant="destructive"
-                            className="h-8 w-8 md:h-9 md:w-9"
-                            onClick={() => handleDelete(item.id)}
-                          >
-                            <Trash2 className="w-3 md:w-4 h-3 md:h-4" />
-                          </Button>
-                        </div>
-                      </div>
-                      <div className="p-2 md:p-3">
-                        <p className="text-white text-xs md:text-sm font-medium truncate">{item.filename}</p>
-                        <p className="text-xs text-slate-400 mt-1">
-                          {formatFileSize(item.size)} • {formatDate(item.created_at)}
-                        </p>
-                      </div>
-                    </div>
-                  ))}
+                  <ImageIcon className="w-12 h-12 mx-auto mb-3 opacity-50" />
+                  <p>Henüz medya dosyası yok</p>
                 </div>
               ) : (
-                <div className="space-y-2">
+                <div
+                  className={
+                    viewMode === "grid" ? "grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 md:gap-4" : "space-y-3"
+                  }
+                >
                   {filteredMedia.map((item) => (
                     <div
                       key={item.id}
-                      className="flex items-center gap-3 md:gap-4 p-2 md:p-3 bg-slate-800 rounded-lg hover:bg-slate-700 transition"
+                      className={`group relative rounded-lg overflow-hidden border border-slate-700 hover:border-blue-500 transition ${
+                        viewMode === "grid" ? "aspect-square" : "flex items-center gap-4 p-3 md:p-4"
+                      }`}
                     >
-                      <div className="w-12 md:w-16 h-12 md:h-16 relative rounded overflow-hidden flex-shrink-0">
-                        {item.file_type.startsWith("video") ? (
-                          <div className="w-full h-full bg-slate-700 flex items-center justify-center">
-                            <Film className="w-4 md:w-6 h-4 md:h-6 text-slate-400" />
+                      {viewMode === "grid" ? (
+                        <>
+                          {item.file_type.startsWith("image/") ? (
+                            <Image
+                              src={item.url || "/placeholder.svg"}
+                              alt={item.title || item.filename}
+                              fill
+                              className="object-cover"
+                              sizes="(max-width: 768px) 50vw, (max-width: 1024px) 33vw, 25vw"
+                            />
+                          ) : (
+                            <div className="w-full h-full bg-slate-800 flex items-center justify-center">
+                              <Film className="w-12 h-12 text-slate-600" />
+                            </div>
+                          )}
+                          {item.title && (
+                            <div className="absolute top-2 left-2 bg-black/70 text-white px-2 py-1 rounded text-xs">
+                              {item.title}
+                            </div>
+                          )}
+                          {item.stage && (
+                            <div className="absolute top-2 right-2 bg-blue-500/80 text-white px-2 py-1 rounded text-xs">
+                              {item.stage}
+                            </div>
+                          )}
+                          <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition flex items-center justify-center gap-2">
+                            <Button
+                              size="icon"
+                              variant="ghost"
+                              className="text-white hover:bg-white/20"
+                              onClick={() => setPreviewItem(item)}
+                            >
+                              <Eye className="w-4 h-4" />
+                            </Button>
+                            <Button
+                              size="icon"
+                              variant="ghost"
+                              className="text-red-400 hover:bg-red-500/20"
+                              onClick={() => handleDelete(item.id)}
+                            >
+                              <Trash2 className="w-4 h-4" />
+                            </Button>
                           </div>
-                        ) : (
-                          <Image
-                            src={item.url || "/placeholder.svg"}
-                            alt={item.filename}
-                            fill
-                            className="object-cover"
-                          />
-                        )}
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <p className="text-white font-medium text-xs md:text-sm truncate">{item.filename}</p>
-                        <p className="text-xs md:text-sm text-slate-400">
-                          {formatFileSize(item.size)} • {item.category} • {formatDate(item.created_at)}
-                        </p>
-                      </div>
-                      <div className="flex gap-1 md:gap-2 flex-shrink-0">
-                        <Button
-                          size="sm"
-                          variant="outline"
-                          onClick={() => setPreviewItem(item)}
-                          className="text-xs md:text-sm"
-                        >
-                          <Eye className="w-3 md:w-4 h-3 md:h-4" />
-                        </Button>
-                        <Button
-                          size="sm"
-                          variant="destructive"
-                          onClick={() => handleDelete(item.id)}
-                          className="text-xs md:text-sm"
-                        >
-                          <Trash2 className="w-3 md:w-4 h-3 md:h-4" />
-                        </Button>
-                      </div>
+                        </>
+                      ) : (
+                        <>
+                          <div className="w-16 h-16 bg-slate-800 rounded flex-shrink-0 flex items-center justify-center overflow-hidden">
+                            {item.file_type.startsWith("image/") ? (
+                              <Image
+                                src={item.url || "/placeholder.svg"}
+                                alt={item.title || item.filename}
+                                width={64}
+                                height={64}
+                                className="object-cover"
+                              />
+                            ) : (
+                              <Film className="w-8 h-8 text-slate-600" />
+                            )}
+                          </div>
+                          <div className="flex-1 min-w-0">
+                            <p className="text-white font-medium truncate text-sm md:text-base">
+                              {item.title || item.filename}
+                            </p>
+                            <div className="flex items-center gap-2 mt-1">
+                              <span className="text-xs text-slate-400">{formatFileSize(item.size)}</span>
+                              <span className="text-xs text-slate-500">•</span>
+                              <span className="text-xs text-slate-400">{formatDate(item.created_at)}</span>
+                              {item.stage && (
+                                <>
+                                  <span className="text-xs text-slate-500">•</span>
+                                  <span className="text-xs text-blue-400">{item.stage}</span>
+                                </>
+                              )}
+                            </div>
+                            <span className="text-xs text-slate-500 mt-0.5 block">{item.category}</span>
+                          </div>
+                          <div className="flex items-center gap-1 md:gap-2">
+                            <Button
+                              size="icon"
+                              variant="ghost"
+                              className="text-white hover:bg-white/10"
+                              onClick={() => setPreviewItem(item)}
+                            >
+                              <Eye className="w-4 h-4" />
+                            </Button>
+                            <Button
+                              size="icon"
+                              variant="ghost"
+                              className="text-red-400 hover:bg-red-500/20"
+                              onClick={() => handleDelete(item.id)}
+                            >
+                              <Trash2 className="w-4 h-4" />
+                            </Button>
+                          </div>
+                        </>
+                      )}
                     </div>
                   ))}
                 </div>
@@ -1115,33 +1223,35 @@ export default function MediaPage() {
       {/* Preview Modal */}
       {previewItem && (
         <div
-          className="fixed inset-0 z-50 bg-black/80 flex items-center justify-center p-3 md:p-4"
+          className="fixed inset-0 bg-black/80 z-50 flex items-center justify-center p-4"
           onClick={() => setPreviewItem(null)}
         >
           <div className="relative max-w-4xl max-h-[90vh] w-full" onClick={(e) => e.stopPropagation()}>
             <Button
               size="icon"
-              variant="secondary"
-              className="absolute -top-10 md:-top-12 right-0"
+              variant="ghost"
+              className="absolute top-2 right-2 text-white hover:bg-white/20 z-10"
               onClick={() => setPreviewItem(null)}
             >
-              <X className="w-5 h-5" />
+              <X className="w-6 h-6" />
             </Button>
-            {previewItem.file_type.startsWith("video") ? (
-              <video src={previewItem.url} controls className="w-full rounded-lg" />
-            ) : (
+            {previewItem.title && (
+              <div className="absolute top-2 left-2 bg-black/70 text-white px-3 py-2 rounded-lg z-10">
+                <p className="font-medium">{previewItem.title}</p>
+                {previewItem.stage && <p className="text-sm text-blue-300 mt-1">{previewItem.stage}</p>}
+              </div>
+            )}
+            {previewItem.file_type.startsWith("image/") ? (
               <Image
                 src={previewItem.url || "/placeholder.svg"}
-                alt={previewItem.filename}
+                alt={previewItem.title || previewItem.filename}
                 width={1200}
                 height={800}
-                className="w-full h-auto rounded-lg object-contain max-h-[80vh]"
+                className="rounded-lg object-contain max-h-[90vh] w-auto mx-auto"
               />
+            ) : (
+              <video src={previewItem.url} controls className="rounded-lg max-h-[90vh] w-full" />
             )}
-            <div className="mt-3 md:mt-4 text-center">
-              <p className="text-white font-medium text-sm md:text-base">{previewItem.filename}</p>
-              <p className="text-xs md:text-sm text-slate-400">{formatFileSize(previewItem.size)}</p>
-            </div>
           </div>
         </div>
       )}

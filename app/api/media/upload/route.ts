@@ -6,9 +6,16 @@ export async function POST(request: Request) {
     const formData = await request.formData()
     const file = formData.get("file") as File
     const category = (formData.get("category") as string) || "Tümü"
+    const title = (formData.get("title") as string) || ""
+    const stage = (formData.get("stage") as string) || "Son Hali"
+    const projectSlug = (formData.get("project_slug") as string) || ""
 
     if (!file) {
       return NextResponse.json({ error: "Dosya bulunamadı" }, { status: 400 })
+    }
+
+    if (!title.trim()) {
+      return NextResponse.json({ error: "Fotoğraf başlığı gereklidir" }, { status: 400 })
     }
 
     const supabase = await createClient()
@@ -24,7 +31,6 @@ export async function POST(request: Request) {
     })
 
     if (uploadError) {
-      console.error("[v0] Storage upload error:", uploadError)
       return NextResponse.json({ error: "Dosya yüklenemedi: " + uploadError.message }, { status: 500 })
     }
 
@@ -32,7 +38,6 @@ export async function POST(request: Request) {
     const { data: publicUrlData } = supabase.storage.from("media").getPublicUrl(filePath)
     const publicUrl = publicUrlData.publicUrl
 
-    // Save to database with proper error handling
     const { data: mediaData, error: dbError } = await supabase
       .from("media")
       .insert({
@@ -42,12 +47,14 @@ export async function POST(request: Request) {
         category: category === "Tümü" ? "Genel" : category,
         size: file.size,
         created_at: new Date().toISOString(),
+        title: title.trim(),
+        stage: stage,
+        project_slug: projectSlug.trim() || null,
       })
       .select()
       .single()
 
     if (dbError) {
-      console.error("[v0] Database insert error:", dbError)
       // Delete uploaded file if DB insert fails
       await supabase.storage.from("media").remove([filePath])
       return NextResponse.json({ error: "Veritabanına kaydedilemedi: " + dbError.message }, { status: 500 })
@@ -57,17 +64,14 @@ export async function POST(request: Request) {
     try {
       await supabase.from("activity_logs").insert({
         action: "media_upload",
-        details: `Dosya yüklendi: ${file.name} (${(file.size / 1024 / 1024).toFixed(2)} MB)`,
+        details: `Dosya yüklendi: ${title} - ${file.name} (${(file.size / 1024 / 1024).toFixed(2)} MB)`,
       })
     } catch (logError) {
-      console.error("[v0] Activity log error:", logError)
       // Don't fail the whole request if logging fails
     }
 
-    console.log("[v0] Media uploaded successfully:", mediaData)
     return NextResponse.json({ success: true, data: mediaData })
   } catch (error) {
-    console.error("[v0] Server error:", error)
     return NextResponse.json(
       { error: "Sunucu hatası: " + (error instanceof Error ? error.message : "Bilinmeyen hata") },
       { status: 500 },
