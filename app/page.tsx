@@ -179,8 +179,7 @@ export default function HomePage() {
         const response = await fetch("/api/projects")
         if (response.ok) {
           const result = await response.json()
-          setProjects(Array.isArray(result) ? result : result.data || [])
-
+          setProjects(result.data || [])
         }
       } catch (error) {
         console.error("Projects fetch error:", error)
