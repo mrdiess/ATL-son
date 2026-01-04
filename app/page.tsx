@@ -250,11 +250,6 @@ export default function HomePage() {
 
   return (
     <div className="min-h-screen bg-background text-foreground">
-
-      <pre style={{ background: "#000", color: "#0f0", padding: 20 }}>
-  {JSON.stringify(projects, null, 2)}
-</pre>
-
       {/* Header */}
       <header
         className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${isScrolled ? "bg-background/95 backdrop-blur-md border-b shadow-sm" : "bg-transparent"}`}
