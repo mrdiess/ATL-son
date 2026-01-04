@@ -6,8 +6,20 @@ import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { ThemeToggle } from "@/components/theme-toggle"
 import { PhotoLightbox } from "@/components/photo-lightbox"
-import { VideoModal } from "@/components/video-modal"
-import { Phone, Mail, MapPin, ChevronLeft, ChevronRight, Building2, Building, Sun, Shield, Menu, X } from "lucide-react"
+import {
+  Phone,
+  Mail,
+  MapPin,
+  ChevronLeft,
+  ChevronRight,
+  Building2,
+  Building,
+  Shield,
+  Menu,
+  X,
+  ArrowRight,
+  Wrench,
+} from "lucide-react"
 
 interface MediaItem {
   id: string
@@ -22,16 +34,6 @@ interface MediaItem {
   project_slug?: string
 }
 
-interface VideoItem {
-  id: string
-  title: string
-  youtube_id: string
-  youtube_url: string
-  category: string
-  thumbnail_url?: string
-  is_active: boolean
-}
-
 interface Sponsor {
   id: string
   name: string
@@ -40,28 +42,36 @@ interface Sponsor {
   sort_order: number
 }
 
+interface Project {
+  id: string
+  title: string
+  slug: string
+  description?: string
+  category: string
+  location: string
+  building_type?: string
+  project_duration?: string
+  featured_image_url?: string
+  is_featured: boolean
+}
+
 const GOOGLE_MAPS_EMBED = `https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d753!2d31.1240669!3d40.8522558!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x409d9f3269fc678f%3A0xcd0d2bf0971b8ae4!2sATL%20%C3%87elik%20ve%20Metal%20%C4%B0%C5%9Fleme!5e0!3m2!1str!2str!4v1736012345678!5m2!1str!2str`
 
 export default function HomePage() {
   const [currentSlide, setCurrentSlide] = useState(0)
   const [activePhotoTab, setActivePhotoTab] = useState("Tümü")
-  const [activeVideoTab, setActiveVideoTab] = useState("Tümü")
   const [lightboxOpen, setLightboxOpen] = useState(false)
   const [lightboxIndex, setLightboxIndex] = useState(0)
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
   const [isScrolled, setIsScrolled] = useState(false)
-  const [videoModalOpen, setVideoModalOpen] = useState(false)
-  const [selectedVideoId, setSelectedVideoId] = useState("")
   const [sponsors, setSponsors] = useState<Sponsor[]>([])
   const [mediaCategories, setMediaCategories] = useState<string[]>(["Tümü"])
-
   const [galleryImages, setGalleryImages] = useState<string[]>([])
   const [allMediaItems, setAllMediaItems] = useState<MediaItem[]>([])
-  const [videos, setVideos] = useState<VideoItem[]>([])
   const [mediaLoading, setMediaLoading] = useState(true)
-  const [videosLoading, setVideosLoading] = useState(true)
-
   const [visibleImageCount, setVisibleImageCount] = useState(8)
+  const [projects, setProjects] = useState<Project[]>([])
+  const [projectsLoading, setProjectsLoading] = useState(true)
 
   useEffect(() => {
     const fetchMedia = async () => {
@@ -71,60 +81,32 @@ export default function HomePage() {
         const result = await response.json()
         if (result.data) {
           setAllMediaItems(result.data)
-
           const uniqueCategories = [
             "Tümü",
             ...Array.from(new Set(result.data.map((item: MediaItem) => item.category).filter(Boolean))),
           ]
           setMediaCategories(uniqueCategories)
-
           const imageItems = result.data.filter((item: MediaItem) => item.file_type.startsWith("image"))
           const images = imageItems.map((item: MediaItem) => item.url)
-
           setGalleryImages(
             images.length > 0
               ? images
               : [
                   "/steel-construction-industrial-factory-building.jpg",
-                  "/steel-construction-building-project-warehouse-.jpg",
                   "/industrial-steel-factory-workers-warehouse.jpg",
                   "/sandwich-panel-building-construction-modern.jpg",
-                  "/steel-construction-industrial-factory-building.jpg",
-                  "/industrial-industrial-.jpg",
-                  "/steel-construction-building-project-warehouse-.jpg",
                 ],
           )
         }
       } catch (error) {
         console.error("Media fetch error:", error)
-        setMediaCategories(["Tümü", "Depo", "Fabrika", "Hangar", "Ticari", "Tarımsal", "Spor"])
         setGalleryImages([
           "/steel-construction-industrial-factory-building.jpg",
-          "/steel-construction-building-project-warehouse-.jpg",
           "/industrial-steel-factory-workers-warehouse.jpg",
           "/sandwich-panel-building-construction-modern.jpg",
-          "/steel-construction-industrial-factory-building.jpg",
-          "/industrial-industrial-.jpg",
-          "/steel-construction-building-project-warehouse-.jpg",
         ])
       } finally {
         setMediaLoading(false)
-      }
-    }
-
-    const fetchVideos = async () => {
-      try {
-        const response = await fetch("/api/videos")
-        if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`)
-        const result = await response.json()
-        if (result.data && Array.isArray(result.data)) {
-          setVideos(result.data)
-        }
-      } catch (error) {
-        console.error("Videos fetch error:", error)
-        setVideos([])
-      } finally {
-        setVideosLoading(false)
       }
     }
 
@@ -137,29 +119,42 @@ export default function HomePage() {
         }
       } catch (error) {
         console.error("Sponsors fetch error:", error)
-        setSponsors([])
+      }
+    }
+
+    const fetchProjects = async () => {
+      try {
+        const response = await fetch("/api/projects")
+        if (response.ok) {
+          const result = await response.json()
+          setProjects(result.data || [])
+        }
+      } catch (error) {
+        console.error("Projects fetch error:", error)
+      } finally {
+        setProjectsLoading(false)
       }
     }
 
     fetchMedia()
-    fetchVideos()
     fetchSponsors()
+    fetchProjects()
   }, [])
 
   const slides = [
     {
       img: "/steel-construction-industrial-factory-building.jpg",
-      title: "Çelik\nKonstrüksiyon",
+      title: "Çelik Konstrüksiyon",
       sub: "Endüstriyel tesis ve depo çözümleriniz için",
     },
     {
       img: "/sandwich-panel-building-construction-modern.jpg",
-      title: "Sandviç\nPanel",
+      title: "Sandviç Panel",
       sub: "Profesyonel üretim ve montaj hizmetleri",
     },
     {
       img: "/industrial-steel-factory-workers-warehouse.jpg",
-      title: "Metal\nİşleme",
+      title: "Metal İşleme",
       sub: "Kaliteli ve hızlı metal işleme çözümleri",
     },
   ]
@@ -199,14 +194,16 @@ export default function HomePage() {
   const displayedImages = filteredImages.slice(0, visibleImageCount)
   const hasMoreImages = filteredImages.length > visibleImageCount
 
+  const featuredProjects = projects.filter((p) => p.is_featured).slice(0, 3)
+
   return (
     <div className="min-h-screen bg-background text-foreground">
+      {/* Header */}
       <header
         className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${isScrolled ? "bg-background/95 backdrop-blur-md border-b shadow-sm" : "bg-transparent"}`}
       >
         <div className="max-w-7xl mx-auto px-4 md:px-6">
           <div className="flex items-center justify-between h-16 md:h-20">
-            {/* Logo */}
             <div className="flex-shrink-0">
               <Link href="/">
                 <img src="/images/logo.png" alt="ATL Çelik Yapı" className="h-12 md:h-16 dark:hidden" />
@@ -214,7 +211,6 @@ export default function HomePage() {
               </Link>
             </div>
 
-            {/* Desktop Navigation - Center */}
             <nav className="hidden md:flex items-center gap-8">
               <a href="#anasayfa" className="text-foreground hover:text-blue-500 transition-colors font-medium">
                 Ana Sayfa
@@ -233,7 +229,6 @@ export default function HomePage() {
               </a>
             </nav>
 
-            {/* Right side - Theme toggle and Phone button */}
             <div className="flex items-center gap-2 md:gap-4">
               <ThemeToggle />
               <a
@@ -243,15 +238,12 @@ export default function HomePage() {
                 <Phone className="w-4 h-4" />
                 <span className="hidden sm:inline">Hemen Ara</span>
               </a>
-
-              {/* Mobile Menu Button */}
               <button onClick={() => setMobileMenuOpen(!mobileMenuOpen)} className="md:hidden p-2 text-foreground">
                 {mobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
               </button>
             </div>
           </div>
 
-          {/* Mobile Navigation */}
           {mobileMenuOpen && (
             <nav className="md:hidden py-4 border-t bg-background/95 backdrop-blur-md">
               <div className="flex flex-col gap-4">
@@ -296,7 +288,7 @@ export default function HomePage() {
         </div>
       </header>
 
-      {/* Hero Slider */}
+      {/* Hero */}
       <section id="anasayfa" className="relative h-screen pt-16 md:pt-20">
         <div className="absolute inset-0">
           {slides.map((slide, i) => (
@@ -311,124 +303,77 @@ export default function HomePage() {
                 className="object-cover"
                 priority={i === 0}
               />
-              <div className="absolute inset-0 bg-gradient-to-r from-black/40 via-black/20 to-transparent" />
+              <div className="absolute inset-0 bg-gradient-to-r from-black/60 via-black/30 to-transparent" />
             </div>
           ))}
         </div>
 
         <div className="relative z-10 h-full flex flex-col justify-center px-4 md:px-12 max-w-7xl mx-auto">
-          <p className="text-blue-400 text-xs mb-2 md:mb-4 tracking-wider font-bold md:text-lg">
+          <p className="text-blue-400 text-sm mb-2 md:mb-4 tracking-wider font-bold md:text-lg">
             {slides[currentSlide].sub}
           </p>
-          <h1 className="text-3xl sm:text-5xl md:text-7xl font-bold mb-4 md:mb-8 leading-tight whitespace-pre-line text-white">
+          <h1 className="text-4xl sm:text-5xl md:text-7xl font-bold mb-6 md:mb-8 leading-tight text-white">
             {slides[currentSlide].title}
           </h1>
-          <div className="flex gap-2 md:gap-4 flex-wrap">
-            <Button className="bg-blue-500 hover:bg-blue-600 text-white px-4 md:px-8 py-3 md:py-6 text-sm md:text-lg font-semibold">
-              Teklif Al <ChevronRight className="ml-2 w-4 md:w-5 h-4 md:h-5" />
+
+          <div className="flex gap-8 mb-8 text-white/90">
+            <div>
+              <span className="text-3xl md:text-4xl font-bold text-blue-400">12+</span>
+              <p className="text-sm">Yıl Tecrübe</p>
+            </div>
+            <div>
+              <span className="text-3xl md:text-4xl font-bold text-blue-400">1000+</span>
+              <p className="text-sm">Proje</p>
+            </div>
+            <div>
+              <span className="text-3xl md:text-4xl font-bold text-blue-400">81</span>
+              <p className="text-sm">İl</p>
+            </div>
+          </div>
+
+          <div className="flex gap-4 flex-wrap">
+            <Button className="bg-blue-500 hover:bg-blue-600 text-white px-6 md:px-8 py-3 md:py-6 text-sm md:text-lg font-semibold">
+              Teklif Al <ArrowRight className="ml-2 w-4 md:w-5 h-4 md:h-5" />
             </Button>
-            <Button className="bg-transparent border border-white text-white hover:bg-white/10 px-4 md:px-8 py-3 md:py-6 text-sm md:text-lg font-semibold">
-              Projelerimizi Gör
+            <Button className="bg-transparent border border-white text-white hover:bg-white/10 px-6 md:px-8 py-3 md:py-6 text-sm md:text-lg font-semibold">
+              Projelerimiz
             </Button>
           </div>
         </div>
 
         <button
           onClick={prevSlide}
-          className="absolute left-2 md:left-4 top-1/2 -translate-y-1/2 z-20 p-2 md:p-3 bg-black/50 hover:bg-black/70 rounded-full transition"
+          className="absolute left-4 top-1/2 -translate-y-1/2 z-20 p-3 bg-black/50 hover:bg-black/70 rounded-full"
         >
-          <ChevronLeft size={20} className="md:w-6 md:h-6 text-white" />
+          <ChevronLeft className="w-6 h-6 text-white" />
         </button>
         <button
           onClick={nextSlide}
-          className="absolute right-2 md:right-4 top-1/2 -translate-y-1/2 z-20 p-2 md:p-3 bg-black/50 hover:bg-black/70 rounded-full transition"
+          className="absolute right-4 top-1/2 -translate-y-1/2 z-20 p-3 bg-black/50 hover:bg-black/70 rounded-full"
         >
-          <ChevronRight size={20} className="md:w-6 md:h-6 text-white" />
+          <ChevronRight className="w-6 h-6 text-white" />
         </button>
       </section>
 
-      {/* Company Profile */}
-      <section id="hakkimizda" className="py-12 md:py-20 px-4 md:px-6">
-        <div className="max-w-7xl mx-auto">
-          <div className="grid md:grid-cols-2 gap-6 md:gap-12 items-center">
-            <div className="relative h-64 md:h-[500px] overflow-hidden rounded-2xl">
-              <Image
-                src="/industrial-steel-factory-workers-warehouse.jpg"
-                alt="Fabrika"
-                fill
-                className="object-cover rounded-2xl hover:scale-105 transition-transform duration-500 ease-out"
-              />
-              <div className="absolute bottom-4 md:bottom-8 left-4 md:left-8 bg-background/95 backdrop-blur-sm rounded-xl p-4 md:p-6 border border-blue-500/50">
-                <div className="text-3xl md:text-5xl font-bold text-blue-400">12+</div>
-                <div className="text-sm md:text-base text-foreground">Yıllık Tecrübe</div>
-              </div>
-            </div>
-
-            <div>
-              <p className="text-blue-400 text-xs md:text-sm mb-2 md:mb-4 tracking-widest uppercase font-bold">
-                Şirket Profil
-              </p>
-              <h2 className="text-2xl sm:text-3xl md:text-5xl font-bold mb-4 md:mb-6 leading-tight">
-                Çelik Sektöründe Yüksek Standart
-              </h2>
-              <p className="text-muted-foreground mb-3 md:mb-6 leading-relaxed text-sm md:text-base">
-                Düzce merkezli olmakla birlikte <strong>81 ile profesyonel hizmet</strong> vermekteyiz. Sandviç Panel
-                Satış ve Montajı, Sac Kesme ve Bükme, Demir Çelik Sac ve Profil Çeşitleri, Soğuk Hava Deposu panel
-                Satışı ve Montajı ve Her türlü Kayıklı-Kayıksız Yapılar konusunda uzman teknik personel ve kaliteli
-                ekipman ile hizmet vermekteyiz.
-              </p>
-              <p className="text-muted-foreground mb-6 md:mb-8 leading-relaxed text-sm md:text-base">
-                Firmamız; sektörün ihtiyaçlarına ve kalite beklentilerine uyumlu düzenleme ve değişikliklerle günümüz
-                rekabet ortamında, gün geçtikçe artan bir rekabet gücüyle faaliyetlerine devam etmektedir.
-              </p>
-              <Button className="bg-blue-500 hover:bg-blue-600 px-6 md:px-8 py-2 md:py-3 text-sm md:text-base">
-                Daha Fazla Bilgi
-              </Button>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Services Section */}
+      {/* Services */}
       <section id="hizmetler" className="py-16 md:py-24 bg-background">
         <div className="max-w-7xl mx-auto px-4 md:px-6">
-          <h2 className="text-3xl md:text-4xl font-bold mb-4 text-center text-blue-500 text-balance">
-            Çelik ve Metal İşleme Çözümleri
-          </h2>
-          <p className="text-gray-600 dark:text-gray-300 mb-12 text-center max-w-3xl mx-auto">
-            Düzce merkezli, 12+ yıllık tecrübemiz ile 81 ile endüstriyel çelik yapı, metal işleme ve sandviç panel
-            çözümleri sunuyoruz.
-          </p>
+          <div className="text-center mb-12">
+            <p className="text-blue-500 font-bold uppercase tracking-wider mb-2">Hizmetlerimiz</p>
+            <h2 className="text-3xl md:text-4xl font-bold mb-4">Çelik Yapı Çözümleri</h2>
+            <p className="text-muted-foreground max-w-2xl mx-auto">Düzce merkezli, 81 ile profesyonel hizmet</p>
+          </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 md:gap-8">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
             {[
-              {
-                icon: Building2,
-                title: "Endüstriyel Çelik Yapılar",
-                desc: "Fabrika, depo ve ticari yapılar için dayanıklı çelik konstrüksiyon",
-              },
-              {
-                icon: Building,
-                title: "Sandviç Panel Sistemleri",
-                desc: "Thermal ve akustik izolasyonlu panel satış ve montajı",
-              },
-              {
-                icon: Sun,
-                title: "Özel Metal İmalat",
-                desc: "Sac kesme, bükme ve kaynaklama işlemleri",
-              },
-              {
-                icon: Shield,
-                title: "Soğuk Hava Deposu",
-                desc: "Yüksek performanslı panel ve sistem çözümleri",
-              },
+              { icon: Building2, title: "Endüstriyel Yapılar", desc: "Fabrika, depo ve ticari yapılar" },
+              { icon: Building, title: "Sandviç Panel", desc: "Satış ve montaj hizmetleri" },
+              { icon: Wrench, title: "Metal İşleme", desc: "Sac kesme, bükme, kaynak" },
+              { icon: Shield, title: "Soğuk Hava Deposu", desc: "Panel satışı ve montajı" },
             ].map((service, idx) => (
-              <div
-                key={idx}
-                className="p-6 rounded-lg border border-border bg-card hover:shadow-lg transition-all duration-300 flex flex-col items-center text-center"
-              >
-                <service.icon className="w-12 h-12 mb-4 text-blue-500 dark:text-blue-400" />
-                <h3 className="text-xl font-bold mb-2">{service.title}</h3>
+              <div key={idx} className="p-6 rounded-xl border bg-card hover:shadow-lg transition-all text-center">
+                <service.icon className="w-12 h-12 mx-auto mb-4 text-blue-500" />
+                <h3 className="text-lg font-bold mb-2">{service.title}</h3>
                 <p className="text-sm text-muted-foreground">{service.desc}</p>
               </div>
             ))}
@@ -436,128 +381,67 @@ export default function HomePage() {
         </div>
       </section>
 
-      <section className="py-16 md:py-24 bg-secondary/5 px-4 md:px-6">
-        <div className="max-w-7xl mx-auto">
-          <div className="text-center mb-12">
-            <p className="text-blue-400 mb-4 tracking-widest uppercase font-bold text-xl">Size Özel Üretim</p>
-            <h2 className="text-3xl md:text-5xl font-bold mb-4">Özel Üretimlerimiz</h2>
-            <p className="text-muted-foreground max-w-3xl mx-auto">
-              İhtiyacınıza özel tasarım ve üretim hizmetleri sunuyoruz. Projeleriniz için en uygun çözümleri birlikte
-              oluşturalım.
-            </p>
-          </div>
-
-          <div className="grid md:grid-cols-3 gap-8">
-            {[
-              {
-                title: "Özel Tasarım Çelik Yapılar",
-                desc: "Proje ihtiyaçlarınıza özel tasarlanan çelik konstrüksiyon çözümleri",
-                img: "/steel-construction-industrial-factory-building.jpg",
-              },
-              {
-                title: "Endüstriyel Kapı Sistemleri",
-                desc: "Otomatik ve manuel endüstriyel kapı sistemleri üretimi ve montajı",
-                img: "/industrial-steel-factory-workers-warehouse.jpg",
-              },
-              {
-                title: "Özel Proje Uygulamaları",
-                desc: "Mimari projelere özel metal işleme ve imalat çözümleri",
-                img: "/sandwich-panel-building-construction-modern.jpg",
-              },
-            ].map((item, idx) => (
-              <div
-                key={idx}
-                className="bg-card border border-border rounded-xl overflow-hidden hover:shadow-xl transition-all duration-300 group"
-              >
-                <div className="relative h-48 overflow-hidden">
-                  <Image
-                    src={item.img || "/placeholder.svg"}
-                    alt={item.title}
-                    fill
-                    className="object-cover group-hover:scale-105 transition-transform duration-300"
-                  />
-                </div>
-                <div className="p-6">
-                  <h3 className="text-xl font-bold mb-3">{item.title}</h3>
-                  <p className="text-muted-foreground text-sm leading-relaxed">{item.desc}</p>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* Trust Section */}
-      <section className="py-16 md:py-24 bg-background">
+      <section id="projeler" className="py-16 md:py-24 bg-secondary/5">
         <div className="max-w-7xl mx-auto px-4 md:px-6">
           <div className="text-center mb-12">
-            <p className="text-blue-400 mb-4 tracking-widest uppercase font-bold text-lg">
-              Sertifikasyonlar & Standartlar
-            </p>
-            <h2 className="text-3xl md:text-5xl font-bold mb-6">Güvenilirlik ve Kalite</h2>
-            <p className="text-muted-foreground max-w-3xl mx-auto text-base">
-              Uluslararası standartlara uygun üretim ve montaj hizmetleri. 12+ yıllık deneyim ve binlerce başarılı
-              proje.
+            <p className="text-blue-500 font-bold uppercase tracking-wider mb-2">Projelerimiz</p>
+            <h2 className="text-3xl md:text-4xl font-bold mb-4">Tamamlanan Projeler</h2>
+            <p className="text-muted-foreground max-w-2xl mx-auto">
+              Her projeyi adım adım, detaylı yapım aşamalarıyla sunuyoruz
             </p>
           </div>
 
-          <div className="grid md:grid-cols-4 gap-6">
-            {[
-              { label: "ISO 9001", icon: "✓" },
-              { label: "CE Belgeli", icon: "✓" },
-              { label: "Teknik Kontrol", icon: "✓" },
-              { label: "Garantili Hizmet", icon: "✓" },
-            ].map((cert, idx) => (
-              <div
-                key={idx}
-                className="p-6 border border-border rounded-xl text-center hover:shadow-lg transition-shadow"
-              >
-                <div className="text-4xl font-bold text-blue-500 mb-3">{cert.icon}</div>
-                <h3 className="font-semibold text-lg">{cert.label}</h3>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
+          {projectsLoading ? (
+            <div className="text-center text-muted-foreground">Projeler yükleniyor...</div>
+          ) : featuredProjects.length > 0 ? (
+            <div className="grid md:grid-cols-3 gap-6 mb-8">
+              {featuredProjects.map((project) => (
+                <Link key={project.id} href={`/projeler/${project.id}`} className="group">
+                  <div className="bg-card border rounded-xl overflow-hidden hover:shadow-xl transition-all">
+                    <div className="relative h-48 overflow-hidden">
+                      <Image
+                        src={project.featured_image_url || "/steel-construction-industrial-factory-building.jpg"}
+                        alt={project.title}
+                        fill
+                        className="object-cover group-hover:scale-105 transition-transform duration-300"
+                      />
+                      <div className="absolute top-4 left-4">
+                        <span className="bg-blue-500 text-white text-xs px-3 py-1 rounded-full font-medium">
+                          {project.category}
+                        </span>
+                      </div>
+                    </div>
+                    <div className="p-5">
+                      <h3 className="text-xl font-bold mb-2 group-hover:text-blue-500 transition-colors">
+                        {project.title}
+                      </h3>
+                      <div className="flex items-center gap-2 text-sm text-muted-foreground mb-3">
+                        <MapPin className="w-4 h-4" />
+                        <span>{project.location}</span>
+                        {project.project_duration && <span>• {project.project_duration}</span>}
+                      </div>
+                      <p className="text-sm text-muted-foreground line-clamp-2">{project.description}</p>
+                      <div className="mt-4 flex items-center text-blue-500 font-medium text-sm">
+                        Yapım Aşamalarını Gör <ArrowRight className="w-4 h-4 ml-1" />
+                      </div>
+                    </div>
+                  </div>
+                </Link>
+              ))}
+            </div>
+          ) : (
+            <div className="text-center text-muted-foreground mb-8">Henüz proje eklenmemiş</div>
+          )}
 
-      {/* Key Metrics Section */}
-      <section className="py-16 md:py-20 bg-blue-600/10 border-t border-b border-blue-600/20">
-        <div className="max-w-7xl mx-auto px-4 md:px-6">
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-6 md:gap-12 text-center">
-            {[
-              { metric: "12+", label: "Yıllık Tecrübe" },
-              { metric: "1000+", label: "Tamamlanan Proje" },
-              { metric: "81", label: "Hizmet Verilen İl" },
-              { metric: "100%", label: "Müşteri Memnuniyeti" },
-            ].map((item, idx) => (
-              <div key={idx}>
-                <div className="text-3xl md:text-5xl font-bold text-blue-500 mb-2">{item.metric}</div>
-                <div className="text-sm md:text-base text-muted-foreground">{item.label}</div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* Photo Gallery - Sayfalama eklendi, sabit yükseklik */}
-      {/* Kategoriler çalışıyor */}
-      <section id="projeler" className="py-12 md:py-16 px-4 md:px-6 bg-secondary/5">
-        <div className="max-w-7xl mx-auto">
-          <div className="text-center mb-8 md:mb-10">
-            <p className="text-blue-400 mb-2 md:mb-4 tracking-widest uppercase font-bold text-xl">
-              Projelerimizden Kareler
-            </p>
-            <h2 className="text-2xl sm:text-3xl md:text-5xl font-bold mb-2 md:mb-4">Foto Galeri</h2>
-            <p className="text-muted-foreground mb-4 md:mb-6 max-w-2xl mx-auto text-xs md:text-base">
-              Tamamladığımız projelerin fotoğraflarını inceleyerek işçiliğimiz hakkında fikir edinin.
-            </p>
-
-            <div className="flex flex-wrap items-center justify-center gap-2 md:gap-3 mb-6">
+          {/* Photo Gallery */}
+          <div className="mt-16">
+            <h3 className="text-2xl font-bold text-center mb-6">Foto Galeri</h3>
+            <div className="flex flex-wrap justify-center gap-2 mb-6">
               {mediaCategories.map((tab) => (
                 <button
                   key={tab}
                   onClick={() => setActivePhotoTab(tab)}
-                  className={`px-3 md:px-5 py-1.5 md:py-2 rounded-full transition font-medium text-xs md:text-sm ${
+                  className={`px-4 py-2 rounded-full text-sm font-medium transition ${
                     activePhotoTab === tab
                       ? "bg-blue-500 text-white"
                       : "bg-secondary text-muted-foreground hover:bg-secondary/80"
@@ -567,98 +451,129 @@ export default function HomePage() {
                 </button>
               ))}
             </div>
-          </div>
 
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-2 md:gap-3">
-            {displayedImages.map((img, i) => (
-              <div
-                key={i}
-                className="relative aspect-square group overflow-hidden rounded-lg cursor-pointer"
-                onClick={() => openLightbox(i)}
-              >
-                <Image
-                  src={img || "/placeholder.svg"}
-                  alt={`Project ${i + 1}`}
-                  fill
-                  className="object-cover group-hover:scale-110 transition duration-500"
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition" />
-              </div>
-            ))}
-          </div>
-
-          {hasMoreImages && (
-            <div className="text-center mt-6">
-              <Button
-                onClick={() => setVisibleImageCount((prev) => prev + 8)}
-                className="bg-blue-500 hover:bg-blue-600 text-white"
-              >
-                Daha Fazla Görsel ({filteredImages.length - visibleImageCount} kaldı)
-              </Button>
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+              {displayedImages.map((img, i) => (
+                <div
+                  key={i}
+                  className="relative aspect-square group overflow-hidden rounded-lg cursor-pointer"
+                  onClick={() => openLightbox(i)}
+                >
+                  <Image
+                    src={img || "/placeholder.svg"}
+                    alt={`Project ${i + 1}`}
+                    fill
+                    className="object-cover group-hover:scale-110 transition duration-500"
+                  />
+                  <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition" />
+                </div>
+              ))}
             </div>
-          )}
+
+            {hasMoreImages && (
+              <div className="text-center mt-6">
+                <Button onClick={() => setVisibleImageCount((prev) => prev + 8)} variant="outline">
+                  Daha Fazla Görsel ({filteredImages.length - visibleImageCount} kaldı)
+                </Button>
+              </div>
+            )}
+          </div>
         </div>
       </section>
 
-      {/* Contact Section */}
-      <section id="iletisim" className="py-12 md:py-20 px-4 md:px-6 bg-secondary/20">
+      {/* About */}
+      <section id="hakkimizda" className="py-16 md:py-24 px-4 md:px-6">
         <div className="max-w-7xl mx-auto">
-          <div className="grid md:grid-cols-2 gap-6 md:gap-12">
+          <div className="grid md:grid-cols-2 gap-12 items-center">
+            <div className="relative h-80 md:h-[450px] rounded-2xl overflow-hidden">
+              <Image
+                src="/industrial-steel-factory-workers-warehouse.jpg"
+                alt="Fabrika"
+                fill
+                className="object-cover"
+              />
+              <div className="absolute bottom-6 left-6 bg-background/95 backdrop-blur rounded-xl p-4 border">
+                <div className="text-4xl font-bold text-blue-500">12+</div>
+                <div className="text-sm">Yıllık Tecrübe</div>
+              </div>
+            </div>
+
             <div>
-              <p className="text-blue-400 text-xs mb-2 md:mb-4 uppercase font-bold tracking-wider md:text-base">
-                İletişim
+              <p className="text-blue-500 font-bold uppercase tracking-wider mb-2">Hakkımızda</p>
+              <h2 className="text-3xl md:text-4xl font-bold mb-6">Çelik Sektöründe Güvenilir Çözüm Ortağı</h2>
+              <p className="text-muted-foreground mb-6 leading-relaxed">
+                Düzce merkezli olmakla birlikte 81 ile profesyonel hizmet vermekteyiz. Sandviç Panel, Sac Kesme-Bükme,
+                Demir Çelik Profil, Soğuk Hava Deposu ve her türlü kaynaklı yapılar konusunda uzman ekibimizle
+                yanınızdayız.
               </p>
-              <h2 className="text-2xl sm:text-3xl md:text-5xl font-bold mb-4 md:mb-6">Bize Ulaşın</h2>
-              <p className="text-muted-foreground mb-6 md:mb-8 leading-relaxed text-sm md:text-base">
-                Projeleriniz için profesyonel çelik yapı çözümleri sunuyoruz. Detaylı bilgi almak ve ücretsiz keşif için
-                bizimle iletişime geçin.
+              <div className="grid grid-cols-2 gap-4 mb-6">
+                {["ISO 9001 Belgeli", "CE Sertifikalı", "Zamanında Teslimat", "Garantili İşçilik"].map((item) => (
+                  <div key={item} className="flex items-center gap-2">
+                    <div className="w-2 h-2 bg-blue-500 rounded-full" />
+                    <span className="text-sm">{item}</span>
+                  </div>
+                ))}
+              </div>
+              <Button className="bg-blue-500 hover:bg-blue-600">Daha Fazla Bilgi</Button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Contact */}
+      <section id="iletisim" className="py-16 md:py-24 px-4 md:px-6 bg-secondary/10">
+        <div className="max-w-7xl mx-auto">
+          <div className="grid md:grid-cols-2 gap-12">
+            <div>
+              <p className="text-blue-500 font-bold uppercase tracking-wider mb-2">İletişim</p>
+              <h2 className="text-3xl md:text-4xl font-bold mb-6">Bize Ulaşın</h2>
+              <p className="text-muted-foreground mb-8">
+                Projeleriniz için profesyonel çelik yapı çözümleri sunuyoruz.
               </p>
 
-              <div className="space-y-4 md:space-y-6">
+              <div className="space-y-4">
                 {[
                   { icon: Phone, label: "Telefon", value: "+90 537 339 39 47" },
                   { icon: Mail, label: "E-posta", value: "info@atlcelikyapi.com" },
-                  { icon: MapPin, label: "Adres", value: "Küçük Sanayi Sitesi Merkez, Düzce, Türkiye" },
+                  { icon: MapPin, label: "Adres", value: "Küçük Sanayi Sitesi, Düzce" },
                 ].map((item, i) => (
-                  <div key={i} className="flex items-center gap-3 md:gap-4">
-                    <div className="w-10 md:w-12 h-10 md:h-12 bg-blue-500/10 rounded-xl flex items-center justify-center flex-shrink-0">
-                      <item.icon className="w-5 md:w-6 h-5 md:h-6 text-blue-400" />
+                  <div key={i} className="flex items-center gap-4">
+                    <div className="w-12 h-12 bg-blue-500/10 rounded-xl flex items-center justify-center">
+                      <item.icon className="w-5 h-5 text-blue-500" />
                     </div>
                     <div>
-                      <div className="font-semibold text-sm md:text-base">{item.label}</div>
-                      <div className="text-muted-foreground text-sm md:text-sm">{item.value}</div>
+                      <div className="font-medium">{item.label}</div>
+                      <div className="text-muted-foreground text-sm">{item.value}</div>
                     </div>
                   </div>
                 ))}
               </div>
             </div>
 
-            <div className="bg-card border border-border rounded-2xl p-4 md:p-8">
-              <h3 className="text-xl md:text-2xl font-bold mb-4 md:mb-6">Teklif Formu</h3>
-              <form className="space-y-3 md:space-y-4">
+            <div className="bg-card border rounded-2xl p-6 md:p-8">
+              <h3 className="text-xl font-bold mb-6">Teklif Formu</h3>
+              <form className="space-y-4">
                 <input
                   type="text"
                   placeholder="Adınız Soyadınız"
-                  className="w-full bg-secondary/50 border border-border rounded-lg px-3 md:px-4 py-2 md:py-3.5 text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-blue-500 transition text-sm md:text-base"
+                  className="w-full bg-secondary/50 border rounded-lg px-4 py-3 focus:outline-none focus:border-blue-500"
                 />
                 <input
                   type="email"
                   placeholder="E-posta Adresiniz"
-                  className="w-full bg-secondary/50 border border-border rounded-lg px-3 md:px-4 py-2 md:py-3.5 text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-blue-500 transition text-sm md:text-base"
+                  className="w-full bg-secondary/50 border rounded-lg px-4 py-3 focus:outline-none focus:border-blue-500"
                 />
                 <input
                   type="tel"
                   placeholder="Telefon Numaranız"
-                  className="w-full bg-secondary/50 border border-border rounded-lg px-3 md:px-4 py-2 md:py-3.5 text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-blue-500 transition text-sm md:text-base"
+                  className="w-full bg-secondary/50 border rounded-lg px-4 py-3 focus:outline-none focus:border-blue-500"
                 />
                 <textarea
-                  placeholder="Mesajınızı Girin"
-                  rows={3}
-                  className="w-full bg-secondary/50 border border-border rounded-lg px-3 md:px-4 py-2 md:py-3.5 text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-blue-500 transition resize-none text-sm md:text-base"
+                  placeholder="Mesajınız"
+                  rows={4}
+                  className="w-full bg-secondary/50 border rounded-lg px-4 py-3 focus:outline-none focus:border-blue-500 resize-none"
                 />
-                <Button className="w-full bg-blue-500 hover:bg-blue-600 py-3 md:py-4 text-base md:text-lg font-semibold">
-                  GÖNDER
-                </Button>
+                <Button className="w-full bg-blue-500 hover:bg-blue-600 py-3 font-semibold">GÖNDER</Button>
               </form>
             </div>
           </div>
@@ -666,17 +581,14 @@ export default function HomePage() {
       </section>
 
       {/* Footer */}
-      <footer className="bg-primary text-primary-foreground py-8 md:py-12 px-4 md:px-6">
+      <footer className="bg-primary text-primary-foreground py-12 px-4 md:px-6">
         <div className="max-w-7xl mx-auto">
           {sponsors.length > 0 && (
-            <div className="mb-8 md:mb-12 pb-8 md:pb-12 border-b border-white/20">
-              <h2 className="text-2xl md:text-3xl font-bold text-white mb-6 text-center">İş Ortaklarımız</h2>
-              <div className="flex items-center justify-center gap-6 md:gap-10 flex-wrap">
+            <div className="mb-12 pb-12 border-b border-white/20">
+              <h2 className="text-2xl font-bold text-white mb-6 text-center">İş Ortaklarımız</h2>
+              <div className="flex items-center justify-center gap-8 flex-wrap">
                 {sponsors.map((sponsor) => (
-                  <div
-                    key={sponsor.id}
-                    className="text-white/90 text-base md:text-xl font-bold hover:text-white transition-colors duration-200"
-                  >
+                  <div key={sponsor.id} className="text-white/90 text-lg font-bold">
                     {sponsor.name}
                   </div>
                 ))}
@@ -684,11 +596,9 @@ export default function HomePage() {
             </div>
           )}
 
-          {/* Harita Bölümü - Sosyal medya footer'a taşındı */}
-          <div className="mb-8 md:mb-12 pb-8 md:pb-12 border-b border-white/20">
-            <h2 className="text-xl md:text-2xl font-bold text-white mb-6 text-center">Biz Neredeyiz?</h2>
-
-            <div className="relative w-full h-64 md:h-80 rounded-lg overflow-hidden mb-6">
+          <div className="mb-12 pb-12 border-b border-white/20">
+            <h2 className="text-xl font-bold text-white mb-6 text-center">Biz Neredeyiz?</h2>
+            <div className="relative w-full h-64 rounded-lg overflow-hidden">
               <iframe
                 width="100%"
                 height="100%"
@@ -696,68 +606,62 @@ export default function HomePage() {
                 src={GOOGLE_MAPS_EMBED}
                 allowFullScreen
                 loading="lazy"
-                referrerPolicy="no-referrer-when-downgrade"
-                title="ATL Çelik Yapı Konum Haritası"
+                title="Konum"
               ></iframe>
             </div>
           </div>
 
-          <div className="flex mb-8 items-stretch leading-7 mr-0 md:mb-0 flex-row gap-[0] text-left justify-center opacity-100">
-            <div className="relative h-32 md:h-48 w-auto">
-              <img src="/images/logo.png" alt="ATL Çelik Yapı" className="h-full w-auto" />
-            </div>
+          <div className="flex justify-center mb-8">
+            <img src="/images/logo.png" alt="ATL Çelik Yapı" className="h-20 md:h-24" />
           </div>
 
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-6 md:gap-8 pb-8 md:pb-10 border-b border-white/20">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-8 pb-8 border-b border-white/20">
             <div>
-              <h3 className="font-bold text-sm md:text-lg mb-3 md:mb-4 text-white">Hizmetler</h3>
-              <ul className="space-y-1 md:space-y-2 text-white/80 text-xs md:text-sm">
-                {["Çelik Konstrüksiyon", "Sandviç Panel", "Sac Metal İşleme", "Özel Üretim"].map((item) => (
+              <h3 className="font-bold mb-4 text-white">Hizmetler</h3>
+              <ul className="space-y-2 text-white/80 text-sm">
+                {["Çelik Konstrüksiyon", "Sandviç Panel", "Metal İşleme", "Özel Üretim"].map((item) => (
                   <li key={item}>
-                    <a href="#" className="hover:text-white transition">
+                    <a href="#" className="hover:text-white">
                       {item}
                     </a>
                   </li>
                 ))}
               </ul>
             </div>
-
             <div>
-              <h3 className="font-bold text-sm md:text-lg mb-3 md:mb-4 text-white">Kurumsal</h3>
-              <ul className="space-y-1 md:space-y-2 text-white/80 text-xs md:text-sm">
-                {["Hakkımızda", "Ürünlerimiz", "Üretim", "İletişim"].map((item) => (
+              <h3 className="font-bold mb-4 text-white">Kurumsal</h3>
+              <ul className="space-y-2 text-white/80 text-sm">
+                {["Hakkımızda", "Projeler", "Referanslar"].map((item) => (
                   <li key={item}>
-                    <a href="#" className="hover:text-white transition">
+                    <a href="#" className="hover:text-white">
                       {item}
                     </a>
                   </li>
                 ))}
               </ul>
             </div>
-
             <div>
-              <h3 className="font-bold text-sm md:text-lg mb-3 md:mb-4 text-white">Destek</h3>
-              <ul className="space-y-1 md:space-y-2 text-white/80 text-xs md:text-sm">
-                {["Teklif Al", "SSS", "Referanslar"].map((item) => (
+              <h3 className="font-bold mb-4 text-white">Destek</h3>
+              <ul className="space-y-2 text-white/80 text-sm">
+                {["Teklif Al", "SSS", "İletişim"].map((item) => (
                   <li key={item}>
-                    <a href="#" className="hover:text-white transition">
+                    <a href="#" className="hover:text-white">
                       {item}
                     </a>
                   </li>
                 ))}
               </ul>
             </div>
-
             <div>
-              <h3 className="font-bold text-sm md:text-lg mb-3 md:mb-4 text-white">İletişim</h3>
-              <ul className="space-y-1 md:space-y-2 text-white/80 text-xs md:text-sm">
+              <h3 className="font-bold mb-4 text-white">İletişim</h3>
+              <ul className="space-y-2 text-white/80 text-sm">
                 <li>
-                  <a href="tel:+905373393947" className="hover:text-white transition">
+                  <a href="tel:+905373393947" className="hover:text-white">
                     0537 339 39 47
                   </a>
                 </li>
                 <li>
-                  <a href="mailto:info@atlcelikyapi.com" className="hover:text-white transition">
+                  <a href="mailto:info@atlcelikyapi.com" className="hover:text-white">
                     info@atlcelikyapi.com
                   </a>
                 </li>
@@ -765,16 +669,14 @@ export default function HomePage() {
             </div>
           </div>
 
-          <div className="pt-6 md:pt-8 flex flex-col md:flex-row items-center justify-between gap-4 text-xs md:text-sm text-white/80 text-center md:text-left">
+          <div className="pt-8 flex flex-col md:flex-row items-center justify-between gap-4 text-sm text-white/80">
             <p>© 2025 ATL Çelik Yapı. Tüm hakları saklıdır.</p>
-
             <div className="flex items-center gap-4">
               <a
                 href="https://www.instagram.com/atlcelikyapi"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="text-white hover:text-blue-400 transition-colors"
-                aria-label="Instagram"
+                className="text-white hover:text-blue-400"
               >
                 <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
                   <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.073-1.689-.073-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073z" />
@@ -784,40 +686,30 @@ export default function HomePage() {
                 href="https://www.tiktok.com/@atlcelikyapi"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="text-white hover:text-blue-400 transition-colors"
-                aria-label="TikTok"
+                className="text-white hover:text-blue-400"
               >
                 <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
                   <path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-5.2 1.74 2.89 2.89 0 0 1 2.31-4.64 2.93 2.93 0 0 1 .88.13V9.4a6.84 6.84 0 0 0-1-.05A6.33 6.33 0 0 0 5 20.1a6.34 6.34 0 0 0 10.86-4.43v-7a8.16 8.16 0 0 0 4.77 1.52v-3.4a4.85 4.85 0 0 1-1-.1z" />
                 </svg>
               </a>
             </div>
-
-            <div className="flex items-center gap-4 text-xs text-white/60">
-              <span>
-                Designed by{" "}
-                <a
-                  href="https://github.com/rootbarann"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-blue-400 hover:text-blue-300 transition-colors font-semibold"
-                >
-                  @rootbarann
-                </a>
-              </span>
-            </div>
+            <span className="text-white/60 text-xs">
+              Designed by{" "}
+              <a
+                href="https://github.com/rootbarann"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-blue-400 hover:text-blue-300 font-semibold"
+              >
+                @rootbarann
+              </a>
+            </span>
           </div>
         </div>
       </footer>
 
-      {/* Photo Lightbox */}
       {lightboxOpen && (
         <PhotoLightbox images={galleryImages} initialIndex={lightboxIndex} onClose={() => setLightboxOpen(false)} />
-      )}
-
-      {/* Video Modal */}
-      {videoModalOpen && (
-        <VideoModal isOpen={videoModalOpen} onClose={() => setVideoModalOpen(false)} title={selectedVideoId} />
       )}
     </div>
   )
