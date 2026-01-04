@@ -17,6 +17,7 @@ import {
   Settings,
   Sun,
   Moon,
+  Building2,
 } from "lucide-react"
 import Link from "next/link"
 import Image from "next/image"
@@ -33,6 +34,7 @@ export default function AdminLayout({
   const [isDarkMode, setIsDarkMode] = useState(true)
 
   const navItems = [
+    { label: "Projeler", href: "/admin/projeler", icon: Building2 },
     { label: "Medya", href: "/admin/medya", icon: ImageIcon },
     { label: "Slider", href: "/admin/slider", icon: Layers },
     { label: "Video", href: "/admin/video", icon: Video },

@@ -53,8 +53,10 @@ export default function HomePage() {
   const [videoModalOpen, setVideoModalOpen] = useState(false)
   const [selectedVideoId, setSelectedVideoId] = useState("")
   const [sponsors, setSponsors] = useState<Sponsor[]>([])
+  const [mediaCategories, setMediaCategories] = useState<string[]>(["Tümü"])
 
   const [galleryImages, setGalleryImages] = useState<string[]>([])
+  const [allMediaItems, setAllMediaItems] = useState<MediaItem[]>([])
   const [videos, setVideos] = useState<VideoItem[]>([])
   const [mediaLoading, setMediaLoading] = useState(true)
   const [videosLoading, setVideosLoading] = useState(true)
@@ -68,9 +70,17 @@ export default function HomePage() {
         if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`)
         const result = await response.json()
         if (result.data) {
-          const images = result.data
-            .filter((item: MediaItem) => item.file_type.startsWith("image"))
-            .map((item: MediaItem) => item.url)
+          setAllMediaItems(result.data)
+
+          const uniqueCategories = [
+            "Tümü",
+            ...Array.from(new Set(result.data.map((item: MediaItem) => item.category).filter(Boolean))),
+          ]
+          setMediaCategories(uniqueCategories)
+
+          const imageItems = result.data.filter((item: MediaItem) => item.file_type.startsWith("image"))
+          const images = imageItems.map((item: MediaItem) => item.url)
+
           setGalleryImages(
             images.length > 0
               ? images
@@ -82,12 +92,12 @@ export default function HomePage() {
                   "/steel-construction-industrial-factory-building.jpg",
                   "/industrial-industrial-.jpg",
                   "/steel-construction-building-project-warehouse-.jpg",
-                  "/laser-cutting-metal-industrial-sparks.jpg",
                 ],
           )
         }
       } catch (error) {
         console.error("Media fetch error:", error)
+        setMediaCategories(["Tümü", "Depo", "Fabrika", "Hangar", "Ticari", "Tarımsal", "Spor"])
         setGalleryImages([
           "/steel-construction-industrial-factory-building.jpg",
           "/steel-construction-building-project-warehouse-.jpg",
@@ -96,7 +106,6 @@ export default function HomePage() {
           "/steel-construction-industrial-factory-building.jpg",
           "/industrial-industrial-.jpg",
           "/steel-construction-building-project-warehouse-.jpg",
-          "/laser-cutting-metal-industrial-sparks.jpg",
         ])
       } finally {
         setMediaLoading(false)
@@ -182,8 +191,13 @@ export default function HomePage() {
     setMobileMenuOpen(false)
   }
 
-  const displayedImages = galleryImages.slice(0, visibleImageCount)
-  const hasMoreImages = galleryImages.length > visibleImageCount
+  const filteredImages =
+    activePhotoTab === "Tümü"
+      ? galleryImages
+      : galleryImages.filter((_, i) => allMediaItems[i]?.category === activePhotoTab)
+
+  const displayedImages = filteredImages.slice(0, visibleImageCount)
+  const hasMoreImages = filteredImages.length > visibleImageCount
 
   return (
     <div className="min-h-screen bg-background text-foreground">
@@ -195,8 +209,8 @@ export default function HomePage() {
             {/* Logo */}
             <div className="flex-shrink-0">
               <Link href="/">
-                <img src="/images/logo.png" alt="ATL Çelik Yapı" className="h-10 md:h-14 dark:hidden" />
-                <img src="/darkmodelogo.png" alt="ATL Çelik Yapı" className="h-10 md:h-14 hidden dark:block" />
+                <img src="/images/logo.png" alt="ATL Çelik Yapı" className="h-12 md:h-16 dark:hidden" />
+                <img src="/images/logo.png" alt="ATL Çelik Yapı" className="h-12 md:h-16 hidden dark:block" />
               </Link>
             </div>
 
@@ -310,11 +324,11 @@ export default function HomePage() {
             {slides[currentSlide].title}
           </h1>
           <div className="flex gap-2 md:gap-4 flex-wrap">
-            <Button className="bg-blue-500 hover:bg-blue-600 text-white px-4 md:px-8 py-3 md:py-6 text-sm md:text-lg">
-              Keşfet <ChevronRight className="ml-2 w-4 md:w-5 h-4 md:h-5" />
+            <Button className="bg-blue-500 hover:bg-blue-600 text-white px-4 md:px-8 py-3 md:py-6 text-sm md:text-lg font-semibold">
+              Teklif Al <ChevronRight className="ml-2 w-4 md:w-5 h-4 md:h-5" />
             </Button>
-            <Button className="bg-transparent border border-white text-white hover:bg-white/10 px-4 md:px-8 py-3 md:py-6 text-sm md:text-lg">
-              İletişime Geç
+            <Button className="bg-transparent border border-white text-white hover:bg-white/10 px-4 md:px-8 py-3 md:py-6 text-sm md:text-lg font-semibold">
+              Projelerimizi Gör
             </Button>
           </div>
         </div>
@@ -390,23 +404,23 @@ export default function HomePage() {
             {[
               {
                 icon: Building2,
-                title: "Çatı ve Sundurma",
-                desc: "Dayanıklı ve estetik çatı sistemleri ile sundurma çözümleri",
+                title: "Endüstriyel Çelik Yapılar",
+                desc: "Fabrika, depo ve ticari yapılar için dayanıklı çelik konstrüksiyon",
               },
               {
                 icon: Building,
-                title: "Çelik Yapı",
-                desc: "Endüstriyel ve ticari çelik yapı projeleri",
+                title: "Sandviç Panel Sistemleri",
+                desc: "Thermal ve akustik izolasyonlu panel satış ve montajı",
               },
               {
                 icon: Sun,
-                title: "Gölgelik",
-                desc: "Modern tasarımlı gölgelik ve tente sistemleri",
+                title: "Özel Metal İmalat",
+                desc: "Sac kesme, bükme ve kaynaklama işlemleri",
               },
               {
                 icon: Shield,
-                title: "Kasa İmalat",
-                desc: "Güvenli ve dayanıklı kasa imalatı çözümleri",
+                title: "Soğuk Hava Deposu",
+                desc: "Yüksek performanslı panel ve sistem çözümleri",
               },
             ].map((service, idx) => (
               <div
@@ -453,14 +467,19 @@ export default function HomePage() {
             ].map((item, idx) => (
               <div
                 key={idx}
-                className="bg-card border border-border rounded-xl overflow-hidden hover:shadow-xl transition-all duration-300"
+                className="bg-card border border-border rounded-xl overflow-hidden hover:shadow-xl transition-all duration-300 group"
               >
-                <div className="relative h-48">
-                  <Image src={item.img || "/placeholder.svg"} alt={item.title} fill className="object-cover" />
+                <div className="relative h-48 overflow-hidden">
+                  <Image
+                    src={item.img || "/placeholder.svg"}
+                    alt={item.title}
+                    fill
+                    className="object-cover group-hover:scale-105 transition-transform duration-300"
+                  />
                 </div>
                 <div className="p-6">
                   <h3 className="text-xl font-bold mb-3">{item.title}</h3>
-                  <p className="text-muted-foreground text-sm">{item.desc}</p>
+                  <p className="text-muted-foreground text-sm leading-relaxed">{item.desc}</p>
                 </div>
               </div>
             ))}
@@ -468,58 +487,52 @@ export default function HomePage() {
         </div>
       </section>
 
+      {/* Trust Section */}
       <section className="py-16 md:py-24 bg-background">
         <div className="max-w-7xl mx-auto px-4 md:px-6">
           <div className="text-center mb-12">
-            <p className="text-blue-400 mb-4 tracking-widest uppercase font-bold text-xl">Profesyonel Hizmet</p>
-            <h2 className="text-3xl md:text-5xl font-bold mb-4">Yapım Aşamaları</h2>
-            <p className="text-muted-foreground max-w-3xl mx-auto">
-              Projelerinizin her aşamasında yanınızdayız. Tasarımdan montaja kadar profesyonel hizmet.
+            <p className="text-blue-400 mb-4 tracking-widest uppercase font-bold text-lg">
+              Sertifikasyonlar & Standartlar
+            </p>
+            <h2 className="text-3xl md:text-5xl font-bold mb-6">Güvenilirlik ve Kalite</h2>
+            <p className="text-muted-foreground max-w-3xl mx-auto text-base">
+              Uluslararası standartlara uygun üretim ve montaj hizmetleri. 12+ yıllık deneyim ve binlerce başarılı
+              proje.
             </p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
+          <div className="grid md:grid-cols-4 gap-6">
             {[
-              {
-                title: "Öncesi",
-                desc: "Alan incelemesi ve proje planlaması",
-                image: "/placeholder.svg?height=300&width=300",
-              },
-              {
-                title: "Adım 1",
-                desc: "Temel hazırlığı ve yapı başlangıcı",
-                image: "/placeholder.svg?height=300&width=300",
-              },
-              {
-                title: "Adım 2",
-                desc: "Çelik yapı ve iskelet montajı",
-                image: "/placeholder.svg?height=300&width=300",
-              },
-              {
-                title: "Adım 3",
-                desc: "Çatı ve dış kaplamaları",
-                image: "/placeholder.svg?height=300&width=300",
-              },
-              {
-                title: "Sonu",
-                desc: "Son kontrol ve teslim işlemleri",
-                image: "/placeholder.svg?height=300&width=300",
-              },
-            ].map((stage, idx) => (
-              <div key={idx} className="flex flex-col items-center">
-                <div className="relative w-full aspect-square rounded-lg overflow-hidden mb-4 shadow-lg hover:shadow-xl transition-shadow">
-                  <img
-                    src={stage.image || "/placeholder.svg"}
-                    alt={stage.title}
-                    className="w-full h-full object-cover"
-                  />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent flex items-end p-4">
-                    <div className="text-white">
-                      <h3 className="text-lg font-bold">{stage.title}</h3>
-                    </div>
-                  </div>
-                </div>
-                <p className="text-sm text-center text-muted-foreground">{stage.desc}</p>
+              { label: "ISO 9001", icon: "✓" },
+              { label: "CE Belgeli", icon: "✓" },
+              { label: "Teknik Kontrol", icon: "✓" },
+              { label: "Garantili Hizmet", icon: "✓" },
+            ].map((cert, idx) => (
+              <div
+                key={idx}
+                className="p-6 border border-border rounded-xl text-center hover:shadow-lg transition-shadow"
+              >
+                <div className="text-4xl font-bold text-blue-500 mb-3">{cert.icon}</div>
+                <h3 className="font-semibold text-lg">{cert.label}</h3>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Key Metrics Section */}
+      <section className="py-16 md:py-20 bg-blue-600/10 border-t border-b border-blue-600/20">
+        <div className="max-w-7xl mx-auto px-4 md:px-6">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-6 md:gap-12 text-center">
+            {[
+              { metric: "12+", label: "Yıllık Tecrübe" },
+              { metric: "1000+", label: "Tamamlanan Proje" },
+              { metric: "81", label: "Hizmet Verilen İl" },
+              { metric: "100%", label: "Müşteri Memnuniyeti" },
+            ].map((item, idx) => (
+              <div key={idx}>
+                <div className="text-3xl md:text-5xl font-bold text-blue-500 mb-2">{item.metric}</div>
+                <div className="text-sm md:text-base text-muted-foreground">{item.label}</div>
               </div>
             ))}
           </div>
@@ -527,6 +540,7 @@ export default function HomePage() {
       </section>
 
       {/* Photo Gallery - Sayfalama eklendi, sabit yükseklik */}
+      {/* Kategoriler çalışıyor */}
       <section id="projeler" className="py-12 md:py-16 px-4 md:px-6 bg-secondary/5">
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-8 md:mb-10">
@@ -539,7 +553,7 @@ export default function HomePage() {
             </p>
 
             <div className="flex flex-wrap items-center justify-center gap-2 md:gap-3 mb-6">
-              {["Tümü", "Depo", "Fabrika", "Hangar", "Ticari", "Tarımsal", "Spor"].map((tab) => (
+              {mediaCategories.map((tab) => (
                 <button
                   key={tab}
                   onClick={() => setActivePhotoTab(tab)}
@@ -579,7 +593,7 @@ export default function HomePage() {
                 onClick={() => setVisibleImageCount((prev) => prev + 8)}
                 className="bg-blue-500 hover:bg-blue-600 text-white"
               >
-                Daha Fazla Görsel ({galleryImages.length - visibleImageCount} kaldı)
+                Daha Fazla Görsel ({filteredImages.length - visibleImageCount} kaldı)
               </Button>
             </div>
           )}
@@ -612,7 +626,7 @@ export default function HomePage() {
                     </div>
                     <div>
                       <div className="font-semibold text-sm md:text-base">{item.label}</div>
-                      <div className="text-muted-foreground text-xs md:text-sm">{item.value}</div>
+                      <div className="text-muted-foreground text-sm md:text-sm">{item.value}</div>
                     </div>
                   </div>
                 ))}
@@ -642,7 +656,7 @@ export default function HomePage() {
                   rows={3}
                   className="w-full bg-secondary/50 border border-border rounded-lg px-3 md:px-4 py-2 md:py-3.5 text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-blue-500 transition resize-none text-sm md:text-base"
                 />
-                <Button className="w-full bg-blue-500 hover:bg-blue-600 py-3 md:py-6 text-sm md:text-lg font-semibold">
+                <Button className="w-full bg-blue-500 hover:bg-blue-600 py-3 md:py-4 text-base md:text-lg font-semibold">
                   GÖNDER
                 </Button>
               </form>
@@ -670,36 +684,11 @@ export default function HomePage() {
             </div>
           )}
 
-          {/* Sosyal medya ikonları - harita üstünde */}
+          {/* Harita Bölümü - Sosyal medya footer'a taşındı */}
           <div className="mb-8 md:mb-12 pb-8 md:pb-12 border-b border-white/20">
             <h2 className="text-xl md:text-2xl font-bold text-white mb-6 text-center">Biz Neredeyiz?</h2>
 
-            <div className="flex items-center justify-center gap-6 mb-6">
-              <a
-                href="https://www.instagram.com/atlcelikyapi"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-white hover:text-blue-400 transition-colors"
-                aria-label="Instagram"
-              >
-                <svg className="w-8 h-8 md:w-10 md:h-10" fill="currentColor" viewBox="0 0 24 24">
-                  <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z" />
-                </svg>
-              </a>
-              <a
-                href="https://www.tiktok.com/@atlcelikyapi"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-white hover:text-blue-400 transition-colors"
-                aria-label="TikTok"
-              >
-                <svg className="w-8 h-8 md:w-10 md:h-10" fill="currentColor" viewBox="0 0 24 24">
-                  <path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-5.2 1.74 2.89 2.89 0 0 1 2.31-4.64 2.93 2.93 0 0 1 .88.13V9.4a6.84 6.84 0 0 0-1-.05A6.33 6.33 0 0 0 5 20.1a6.34 6.34 0 0 0 10.86-4.43v-7a8.16 8.16 0 0 0 4.77 1.52v-3.4a4.85 4.85 0 0 1-1-.1z" />
-                </svg>
-              </a>
-            </div>
-
-            <div className="relative w-full h-64 md:h-80 rounded-lg overflow-hidden">
+            <div className="relative w-full h-64 md:h-80 rounded-lg overflow-hidden mb-6">
               <iframe
                 width="100%"
                 height="100%"
@@ -715,8 +704,7 @@ export default function HomePage() {
 
           <div className="flex mb-8 items-stretch leading-7 mr-0 md:mb-0 flex-row gap-[0] text-left justify-center opacity-100">
             <div className="relative h-32 md:h-48 w-auto">
-              <img src="/images/image.png" alt="ATL Çelik Yapı" className="h-full w-auto dark:hidden" />
-              <img src="/darkmodelogo.png" alt="ATL Çelik Yapı" className="h-full w-auto hidden dark:block" />
+              <img src="/images/logo.png" alt="ATL Çelik Yapı" className="h-full w-auto" />
             </div>
           </div>
 
@@ -779,6 +767,31 @@ export default function HomePage() {
 
           <div className="pt-6 md:pt-8 flex flex-col md:flex-row items-center justify-between gap-4 text-xs md:text-sm text-white/80 text-center md:text-left">
             <p>© 2025 ATL Çelik Yapı. Tüm hakları saklıdır.</p>
+
+            <div className="flex items-center gap-4">
+              <a
+                href="https://www.instagram.com/atlcelikyapi"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-white hover:text-blue-400 transition-colors"
+                aria-label="Instagram"
+              >
+                <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+                  <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.073-1.689-.073-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073z" />
+                </svg>
+              </a>
+              <a
+                href="https://www.tiktok.com/@atlcelikyapi"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-white hover:text-blue-400 transition-colors"
+                aria-label="TikTok"
+              >
+                <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+                  <path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-5.2 1.74 2.89 2.89 0 0 1 2.31-4.64 2.93 2.93 0 0 1 .88.13V9.4a6.84 6.84 0 0 0-1-.05A6.33 6.33 0 0 0 5 20.1a6.34 6.34 0 0 0 10.86-4.43v-7a8.16 8.16 0 0 0 4.77 1.52v-3.4a4.85 4.85 0 0 1-1-.1z" />
+                </svg>
+              </a>
+            </div>
 
             <div className="flex items-center gap-4 text-xs text-white/60">
               <span>
