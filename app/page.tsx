@@ -6,6 +6,7 @@ import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { ThemeToggle } from "@/components/theme-toggle"
 import { PhotoLightbox } from "@/components/photo-lightbox"
+import ConstructionProcess from "@/components/construction-process"
 import {
   Phone,
   Mail,
@@ -75,58 +76,28 @@ export default function HomePage() {
   const [phaseModalOpen, setPhaseModalOpen] = useState(false)
   const [phaseModalIndex, setPhaseModalIndex] = useState(0)
   const [currentPhaseImages, setCurrentPhaseImages] = useState<string[]>([])
-  const [activePhase, setActivePhase] = useState(0)
 
-  const constructionPhases = [
-    {
-      id: 1,
-      step: "01",
-      title: "Proje Planlama & Mühendislik",
-      description: "Detaylı analiz, 3D modelleme ve mühendislik hesapları ile projenin temeli atılır.",
-      image: "/placeholder.svg?height=400&width=600",
-    },
-    {
-      id: 2,
-      step: "02",
-      title: "Saha Hazırlığı & Temel",
-      description: "Zemin etüdü, kazı çalışmaları ve betonarme temel imalatı gerçekleştirilir.",
-      image: "/placeholder.svg?height=400&width=600",
-    },
-    {
-      id: 3,
-      step: "03",
-      title: "Çelik İmalat",
-      description: "Fabrikamızda çelik profillerin kesimi, kaynak ve yüzey işlemleri yapılır.",
-      image: "/placeholder.svg?height=400&width=600",
-    },
-    {
-      id: 4,
-      step: "04",
-      title: "Çelik Strüktür Montajı",
-      description: "Prefabrik çelik elemanlar sahada vinç yardımıyla monte edilir.",
-      image: "/placeholder.svg?height=400&width=600",
-    },
-    {
-      id: 5,
-      step: "05",
-      title: "Çatı & Cephe Sistemleri",
-      description: "Sandviç panel, trapez sac ve cephe kaplamaları ile yapı tamamlanır.",
-      image: "/placeholder.svg?height=400&width=600",
-    },
-    {
-      id: 6,
-      step: "06",
-      title: "Teslim & Garanti",
-      description: "Kalite kontrol, final testler ve anahtar teslim ile proje sonlandırılır.",
-      image: "/placeholder.svg?height=400&width=600",
-    },
-  ]
+  const nextSlide = () => setCurrentSlide((prev) => (prev + 1) % 3)
+  const prevSlide = () => setCurrentSlide((prev) => (prev - 1 + 3) % 3)
 
-  const openPhaseModal = (images: string[], index: number) => {
-    setCurrentPhaseImages(images)
-    setPhaseModalIndex(index)
-    setPhaseModalOpen(true)
+  const openLightbox = (index: number) => {
+    setLightboxIndex(index)
+    setLightboxOpen(true)
   }
+
+  const handleNavClick = () => {
+    setMobileMenuOpen(false)
+  }
+
+  const filteredImages =
+    activePhotoTab === "Tümü"
+      ? galleryImages
+      : galleryImages.filter((_, i) => allMediaItems[i]?.category === activePhotoTab)
+
+  const displayedImages = filteredImages.slice(0, visibleImageCount)
+  const hasMoreImages = filteredImages.length > visibleImageCount
+
+  const featuredProjects = projects.filter((p) => p.is_featured).slice(0, 3)
 
   useEffect(() => {
     const fetchMedia = async () => {
@@ -196,30 +167,12 @@ export default function HomePage() {
     fetchProjects()
   }, [])
 
-  const slides = [
-    {
-      img: "/steel-construction-industrial-factory-building.jpg",
-      title: "Çelik Konstrüksiyon",
-      sub: "Endüstriyel tesis ve depo çözümleriniz için",
-    },
-    {
-      img: "/sandwich-panel-building-construction-modern.jpg",
-      title: "Sandviç Panel",
-      sub: "Profesyonel üretim ve montaj hizmetleri",
-    },
-    {
-      img: "/industrial-steel-factory-workers-warehouse.jpg",
-      title: "Metal İşleme",
-      sub: "Kaliteli ve hızlı metal işleme çözümleri",
-    },
-  ]
-
   useEffect(() => {
     const timer = setInterval(() => {
-      setCurrentSlide((prev) => (prev + 1) % slides.length)
+      setCurrentSlide((prev) => (prev + 1) % 3)
     }, 5000)
     return () => clearInterval(timer)
-  }, [slides.length])
+  }, [3])
 
   useEffect(() => {
     const handleScroll = () => {
@@ -228,28 +181,6 @@ export default function HomePage() {
     window.addEventListener("scroll", handleScroll)
     return () => window.removeEventListener("scroll", handleScroll)
   }, [])
-
-  const nextSlide = () => setCurrentSlide((prev) => (prev + 1) % slides.length)
-  const prevSlide = () => setCurrentSlide((prev) => (prev - 1 + slides.length) % slides.length)
-
-  const openLightbox = (index: number) => {
-    setLightboxIndex(index)
-    setLightboxOpen(true)
-  }
-
-  const handleNavClick = () => {
-    setMobileMenuOpen(false)
-  }
-
-  const filteredImages =
-    activePhotoTab === "Tümü"
-      ? galleryImages
-      : galleryImages.filter((_, i) => allMediaItems[i]?.category === activePhotoTab)
-
-  const displayedImages = filteredImages.slice(0, visibleImageCount)
-  const hasMoreImages = filteredImages.length > visibleImageCount
-
-  const featuredProjects = projects.filter((p) => p.is_featured).slice(0, 3)
 
   return (
     <div className="min-h-screen bg-background text-foreground">
@@ -346,14 +277,20 @@ export default function HomePage() {
       {/* Hero */}
       <section id="anasayfa" className="relative h-screen pt-16 md:pt-20">
         <div className="absolute inset-0">
-          {slides.map((slide, i) => (
+          {[0, 1, 2].map((i) => (
             <div
               key={i}
               className={`absolute inset-0 transition-opacity duration-1000 ${currentSlide === i ? "opacity-100" : "opacity-0"}`}
             >
               <Image
-                src={slide.img || "/placeholder.svg"}
-                alt={slide.title}
+                src={
+                  [
+                    "/steel-construction-industrial-factory-building.jpg",
+                    "/sandwich-panel-building-construction-modern.jpg",
+                    "/industrial-steel-factory-workers-warehouse.jpg",
+                  ][i] || "/placeholder.svg"
+                }
+                alt={["Çelik Konstrüksiyon", "Sandviç Panel", "Metal İşleme"][i]}
                 fill
                 className="object-cover"
                 priority={i === 0}
@@ -365,10 +302,16 @@ export default function HomePage() {
 
         <div className="relative z-10 h-full flex flex-col justify-center px-4 md:px-12 max-w-7xl mx-auto">
           <p className="text-blue-400 text-sm mb-2 md:mb-4 tracking-wider font-bold md:text-lg">
-            {slides[currentSlide].sub}
+            {
+              [
+                "Endüstriyel tesis ve depo çözümleriniz için",
+                "Profesyonel üretim ve montaj hizmetleri",
+                "Kaliteli ve hızlı metal işleme çözümleri",
+              ][currentSlide]
+            }
           </p>
           <h1 className="text-4xl sm:text-5xl md:text-7xl font-bold mb-6 md:mb-8 leading-tight text-white">
-            {slides[currentSlide].title}
+            {["Çelik Konstrüksiyon", "Sandviç Panel", "Metal İşleme"][currentSlide]}
           </h1>
 
           <div className="flex gap-8 mb-8 text-white/90">
@@ -451,131 +394,10 @@ export default function HomePage() {
             </p>
           </div>
 
-          {/* Horizontal Carousel */}
-          <div className="relative">
-            {/* Navigation Arrows */}
-            <button
-              onClick={() => setActivePhase((prev) => (prev > 0 ? prev - 1 : constructionPhases.length - 1))}
-              className="absolute left-0 top-1/2 -translate-y-1/2 z-10 bg-blue-500/80 hover:bg-blue-500 text-white p-3 rounded-full shadow-lg transition-all -ml-4 md:ml-0"
-              aria-label="Önceki aşama"
-            >
-              <ChevronLeft className="w-6 h-6" />
-            </button>
-
-            <button
-              onClick={() => setActivePhase((prev) => (prev < constructionPhases.length - 1 ? prev + 1 : 0))}
-              className="absolute right-0 top-1/2 -translate-y-1/2 z-10 bg-blue-500/80 hover:bg-blue-500 text-white p-3 rounded-full shadow-lg transition-all -mr-4 md:mr-0"
-              aria-label="Sonraki aşama"
-            >
-              <ChevronRight className="w-6 h-6" />
-            </button>
-
-            {/* Cards Container */}
-            <div className="overflow-hidden mx-8 md:mx-16">
-              <div
-                className="flex transition-transform duration-500 ease-out"
-                style={{ transform: `translateX(-${activePhase * 100}%)` }}
-              >
-                {constructionPhases.map((phase) => (
-                  <div key={phase.id} className="w-full flex-shrink-0 px-2">
-                    <div className="bg-slate-800/50 backdrop-blur border border-slate-700 rounded-2xl overflow-hidden shadow-xl max-w-4xl mx-auto">
-                      <div className="grid md:grid-cols-2 gap-0">
-                        {/* Image Side */}
-                        <div className="relative aspect-[4/3] md:aspect-auto md:h-80">
-                          <Image
-                            src={phase.image || "/placeholder.svg"}
-                            alt={phase.title}
-                            fill
-                            className="object-cover"
-                          />
-                          {/* Step Badge */}
-                          <div className="absolute top-4 left-4 bg-blue-500 text-white px-4 py-2 rounded-lg font-bold text-2xl shadow-lg">
-                            {phase.step}
-                          </div>
-                        </div>
-
-                        {/* Content Side */}
-                        <div className="p-6 md:p-8 flex flex-col justify-center">
-                          <h3 className="text-2xl md:text-3xl font-bold mb-4 text-white">{phase.title}</h3>
-                          <p className="text-slate-300 text-lg leading-relaxed mb-6">{phase.description}</p>
-
-                          {/* Progress Indicator */}
-                          <div className="flex items-center gap-2 text-sm text-slate-400">
-                            <span>Aşama {phase.id}</span>
-                            <span>/</span>
-                            <span>{constructionPhases.length}</span>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-
-            {/* Pagination Dots */}
-            <div className="flex justify-center gap-2 mt-8">
-              {constructionPhases.map((_, index) => (
-                <button
-                  key={index}
-                  onClick={() => setActivePhase(index)}
-                  className={`w-3 h-3 rounded-full transition-all ${
-                    index === activePhase ? "bg-blue-500 w-8" : "bg-slate-600 hover:bg-slate-500"
-                  }`}
-                  aria-label={`Aşama ${index + 1}'e git`}
-                />
-              ))}
-            </div>
-          </div>
-
-          {/* CTA */}
-          <div className="text-center mt-12">
-            <p className="text-slate-300 mb-4">Sizin projeniz için de aynı kaliteyi sunmak istiyoruz.</p>
-            <Button asChild className="bg-blue-500 hover:bg-blue-600 text-white px-8 py-3">
-              <a href="#iletisim">Ücretsiz Keşif Talep Et</a>
-            </Button>
-          </div>
+          {/* Premium Construction Process Component */}
+          <ConstructionProcess />
         </div>
       </section>
-
-      {/* Phase Images Lightbox Modal */}
-      {phaseModalOpen && (
-        <div className="fixed inset-0 z-50 bg-black/90 flex items-center justify-center p-4">
-          <button
-            onClick={() => setPhaseModalOpen(false)}
-            className="absolute top-4 right-4 text-white hover:text-gray-300 z-50"
-          >
-            <X className="w-8 h-8" />
-          </button>
-
-          <button
-            onClick={() => setPhaseModalIndex((prev) => (prev > 0 ? prev - 1 : currentPhaseImages.length - 1))}
-            className="absolute left-4 text-white hover:text-gray-300"
-          >
-            <ChevronLeft className="w-10 h-10" />
-          </button>
-
-          <div className="relative w-full max-w-4xl aspect-video">
-            <Image
-              src={currentPhaseImages[phaseModalIndex] || "/placeholder.svg"}
-              alt="Yapım aşaması görseli"
-              fill
-              className="object-contain"
-            />
-          </div>
-
-          <button
-            onClick={() => setPhaseModalIndex((prev) => (prev < currentPhaseImages.length - 1 ? prev + 1 : 0))}
-            className="absolute right-4 text-white hover:text-gray-300"
-          >
-            <ChevronRight className="w-10 h-10" />
-          </button>
-
-          <div className="absolute bottom-4 left-1/2 -translate-x-1/2 text-white text-sm">
-            {phaseModalIndex + 1} / {currentPhaseImages.length}
-          </div>
-        </div>
-      )}
 
       {/* About */}
       <section id="hakkimizda" className="py-16 md:py-24 px-4 md:px-6">
