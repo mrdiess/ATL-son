@@ -1,7 +1,6 @@
 "use client"
 
 import type React from "react"
-
 import { useState } from "react"
 import Image from "next/image"
 import { X } from "lucide-react"
@@ -35,29 +34,39 @@ export default function ConstructionProcess() {
 
   return (
     <>
-      {/* Compact Grid - Minimal Space */}
-      <div className="grid grid-cols-10 gap-2 md:gap-3 max-w-4xl mx-auto">
-        {STEPS.map((step, idx) => (
+      <div className="grid grid-cols-5 md:grid-cols-10 gap-2 md:gap-3 max-w-6xl mx-auto">
+        {STEPS.map((step) => (
           <button
             key={step.id}
             onClick={() => {
               setSelectedStep(step.id)
               setSliderPosition(50)
             }}
-            className={`aspect-square rounded-lg font-bold text-xs md:text-sm transition-all duration-200 ${
-              selectedStep === step.id
-                ? "bg-blue-500 text-white shadow-lg shadow-blue-500/50 scale-105 border-2 border-blue-400"
-                : "bg-slate-800 text-slate-400 hover:bg-slate-700 border border-slate-700 hover:border-slate-600"
-            }`}
+            className="group relative aspect-square rounded-lg overflow-hidden transition-all duration-300 hover:scale-105 hover:shadow-lg hover:shadow-blue-500/30"
             aria-label={`Adım ${step.label}`}
             title={`Adım ${step.label}`}
           >
-            {step.label}
+            {/* AFTER görselini arka plan olarak kullan */}
+            <Image
+              src={`/process/after-${step.id}.jpg`}
+              alt={`Yapım Adımı ${step.label}`}
+              fill
+              className="object-cover select-none pointer-events-none"
+              onError={(e) => {
+                e.currentTarget.src = `/placeholder.svg?height=300&width=300&query=construction-process-${step.id}`
+              }}
+            />
+
+            {/* Hafif dark overlay - numarayı oku yapmak için */}
+            <div className="absolute inset-0 bg-black/20 group-hover:bg-black/10 transition-all duration-300" />
+
+            <div className="absolute bottom-2 right-2 bg-blue-600/80 backdrop-blur px-2 py-1 rounded text-xs md:text-sm font-bold text-white">
+              {step.label}
+            </div>
           </button>
         ))}
       </div>
 
-      {/* Fullscreen Modal - BEFORE/AFTER Slider */}
       {selectedStep && currentStep && (
         <div
           className="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4"

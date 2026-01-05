@@ -149,12 +149,19 @@ export default function Home() {
     const fetchSponsors = async () => {
       try {
         const response = await fetch("/api/sponsors")
-        if (response.ok) {
-          const result = await response.json()
-          setSponsors(result.data || [])
+        if (!response.ok) {
+          console.error("[v0] Sponsors response not ok:", response.status, response.statusText)
+          throw new Error(`HTTP error! status: ${response.status}`)
+        }
+        const result = await response.json()
+        if (result.data && Array.isArray(result.data)) {
+          setSponsors(result.data)
+        } else {
+          console.warn("[v0] Sponsors data is not an array:", result)
         }
       } catch (error) {
-        console.error("Sponsors fetch error:", error)
+        console.error("[v0] Sponsors fetch error:", error)
+        setSponsors([])
       }
     }
 
@@ -247,6 +254,9 @@ export default function Home() {
               <a href="#hakkimizda" className="text-foreground hover:text-blue-500 transition-colors font-medium">
                 Hakkımızda
               </a>
+              <Link href="/galeri" className="text-foreground hover:text-blue-500 transition-colors font-medium">
+                Galeri
+              </Link>
               <a href="#iletisim" className="text-foreground hover:text-blue-500 transition-colors font-medium">
                 İletişim
               </a>
@@ -298,6 +308,13 @@ export default function Home() {
                 >
                   Hakkımızda
                 </a>
+                <Link
+                  href="/galeri"
+                  onClick={handleNavClick}
+                  className="text-foreground hover:text-blue-500 transition-colors font-medium py-2"
+                >
+                  Galeri
+                </Link>
                 <a
                   href="#iletisim"
                   onClick={handleNavClick}
@@ -416,13 +433,9 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Projects - Construction Process Showcase */}
-      <section
-        id="projeler"
-        className="py-16 md:py-24 bg-gradient-to-b from-slate-900 to-slate-800 text-white overflow-hidden"
-      >
+      {/* Construction Process */}
+      <section className="py-16 md:py-24 bg-gradient-to-b from-slate-900 to-slate-800 text-white overflow-hidden">
         <div className="max-w-7xl mx-auto px-4 md:px-6">
-          {/* Section Header */}
           <div className="text-center mb-12">
             <span className="text-blue-400 font-semibold text-sm uppercase tracking-wider">Yapım Süreci</span>
             <h2 className="text-3xl md:text-4xl font-bold mt-2 mb-4">Projelerimiz Nasıl Hayata Geçiyor?</h2>
@@ -430,8 +443,6 @@ export default function Home() {
               Her projemiz 6 ana aşamadan geçerek profesyonel standartlarda tamamlanır.
             </p>
           </div>
-
-          {/* Premium Construction Process Component */}
           <ConstructionProcess />
         </div>
       </section>
@@ -472,6 +483,59 @@ export default function Home() {
               <Button className="bg-blue-500 hover:bg-blue-600">Daha Fazla Bilgi</Button>
             </div>
           </div>
+        </div>
+      </section>
+
+      {/* Featured Projects */}
+      <section id="projeler" className="py-16 md:py-24 px-4 md:px-6 bg-background">
+        <div className="max-w-7xl mx-auto">
+          <div className="text-center mb-12">
+            <p className="text-blue-500 font-bold uppercase tracking-wider mb-2">Seçkin Projeler</p>
+            <h2 className="text-3xl md:text-4xl font-bold mb-4">Tamamlanan Projeler</h2>
+            <p className="text-muted-foreground max-w-2xl mx-auto">
+              Başarıyla tamamladığımız endüstriyel yapı projeleri
+            </p>
+          </div>
+
+          {projectsLoading ? (
+            <div className="text-center py-12 text-muted-foreground">Projeler yükleniyor...</div>
+          ) : featuredProjects.length > 0 ? (
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              {featuredProjects.map((project) => (
+                <Link key={project.id} href={`/projeler/${project.slug}`}>
+                  <div className="group cursor-pointer h-full">
+                    <div className="relative h-64 rounded-xl overflow-hidden bg-secondary/20 mb-4">
+                      {project.featured_image_url ? (
+                        <Image
+                          src={project.featured_image_url || "/placeholder.svg"}
+                          alt={project.title}
+                          fill
+                          className="object-cover group-hover:scale-110 transition-transform duration-300"
+                        />
+                      ) : (
+                        <div className="w-full h-full bg-gradient-to-br from-slate-700 to-slate-900 flex items-center justify-center">
+                          <Building2 className="w-16 h-16 text-slate-500" />
+                        </div>
+                      )}
+                      <div className="absolute inset-0 bg-black/0 group-hover:bg-black/30 transition-colors" />
+                    </div>
+                    <h3 className="text-lg font-bold group-hover:text-blue-500 transition-colors">{project.title}</h3>
+                    <p className="text-sm text-muted-foreground mb-2">{project.location}</p>
+                    {project.category && (
+                      <span className="inline-block px-3 py-1 bg-blue-500/10 text-blue-600 dark:text-blue-400 rounded-full text-xs font-medium">
+                        {project.category}
+                      </span>
+                    )}
+                    <div className="mt-4 flex items-center gap-2 text-blue-500 font-semibold text-sm group-hover:gap-3 transition-all">
+                      Detaylar <ArrowRight className="w-4 h-4" />
+                    </div>
+                  </div>
+                </Link>
+              ))}
+            </div>
+          ) : (
+            <div className="text-center py-12 text-muted-foreground">Henüz proje eklenmemiştir.</div>
+          )}
         </div>
       </section>
 
