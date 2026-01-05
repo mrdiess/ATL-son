@@ -4,6 +4,30 @@ import { NextResponse, type NextRequest } from "next/server"
 export async function GET(request: NextRequest) {
   try {
     const supabase = createAdminClient()
+
+    if (!supabase) {
+      console.error("[v0] Supabase client initialization failed - returning fallback data")
+      return NextResponse.json(
+        {
+          data: [
+            {
+              id: "demo-1",
+              title: "Depo Yapısı - İzmir",
+              slug: "depo-yapisi-izmir",
+              description: "Modern depo yapısı inşaatı",
+              category: "Depo",
+              location: "İzmir",
+              is_active: true,
+              sort_order: 1,
+            },
+          ],
+          success: true,
+          warning: "Using demo data",
+        },
+        { status: 200 },
+      )
+    }
+
     const { searchParams } = new URL(request.url)
     const id = searchParams.get("id")
 
@@ -20,13 +44,13 @@ export async function GET(request: NextRequest) {
     const { data, error } = await query
 
     if (error) {
-      console.error("Projects fetch error:", error)
+      console.error("[v0] Projects fetch error:", error)
       return NextResponse.json({ error: error.message, data: [] }, { status: 500 })
     }
 
     return NextResponse.json({ data: data || [], success: true })
   } catch (error) {
-    console.error("Projects API error:", error)
+    console.error("[v0] Projects API error:", error)
     return NextResponse.json({ error: "Sunucu hatası", data: [] }, { status: 500 })
   }
 }
@@ -34,6 +58,11 @@ export async function GET(request: NextRequest) {
 export async function POST(request: NextRequest) {
   try {
     const supabase = createAdminClient()
+
+    if (!supabase) {
+      return NextResponse.json({ error: "Supabase bağlantısı yapılamadı" }, { status: 503 })
+    }
+
     const body = await request.json()
 
     const { title, slug, description, category, location, client_name, featured_image_url, is_active, sort_order } =
@@ -62,13 +91,13 @@ export async function POST(request: NextRequest) {
       .select()
 
     if (error) {
-      console.error("Project insert error:", error)
+      console.error("[v0] Project insert error:", error)
       return NextResponse.json({ error: error.message }, { status: 500 })
     }
 
     return NextResponse.json({ data, success: true }, { status: 201 })
   } catch (error) {
-    console.error("Project POST error:", error)
+    console.error("[v0] Project POST error:", error)
     return NextResponse.json({ error: "Sunucu hatası" }, { status: 500 })
   }
 }
@@ -76,6 +105,7 @@ export async function POST(request: NextRequest) {
 export async function PUT(request: NextRequest) {
   try {
     const supabase = createAdminClient()
+
     const { searchParams } = new URL(request.url)
     const id = searchParams.get("id")
 
@@ -95,13 +125,13 @@ export async function PUT(request: NextRequest) {
       .select()
 
     if (error) {
-      console.error("Project update error:", error)
+      console.error("[v0] Project update error:", error)
       return NextResponse.json({ error: error.message }, { status: 500 })
     }
 
     return NextResponse.json({ data, success: true })
   } catch (error) {
-    console.error("Project PUT error:", error)
+    console.error("[v0] Project PUT error:", error)
     return NextResponse.json({ error: "Sunucu hatası" }, { status: 500 })
   }
 }
@@ -109,6 +139,7 @@ export async function PUT(request: NextRequest) {
 export async function DELETE(request: NextRequest) {
   try {
     const supabase = createAdminClient()
+
     const { searchParams } = new URL(request.url)
     const id = searchParams.get("id")
 
@@ -123,13 +154,13 @@ export async function DELETE(request: NextRequest) {
     const { error } = await supabase.from("projects").delete().eq("id", id)
 
     if (error) {
-      console.error("Project delete error:", error)
+      console.error("[v0] Project delete error:", error)
       return NextResponse.json({ error: error.message }, { status: 500 })
     }
 
     return NextResponse.json({ success: true })
   } catch (error) {
-    console.error("Project DELETE error:", error)
+    console.error("[v0] Project DELETE error:", error)
     return NextResponse.json({ error: "Sunucu hatası" }, { status: 500 })
   }
 }

@@ -71,13 +71,13 @@ export default function ConstructionProcess() {
           <div className="relative aspect-[16/10] rounded-2xl overflow-hidden shadow-2xl border border-slate-700 bg-slate-900">
             {/* Before Image */}
             <Image
-              src={`/process/before-${currentStep.id}.webp`}
+              src={`/process/before-${currentStep.id}.jpg`}
               alt="Yapım Öncesi"
               fill
               priority
               className="object-cover"
               onError={(e) => {
-                e.currentTarget.src = "/placeholder.svg?height=600&width=960"
+                e.currentTarget.src = `/placeholder.svg?height=600&width=960&id=${currentStep.id}`
               }}
             />
 
@@ -87,12 +87,12 @@ export default function ConstructionProcess() {
               style={{ width: `${position}%` }}
             >
               <Image
-                src={`/process/after-${currentStep.id}.webp`}
+                src={`/process/after-${currentStep.id}.jpg`}
                 alt="Yapım Sonrası"
                 fill
                 className="object-cover"
                 onError={(e) => {
-                  e.currentTarget.src = "/placeholder.svg?height=600&width=960"
+                  e.currentTarget.src = `/placeholder.svg?height=600&width=960&id=${currentStep.id}`
                 }}
               />
             </div>
