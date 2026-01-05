@@ -591,8 +591,20 @@ export default function Home() {
                   className="w-10 h-10 rounded-full bg-slate-700 hover:bg-blue-500 flex items-center justify-center transition-colors"
                   title="Instagram"
                 >
-                  <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
-                    <path d="M12 0C5.373 0 0 5.373 0 12s5.373 12 12 12 12-5.373 12-12S18.627 0 12 0zm0 2.25c5.385 0 9.75 4.365 9.75 9.75s-4.365 9.75-9.75 9.75S2.25 17.385 2.25 12 6.615 2.25 12 2.25zm0 1.5c-4.557 0-8.25 3.693-8.25 8.25s3.693 8.25 8.25 8.25 8.25-3.693 8.25-8.25-3.693-8.25-8.25-8.25z" />
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={1.5}
+                      d="M7.5 3h9c1.866 0 3 1.134 3 3v9c0 1.866-1.134 3-3 3h-9c-1.866 0-3-1.134-3-3v-9c0-1.866 1.134-3 3-3z"
+                    />
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={1.5}
+                      d="M12 9a3 3 0 100 6 3 3 0 000-6z"
+                    />
+                    <circle cx="18" cy="6" r="0.75" fill="currentColor" />
                   </svg>
                 </a>
                 <a
@@ -603,7 +615,7 @@ export default function Home() {
                   title="TikTok"
                 >
                   <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
-                    <path d="M12 0C5.373 0 0 5.373 0 12s5.373 12 12 12 12-5.373 12-12S18.627 0 12 0zm0 2.25c5.385 0 9.75 4.365 9.75 9.75s-4.365 9.75-9.75 9.75S2.25 17.385 2.25 12 6.615 2.25 12 2.25zm3.75 9c-.495 0-.9-.405-.9-.9s.405-.9.9-.9.9.405.9.9-.405.9-.9.9zm-6-1.5c0 .825.675 1.5 1.5 1.5s1.5-.675 1.5-1.5-.675-1.5-1.5-1.5-1.5.675-1.5 1.5z" />
+                    <path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.68v13.67a2.4 2.4 0 0 1-2.4 2.4 2.4 2.4 0 0 1-2.4-2.4 2.4 2.4 0 0 1 2.4-2.4c.26 0 .52.04.77.12V9.24A5.1 5.1 0 0 0 9.14 9c-2.8 0-5.3 2.26-5.3 5.13 0 2.87 2.13 5.28 5 5.28s5.3-2.39 5.3-5.28v-5.02c1.86 1.43 4.35 2.33 7.07 2.33v-3.72c-1.45-.37-2.78-1.04-3.89-1.95z" />
                   </svg>
                 </a>
               </div>
@@ -664,8 +676,20 @@ export default function Home() {
                   className="text-white hover:text-blue-400 transition-colors"
                   title="Instagram"
                 >
-                  <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
-                    <path d="M12 0C5.373 0 0 5.373 0 12s5.373 12 12 12 12-5.373 12-12S18.627 0 12 0zm0 2.25c5.385 0 9.75 4.365 9.75 9.75s-4.365 9.75-9.75 9.75S2.25 17.385 2.25 12 6.615 2.25 12 2.25zm0 1.5c-4.557 0-8.25 3.693-8.25 8.25s3.693 8.25 8.25 8.25 8.25-3.693 8.25-8.25-3.693-8.25-8.25-8.25z" />
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={1.5}
+                      d="M7.5 3h9c1.866 0 3 1.134 3 3v9c0 1.866-1.134 3-3 3h-9c-1.866 0-3-1.134-3-3v-9c0-1.866 1.134-3 3-3z"
+                    />
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={1.5}
+                      d="M12 9a3 3 0 100 6 3 3 0 000-6z"
+                    />
+                    <circle cx="18" cy="6" r="0.75" fill="currentColor" />
                   </svg>
                 </a>
                 <a
@@ -676,7 +700,7 @@ export default function Home() {
                   title="TikTok"
                 >
                   <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
-                    <path d="M12 0C5.373 0 0 5.373 0 12s5.373 12 12 12 12-5.373 12-12S18.627 0 12 0zm0 2.25c5.385 0 9.75 4.365 9.75 9.75s-4.365 9.75-9.75 9.75S2.25 17.385 2.25 12 6.615 2.25 12 2.25zm3.75 9c-.495 0-.9-.405-.9-.9s.405-.9.9-.9.9.405.9.9-.405.9-.9.9zm-6-1.5c0 .825.675 1.5 1.5 1.5s1.5-.675 1.5-1.5-.675-1.5-1.5-1.5-1.5.675-1.5 1.5z" />
+                    <path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.68v13.67a2.4 2.4 0 0 1-2.4 2.4 2.4 2.4 0 0 1-2.4-2.4 2.4 2.4 0 0 1 2.4-2.4c.26 0 .52.04.77.12V9.24A5.1 5.1 0 0 0 9.14 9c-2.8 0-5.3 2.26-5.3 5.13 0 2.87 2.13 5.28 5 5.28s5.3-2.39 5.3-5.28v-5.02c1.86 1.43 4.35 2.33 7.07 2.33v-3.72c-1.45-.37-2.78-1.04-3.89-1.95z" />
                   </svg>
                 </a>
               </div>
