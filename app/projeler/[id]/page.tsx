@@ -203,6 +203,24 @@ export default function ProjectPage({ params }: { params: Promise<{ id: string }
             <div className="space-y-8">
               {steps.map((step, idx) => (
                 <div key={step.id} className="relative">
+                  {/* Step Cover Photo */}
+                  {step.project_photos && step.project_photos.length > 0 && (
+                    <div className="mb-4 h-48 md:h-64 rounded-xl overflow-hidden relative">
+                      <Image
+                        src={step.project_photos[0].photo_url || "/placeholder.svg"}
+                        alt={`${step.title} - Kapak`}
+                        fill
+                        className="object-cover"
+                      />
+                      <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent" />
+                      <div className="absolute bottom-4 left-4 right-4">
+                        <span className="inline-block bg-blue-500 text-white text-sm px-3 py-1 rounded-full font-semibold">
+                          Adım {step.step_number}
+                        </span>
+                      </div>
+                    </div>
+                  )}
+
                   {/* Step Card */}
                   <div className="md:ml-20 bg-card border rounded-xl p-6 hover:shadow-lg transition-shadow">
                     {/* Step Number - Desktop */}
