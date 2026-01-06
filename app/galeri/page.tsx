@@ -38,7 +38,9 @@ export default function GaleriPage() {
   useEffect(() => {
     const fetchGallery = async () => {
       try {
-        const response = await fetch("/data/galeri.json")
+        const response = await fetch("/data/galeri.json", {
+          cache: "no-store",
+        })
         if (!response.ok) throw new Error("Galeri verisi yüklenemedi")
         const data = await response.json()
         setGalleryData(data)
