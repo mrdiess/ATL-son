@@ -3,9 +3,11 @@
 import { useState, useEffect } from "react"
 import Image from "next/image"
 import Link from "next/link"
+import { useParams, notFound } from "next/navigation"
 import { ThemeToggle } from "@/components/theme-toggle"
 import { Menu, X, Phone } from "lucide-react"
 
+// Sabit kategoriler
 const CATEGORIES = [
   { id: "tumu", label: "Tümü", slug: "tumu" },
   { id: "celik-yapi", label: "Çelik Yapı", slug: "celik-yapi" },
@@ -15,6 +17,16 @@ const CATEGORIES = [
   { id: "kamyon-kasa", label: "Kamyon Kasa", slug: "kamyon-kasa" },
   { id: "diger", label: "Diğer", slug: "diger" },
 ]
+
+// SEO başlıkları
+const SEO_TITLES: { [key: string]: string } = {
+  "celik-yapi": "Çelik Yapı Projeleri | ATL Çelik Yapı",
+  merdiven: "Çelik Merdiven Projeleri | ATL Çelik Yapı",
+  korkuluk: "Korkuluk Sistemleri | ATL Çelik Yapı",
+  ferforje: "Ferforje İşleri | ATL Çelik Yapı",
+  "kamyon-kasa": "Kamyon Kasa Üretimi | ATL Çelik Yapı",
+  diger: "Diğer Projeler | ATL Çelik Yapı",
+}
 
 interface GalleryItem {
   src: string
@@ -26,14 +38,19 @@ interface GalleryData {
   [key: string]: GalleryItem[]
 }
 
-export default function GaleriPage() {
+export default function KategoriPage() {
+  const params = useParams()
+  const kategori = params.kategori as string
+
   const [galleryData, setGalleryData] = useState<GalleryData>({})
-  const [selectedCategory, setSelectedCategory] = useState("tumu")
   const [isLoading, setIsLoading] = useState(true)
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
   const [isScrolled, setIsScrolled] = useState(false)
   const [lightboxOpen, setLightboxOpen] = useState(false)
   const [lightboxIndex, setLightboxIndex] = useState(0)
+
+  // Kategori valid mi kontrol et
+  const categoryInfo = CATEGORIES.find((c) => c.slug === kategori)
 
   useEffect(() => {
     const fetchGallery = async () => {
@@ -57,14 +74,12 @@ export default function GaleriPage() {
     return () => window.removeEventListener("scroll", handleScroll)
   }, [])
 
-  const getFilteredItems = (): GalleryItem[] => {
-    if (selectedCategory === "tumu") {
-      return Object.values(galleryData).flat()
-    }
-    return galleryData[selectedCategory] || []
+  // Geçersiz kategori
+  if (!categoryInfo || kategori === "tumu") {
+    return notFound()
   }
 
-  const filteredItems = getFilteredItems()
+  const items = galleryData[kategori] || []
 
   const openLightbox = (index: number) => {
     setLightboxIndex(index)
@@ -72,14 +87,8 @@ export default function GaleriPage() {
   }
 
   const closeLightbox = () => setLightboxOpen(false)
-
-  const nextImage = () => {
-    setLightboxIndex((prev) => (prev + 1) % filteredItems.length)
-  }
-
-  const prevImage = () => {
-    setLightboxIndex((prev) => (prev - 1 + filteredItems.length) % filteredItems.length)
-  }
+  const nextImage = () => setLightboxIndex((prev) => (prev + 1) % items.length)
+  const prevImage = () => setLightboxIndex((prev) => (prev - 1 + items.length) % items.length)
 
   return (
     <div className="min-h-screen bg-background text-foreground">
@@ -181,7 +190,7 @@ export default function GaleriPage() {
         </div>
       </header>
 
-      {/* Hero - max 260px */}
+      {/* Hero */}
       <section className="relative h-[260px] pt-16">
         <div className="absolute inset-0 bg-slate-950">
           <div
@@ -193,39 +202,44 @@ export default function GaleriPage() {
           />
         </div>
         <div className="relative z-10 h-full flex flex-col justify-center items-center text-center px-4">
-          <h1 className="text-3xl md:text-4xl font-bold text-white">Foto Galeri</h1>
-          <p className="text-slate-400 text-sm md:text-base mt-2 max-w-xl">
-            Tamamladığımız projeler ve çalışmalarımızdan görseller
-          </p>
+          <h1 className="text-3xl md:text-4xl font-bold text-white">{categoryInfo.label}</h1>
+          <p className="text-slate-400 text-sm md:text-base mt-2">{categoryInfo.label} kategorisindeki projelerimiz</p>
+          <Link href="/galeri" className="mt-4 text-blue-400 hover:text-blue-300 text-sm flex items-center gap-1">
+            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+            </svg>
+            Tüm Galeri
+          </Link>
         </div>
       </section>
 
       {/* Main Content */}
       <div className="max-w-7xl mx-auto px-4 md:px-6 py-12">
+        {/* Category Tabs */}
         <div className="mb-12 border-b border-slate-200 dark:border-slate-800">
           <div className="flex overflow-x-auto gap-0 -mx-4 px-4 md:gap-0 md:mx-0 md:px-0 scrollbar-hide">
-            {CATEGORIES.map((category) => (
-              <button
-                key={category.id}
-                onClick={() => setSelectedCategory(category.id)}
+            {CATEGORIES.map((cat) => (
+              <Link
+                key={cat.id}
+                href={cat.id === "tumu" ? "/galeri" : `/galeri/${cat.slug}`}
                 className={`px-6 py-3 font-medium text-sm md:text-base transition-colors whitespace-nowrap border-b-2 ${
-                  selectedCategory === category.id
+                  kategori === cat.slug
                     ? "text-blue-500 border-blue-500"
                     : "text-slate-600 dark:text-slate-400 border-transparent hover:text-slate-900 dark:hover:text-slate-200"
                 }`}
               >
-                {category.label}
-              </button>
+                {cat.label}
+              </Link>
             ))}
           </div>
         </div>
 
-        {/* Gallery Grid - 4:3 oran */}
+        {/* Gallery Grid */}
         {isLoading ? (
           <div className="text-center py-12 text-slate-500">Galeri yükleniyor...</div>
-        ) : filteredItems.length > 0 ? (
+        ) : items.length > 0 ? (
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-            {filteredItems.map((item, index) => (
+            {items.map((item, index) => (
               <div
                 key={`${item.src}-${index}`}
                 onClick={() => openLightbox(index)}
@@ -237,7 +251,6 @@ export default function GaleriPage() {
                   fill
                   className="object-cover group-hover:scale-105 transition-transform duration-300"
                 />
-                {/* Hover overlay */}
                 <div className="absolute inset-0 bg-black/0 group-hover:bg-black/30 transition-all duration-300 flex items-center justify-center">
                   <svg
                     className="w-8 h-8 text-white opacity-0 group-hover:opacity-100 transition-opacity duration-300"
@@ -253,7 +266,6 @@ export default function GaleriPage() {
                     />
                   </svg>
                 </div>
-                {/* Title overlay */}
                 <div className="absolute bottom-0 left-0 right-0 p-3 bg-gradient-to-t from-black/70 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300">
                   <p className="text-white text-sm font-medium truncate">{item.title}</p>
                 </div>
@@ -261,12 +273,12 @@ export default function GaleriPage() {
             ))}
           </div>
         ) : (
-          <div className="text-center py-12 text-slate-500">Seçilen kategoride fotoğraf bulunmamaktadır.</div>
+          <div className="text-center py-12 text-slate-500">Bu kategoride henüz fotoğraf bulunmamaktadır.</div>
         )}
       </div>
 
       {/* Lightbox Modal */}
-      {lightboxOpen && filteredItems.length > 0 && (
+      {lightboxOpen && items.length > 0 && (
         <div className="fixed inset-0 z-50 bg-black/90 flex items-center justify-center" onClick={closeLightbox}>
           <button
             onClick={closeLightbox}
@@ -289,16 +301,16 @@ export default function GaleriPage() {
 
           <div className="relative max-w-5xl max-h-[85vh] w-full mx-4" onClick={(e) => e.stopPropagation()}>
             <Image
-              src={filteredItems[lightboxIndex].src || "/placeholder.svg"}
-              alt={filteredItems[lightboxIndex].alt}
+              src={items[lightboxIndex].src || "/placeholder.svg"}
+              alt={items[lightboxIndex].alt}
               width={1200}
               height={900}
               className="object-contain w-full h-full max-h-[85vh]"
             />
             <div className="absolute bottom-0 left-0 right-0 p-4 bg-gradient-to-t from-black/70 to-transparent">
-              <p className="text-white text-lg font-medium">{filteredItems[lightboxIndex].title}</p>
+              <p className="text-white text-lg font-medium">{items[lightboxIndex].title}</p>
               <p className="text-slate-300 text-sm">
-                {lightboxIndex + 1} / {filteredItems.length}
+                {lightboxIndex + 1} / {items.length}
               </p>
             </div>
           </div>
