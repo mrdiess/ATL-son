@@ -4,6 +4,12 @@
   "korkuluk": [],
   "kasaimalat": [],
   "diger": [],
-  "celikyapi": [],
+  "celikyapi": [
+    {
+      "src": "https://drive.google.com/uc?id=1csWqeBVA1loSkC4Pi5XTgM0AFIEJtyxX",
+      "title": "test-celik-yapi",
+      "alt": "ATL ?elik Yap? test-celik-yapi"
+    }
+  ],
   "catisundurma": []
 }
