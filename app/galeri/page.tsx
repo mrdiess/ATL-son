@@ -1,6 +1,3 @@
-"use client"
-
-import { useState, useEffect } from "react"
 import Image from "next/image"
 import Link from "next/link"
 import { ThemeToggle } from "@/components/theme-toggle"
@@ -13,42 +10,41 @@ interface GalleryItem {
   category: string
 }
 
-export default function GaleriPage() {
-  const [galleryData, setGalleryData] = useState([])
-  const [categories, setCategories] = useState([])
-  const [selectedCategory, setSelectedCategory] = useState("Tümü")
-  const [isLoading, setIsLoading] = useState(true)
-  const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
-  const [isScrolled, setIsScrolled] = useState(false)
-  const [lightboxOpen, setLightboxOpen] = useState(false)
-  const [lightboxIndex, setLightboxIndex] = useState(0)
+export default async function GaleriPage() {
+  const { gallery: galleryData, categories } = await fetchGalleryData()
 
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const { gallery, categories } = await fetchGalleryData()
-        setGalleryData(gallery)
-        setCategories(categories)
-        setIsLoading(false)
-      } catch (error) {
-        console.error("Veri yükleme hatası:", error)
-        setIsLoading(false)
-      }
-    }
-    fetchData()
-  }, [])
+  const defaultCategory = "Tümü"
 
-  useEffect(() => {
+  return <GaleriContent initialGallery={galleryData} initialCategories={categories} defaultCategory={defaultCategory} />
+}
+;("use client")
+
+import React from "react"
+
+interface GaleriContentProps {
+  initialGallery: GalleryItem[]
+  initialCategories: string[]
+  defaultCategory: string
+}
+
+function GaleriContent({ initialGallery, initialCategories, defaultCategory }: GaleriContentProps) {
+  const [selectedCategory, setSelectedCategory] = React.useState(defaultCategory)
+  const [mobileMenuOpen, setMobileMenuOpen] = React.useState(false)
+  const [isScrolled, setIsScrolled] = React.useState(false)
+  const [lightboxOpen, setLightboxOpen] = React.useState(false)
+  const [lightboxIndex, setLightboxIndex] = React.useState(0)
+
+  React.useEffect(() => {
     const handleScroll = () => setIsScrolled(window.scrollY > 50)
     window.addEventListener("scroll", handleScroll)
     return () => window.removeEventListener("scroll", handleScroll)
   }, [])
 
-  const getFilteredItems = (): any[] => {
+  const getFilteredItems = (): GalleryItem[] => {
     if (selectedCategory === "Tümü") {
-      return galleryData
+      return initialGallery
     }
-    return galleryData.filter((item: GalleryItem) => item.category === selectedCategory)
+    return initialGallery.filter((item: GalleryItem) => item.category === selectedCategory)
   }
 
   const filteredItems = getFilteredItems()
@@ -191,7 +187,7 @@ export default function GaleriPage() {
       <div className="max-w-7xl mx-auto px-4 md:px-6 py-12">
         <div className="mb-12 border-b border-slate-200 dark:border-slate-800">
           <div className="flex overflow-x-auto gap-0 -mx-4 px-4 md:gap-0 md:mx-0 md:px-0 scrollbar-hide">
-            {categories.map((category) => (
+            {initialCategories.map((category) => (
               <button
                 key={category}
                 onClick={() => setSelectedCategory(category)}
@@ -208,9 +204,7 @@ export default function GaleriPage() {
         </div>
 
         {/* Gallery Grid - 4:3 oran */}
-        {isLoading ? (
-          <div className="text-center py-12 text-slate-500">Galeri yükleniyor...</div>
-        ) : filteredItems.length > 0 ? (
+        {initialGallery.length > 0 ? (
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
             {filteredItems.map((item, index) => (
               <div
