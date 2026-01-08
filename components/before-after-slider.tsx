@@ -3,7 +3,6 @@
 import type React from "react"
 
 import { useState, useRef } from "react"
-import Image from "next/image"
 
 interface Project {
   title: string
@@ -55,14 +54,22 @@ export function BeforeAfterSlider({ projects }: { projects: Project[] }) {
             className="relative aspect-video bg-slate-200 dark:bg-slate-800 rounded-xl overflow-hidden cursor-col-resize group"
           >
             {/* Before görsel */}
-            <Image src={project.after || "/placeholder.svg"} alt="After" fill className="object-cover" />
+            <img
+              src={project.after || "/placeholder.svg"}
+              alt="After"
+              className="absolute inset-0 w-full h-full object-cover"
+            />
 
             {/* After overlay */}
             <div
               style={{ width: `${position}%` }}
               className="absolute inset-y-0 left-0 overflow-hidden transition-none"
             >
-              <Image src={project.before || "/placeholder.svg"} alt="Before" fill className="object-cover" />
+              <img
+                src={project.before || "/placeholder.svg"}
+                alt="Before"
+                className="absolute inset-0 w-full h-full object-cover"
+              />
             </div>
 
             {/* Slider handle */}

@@ -1,7 +1,6 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import Image from "next/image"
 import Link from "next/link"
 import { ThemeToggle } from "@/components/theme-toggle"
 import { Menu, X, Phone } from "lucide-react"
@@ -265,11 +264,10 @@ export default function GaleriPage() {
                 onClick={() => openLightbox(index)}
                 className="group relative aspect-[4/3] bg-slate-200 dark:bg-slate-800 rounded overflow-hidden cursor-pointer"
               >
-                <Image
+                <img
                   src={item.src || "/placeholder.svg?height=300&width=400&query=steel construction"}
                   alt={item.alt}
-                  fill
-                  className="object-cover group-hover:scale-105 transition-transform duration-300"
+                  className="object-cover group-hover:scale-105 transition-transform duration-300 w-full h-full"
                 />
                 {/* Hover overlay */}
                 <div className="absolute inset-0 bg-black/0 group-hover:bg-black/30 transition-all duration-300 flex items-center justify-center">
@@ -322,11 +320,9 @@ export default function GaleriPage() {
           </button>
 
           <div className="relative max-w-5xl max-h-[85vh] w-full mx-4" onClick={(e) => e.stopPropagation()}>
-            <Image
+            <img
               src={filteredItems[lightboxIndex].src || "/placeholder.svg"}
               alt={filteredItems[lightboxIndex].alt}
-              width={1200}
-              height={900}
               className="object-contain w-full h-full max-h-[85vh]"
             />
             <div className="absolute bottom-0 left-0 right-0 p-4 bg-gradient-to-t from-black/70 to-transparent">

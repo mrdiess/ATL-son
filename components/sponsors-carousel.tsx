@@ -1,7 +1,6 @@
 "use client"
 
 import { useEffect, useState } from "react"
-import Image from "next/image"
 
 interface Sponsor {
   name: string
@@ -51,12 +50,11 @@ export function SponsorsCarousel({ sponsors }: { sponsors: Sponsor[] }) {
             }}
             className="flex items-center justify-center p-4 bg-black/20 rounded-lg border border-slate-700 hover:border-slate-600 transition-all"
           >
-            <Image
+            <img
               src={sponsor.logo || "/placeholder.svg"}
               alt={sponsor.name}
-              width={100}
-              height={50}
               className="object-contain max-w-full h-auto filter grayscale hover:grayscale-0 transition-all"
+              style={{ maxWidth: "100px", maxHeight: "50px" }}
             />
           </div>
         ))}
