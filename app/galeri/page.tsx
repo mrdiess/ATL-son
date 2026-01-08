@@ -5,42 +5,18 @@ import Image from "next/image"
 import Link from "next/link"
 import { ThemeToggle } from "@/components/theme-toggle"
 import { Menu, X, Phone } from "lucide-react"
-
-const fetchCategoriesAndGalleryData = async () => {
-  try {
-    const categoriesResponse = await fetch("/api/categories", {
-      cache: "no-store",
-    })
-    if (!categoriesResponse.ok) throw new Error("Kategoriler verisi yüklenemedi")
-    const categoriesData = await categoriesResponse.json()
-
-    const galleryResponse = await fetch("/api/gallery", {
-      cache: "no-store",
-    })
-    if (!galleryResponse.ok) throw new Error("Galeri verisi yüklenemedi")
-    const galleryData = await galleryResponse.json()
-
-    return { categoriesData, galleryData }
-  } catch (error) {
-    console.error("Veri yükleme hatası:", error)
-    return { categoriesData: [], galleryData: {} }
-  }
-}
+import { fetchGalleryData } from "./gallery-data-fetcher"
 
 interface GalleryItem {
   src: string
   title: string
-  alt: string
-}
-
-interface GalleryData {
-  [key: string]: GalleryItem[]
+  category: string
 }
 
 export default function GaleriPage() {
-  const [galleryData, setGalleryData] = useState<GalleryData>({})
+  const [galleryData, setGalleryData] = useState([])
   const [categories, setCategories] = useState([])
-  const [selectedCategory, setSelectedCategory] = useState("")
+  const [selectedCategory, setSelectedCategory] = useState("Tümü")
   const [isLoading, setIsLoading] = useState(true)
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
   const [isScrolled, setIsScrolled] = useState(false)
@@ -50,13 +26,12 @@ export default function GaleriPage() {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const { categoriesData, galleryData } = await fetchCategoriesAndGalleryData()
-        setCategories(categoriesData)
-        setGalleryData(galleryData)
-        setSelectedCategory(categoriesData.length > 0 ? categoriesData[0].id : "")
+        const { gallery, categories } = await fetchGalleryData()
+        setGalleryData(gallery)
+        setCategories(categories)
+        setIsLoading(false)
       } catch (error) {
         console.error("Veri yükleme hatası:", error)
-      } finally {
         setIsLoading(false)
       }
     }
@@ -69,11 +44,11 @@ export default function GaleriPage() {
     return () => window.removeEventListener("scroll", handleScroll)
   }, [])
 
-  const getFilteredItems = (): GalleryItem[] => {
-    if (selectedCategory === "") {
-      return Object.values(galleryData).flat()
+  const getFilteredItems = (): any[] => {
+    if (selectedCategory === "Tümü") {
+      return galleryData
     }
-    return galleryData[selectedCategory] || []
+    return galleryData.filter((item: GalleryItem) => item.category === selectedCategory)
   }
 
   const filteredItems = getFilteredItems()
@@ -218,15 +193,15 @@ export default function GaleriPage() {
           <div className="flex overflow-x-auto gap-0 -mx-4 px-4 md:gap-0 md:mx-0 md:px-0 scrollbar-hide">
             {categories.map((category) => (
               <button
-                key={category.id}
-                onClick={() => setSelectedCategory(category.id)}
+                key={category}
+                onClick={() => setSelectedCategory(category)}
                 className={`px-6 py-3 font-medium text-sm md:text-base transition-colors whitespace-nowrap border-b-2 ${
-                  selectedCategory === category.id
+                  selectedCategory === category
                     ? "text-blue-500 border-blue-500"
                     : "text-slate-600 dark:text-slate-400 border-transparent hover:text-slate-900 dark:hover:text-slate-200"
                 }`}
               >
-                {category.label}
+                {category}
               </button>
             ))}
           </div>
@@ -245,7 +220,7 @@ export default function GaleriPage() {
               >
                 <Image
                   src={item.src || "/placeholder.svg?height=300&width=400&query=steel construction"}
-                  alt={item.alt}
+                  alt={item.title}
                   fill
                   className="object-cover group-hover:scale-105 transition-transform duration-300"
                 />
@@ -295,14 +270,14 @@ export default function GaleriPage() {
             className="absolute left-4 top-1/2 -translate-y-1/2 text-white hover:text-slate-300 transition-colors p-2"
           >
             <svg className="w-10 h-10" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
             </svg>
           </button>
 
           <div className="relative max-w-5xl max-h-[85vh] w-full mx-4" onClick={(e) => e.stopPropagation()}>
             <Image
               src={filteredItems[lightboxIndex].src || "/placeholder.svg"}
-              alt={filteredItems[lightboxIndex].alt}
+              alt={filteredItems[lightboxIndex].title}
               width={1200}
               height={900}
               className="object-contain w-full h-full max-h-[85vh]"
