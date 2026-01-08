@@ -26,8 +26,6 @@ import {
   ArrowRight,
   Wrench,
 } from "lucide-react"
-import NewComponent from "@/components/new-component"
-import GoogleAppsScriptAPI from "@/components/google-apps-script-api"
 
 interface MediaItem {
   id: string
@@ -834,12 +832,6 @@ export default function Home() {
           </div>
         </div>
       </footer>
-
-      {/* New Component */}
-      <NewComponent />
-
-      {/* Google Apps Script API */}
-      <GoogleAppsScriptAPI />
 
       {lightboxOpen && (
         <PhotoLightbox images={galleryImages} initialIndex={lightboxIndex} onClose={() => setLightboxOpen(false)} />
