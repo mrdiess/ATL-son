@@ -5,6 +5,7 @@ import Image from "next/image"
 import Link from "next/link"
 import { ThemeToggle } from "@/components/theme-toggle"
 import { Menu, X, Phone } from "lucide-react"
+import { getFallbackGalleryData } from "@/data/fallbackGalleryData"
 
 const CATEGORIES = [
   { id: "tumu", label: "Tümü", slug: "tumu" },
@@ -38,18 +39,49 @@ export default function GaleriPage() {
   useEffect(() => {
     const fetchGallery = async () => {
       try {
-        const response = await fetch("/data/galeri.json", {
+        const apiUrl = process.env.NEXT_PUBLIC_GOOGLE_APPS_SCRIPT_URL
+
+        if (!apiUrl) {
+          console.log("[v0] Google Apps Script URL not configured, using fallback data")
+          setGalleryData(getFallbackGalleryData())
+          setIsLoading(false)
+          return
+        }
+
+        const response = await fetch(apiUrl, {
           cache: "no-store",
         })
-        if (!response.ok) throw new Error("Galeri verisi yüklenemedi")
+        if (!response.ok) throw new Error("API verisi yüklenemedi")
+
         const data = await response.json()
-        setGalleryData(data)
+
+        if (data.gallery && Array.isArray(data.gallery)) {
+          const organizedData: GalleryData = {}
+
+          data.gallery.forEach((item: any) => {
+            const category = item.category || "diger"
+            if (!organizedData[category]) {
+              organizedData[category] = []
+            }
+            organizedData[category].push({
+              src: item.src,
+              title: item.title || "Başlıksız",
+              alt: item.alt || item.title || "Galeri görseli",
+            })
+          })
+
+          setGalleryData(organizedData)
+        } else {
+          setGalleryData(getFallbackGalleryData())
+        }
       } catch (error) {
-        console.error("Galeri yükleme hatası:", error)
+        console.error("[v0] Galeri API hatası:", error)
+        setGalleryData(getFallbackGalleryData())
       } finally {
         setIsLoading(false)
       }
     }
+
     fetchGallery()
   }, [])
 
