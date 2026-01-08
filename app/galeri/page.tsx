@@ -6,15 +6,26 @@ import Link from "next/link"
 import { ThemeToggle } from "@/components/theme-toggle"
 import { Menu, X, Phone } from "lucide-react"
 
-const CATEGORIES = [
-  { id: "tumu", label: "Tümü", slug: "tumu" },
-  { id: "celik-yapi", label: "Çelik Yapı", slug: "celik-yapi" },
-  { id: "merdiven", label: "Merdiven", slug: "merdiven" },
-  { id: "korkuluk", label: "Korkuluk", slug: "korkuluk" },
-  { id: "ferforje", label: "Ferforje", slug: "ferforje" },
-  { id: "kamyon-kasa", label: "Kamyon Kasa", slug: "kamyon-kasa" },
-  { id: "diger", label: "Diğer", slug: "diger" },
-]
+const fetchCategoriesAndGalleryData = async () => {
+  try {
+    const categoriesResponse = await fetch("/api/categories", {
+      cache: "no-store",
+    })
+    if (!categoriesResponse.ok) throw new Error("Kategoriler verisi yüklenemedi")
+    const categoriesData = await categoriesResponse.json()
+
+    const galleryResponse = await fetch("/api/gallery", {
+      cache: "no-store",
+    })
+    if (!galleryResponse.ok) throw new Error("Galeri verisi yüklenemedi")
+    const galleryData = await galleryResponse.json()
+
+    return { categoriesData, galleryData }
+  } catch (error) {
+    console.error("Veri yükleme hatası:", error)
+    return { categoriesData: [], galleryData: {} }
+  }
+}
 
 interface GalleryItem {
   src: string
@@ -28,7 +39,8 @@ interface GalleryData {
 
 export default function GaleriPage() {
   const [galleryData, setGalleryData] = useState<GalleryData>({})
-  const [selectedCategory, setSelectedCategory] = useState("tumu")
+  const [categories, setCategories] = useState([])
+  const [selectedCategory, setSelectedCategory] = useState("")
   const [isLoading, setIsLoading] = useState(true)
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
   const [isScrolled, setIsScrolled] = useState(false)
@@ -36,21 +48,19 @@ export default function GaleriPage() {
   const [lightboxIndex, setLightboxIndex] = useState(0)
 
   useEffect(() => {
-    const fetchGallery = async () => {
+    const fetchData = async () => {
       try {
-        const response = await fetch("/data/galeri.json", {
-          cache: "no-store",
-        })
-        if (!response.ok) throw new Error("Galeri verisi yüklenemedi")
-        const data = await response.json()
-        setGalleryData(data)
+        const { categoriesData, galleryData } = await fetchCategoriesAndGalleryData()
+        setCategories(categoriesData)
+        setGalleryData(galleryData)
+        setSelectedCategory(categoriesData.length > 0 ? categoriesData[0].id : "")
       } catch (error) {
-        console.error("Galeri yükleme hatası:", error)
+        console.error("Veri yükleme hatası:", error)
       } finally {
         setIsLoading(false)
       }
     }
-    fetchGallery()
+    fetchData()
   }, [])
 
   useEffect(() => {
@@ -60,7 +70,7 @@ export default function GaleriPage() {
   }, [])
 
   const getFilteredItems = (): GalleryItem[] => {
-    if (selectedCategory === "tumu") {
+    if (selectedCategory === "") {
       return Object.values(galleryData).flat()
     }
     return galleryData[selectedCategory] || []
@@ -206,7 +216,7 @@ export default function GaleriPage() {
       <div className="max-w-7xl mx-auto px-4 md:px-6 py-12">
         <div className="mb-12 border-b border-slate-200 dark:border-slate-800">
           <div className="flex overflow-x-auto gap-0 -mx-4 px-4 md:gap-0 md:mx-0 md:px-0 scrollbar-hide">
-            {CATEGORIES.map((category) => (
+            {categories.map((category) => (
               <button
                 key={category.id}
                 onClick={() => setSelectedCategory(category.id)}
