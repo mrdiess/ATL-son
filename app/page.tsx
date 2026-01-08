@@ -10,8 +10,8 @@ import { ThemeToggle } from "@/components/theme-toggle"
 import { PhotoLightbox } from "@/components/photo-lightbox"
 import ConstructionProcess from "@/components/construction-process"
 import CustomManufacturing from "@/components/custom-manufacturing"
-import GoogleAppsScriptAPI from "@/components/google-apps-script-api"
-import NewComponent from "@/components/new-component"
+import { BeforeAfterSlider } from "@/components/before-after-slider"
+import { SponsorsCarousel } from "@/components/sponsors-carousel"
 import {
   Phone,
   Mail,
@@ -26,6 +26,8 @@ import {
   ArrowRight,
   Wrench,
 } from "lucide-react"
+import NewComponent from "@/components/new-component"
+import GoogleAppsScriptAPI from "@/components/google-apps-script-api"
 
 interface MediaItem {
   id: string
@@ -70,6 +72,8 @@ interface Project {
   project_duration?: string
   featured_image_url?: string
   is_featured: boolean
+  before_image_url?: string
+  after_image_url?: string
 }
 
 const GOOGLE_MAPS_EMBED = `https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d753!2d31.1240669!3d40.8522558!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x409d9f3269fc678f%3A0xcd0d2bf0971b8ae4!2sATL%20%C3%87elik%20ve%20Metal%20%C4%B0%C5%9Fleme!5e0!3m2!1str!2str!4v1736012345678!5m2!1str!2str`
@@ -163,16 +167,18 @@ export default function Home() {
 
     const fetchSponsors = async () => {
       try {
-        const response = await fetch("/api/sponsors")
-        if (!response.ok) {
-          console.error("[v0] Sponsors response not ok:", response.status, response.statusText)
-          throw new Error(`HTTP error! status: ${response.status}`)
+        const apiUrl = process.env.NEXT_PUBLIC_GOOGLE_APPS_SCRIPT_URL
+        if (!apiUrl) {
+          console.warn("[v0] Google Apps Script URL not configured")
+          return
         }
-        const result = await response.json()
-        if (result.data && Array.isArray(result.data)) {
-          setSponsors(result.data)
-        } else {
-          console.warn("[v0] Sponsors data is not an array:", result)
+        const response = await fetch(apiUrl, { cache: "no-store" })
+        if (response.ok) {
+          const result = await response.json()
+          // API'den gelen sponsors verisi
+          if (result.sponsors && Array.isArray(result.sponsors)) {
+            setSponsors(result.sponsors)
+          }
         }
       } catch (error) {
         console.error("[v0] Sponsors fetch error:", error)
@@ -182,10 +188,19 @@ export default function Home() {
 
     const fetchProjects = async () => {
       try {
-        const response = await fetch("/api/projects")
+        const apiUrl = process.env.NEXT_PUBLIC_GOOGLE_APPS_SCRIPT_URL
+        if (!apiUrl) {
+          console.warn("[v0] Google Apps Script URL not configured")
+          setProjectsLoading(false)
+          return
+        }
+        const response = await fetch(apiUrl, { cache: "no-store" })
         if (response.ok) {
           const result = await response.json()
-          setProjects(result.data || [])
+          // API'den gelen projects verisi
+          if (result.projects && Array.isArray(result.projects)) {
+            setProjects(result.projects)
+          }
         }
       } catch (error) {
         console.error("Projects fetch error:", error)
@@ -542,42 +557,47 @@ export default function Home() {
       {/* Custom Manufacturing */}
       <CustomManufacturing />
 
-      {/* Partners */}
-      <section className="py-16 md:py-24 px-4 md:px-6 bg-background">
-        <div className="max-w-7xl mx-auto">
+      {/* Projeler / Özel Üretimler */}
+      <section id="projeler" className="py-16 md:py-24 bg-gradient-to-b from-background to-slate-900/20">
+        <div className="max-w-7xl mx-auto px-4 md:px-6">
           <div className="text-center mb-12">
-            <p className="text-blue-500 font-bold uppercase tracking-wider mb-2">İş Ortaklarımız</p>
-            <h2 className="text-3xl md:text-4xl font-bold mb-4">Uzun Soluklu İş Birlikleri</h2>
+            <p className="text-blue-500 font-bold uppercase tracking-wider mb-2">Seçkin Projeler</p>
+            <h2 className="text-3xl md:text-4xl font-bold mb-4">Özel Üretimler</h2>
             <p className="text-muted-foreground max-w-2xl mx-auto">
-              Uzun soluklu iş birlikleriyle güçlü yapılar üretiyoruz.
+              Müşterilerimizin ihtiyaçlarına göre tasarladığımız özel üretim projelerimiz
             </p>
           </div>
 
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-6">
-            {partners.length > 0 ? (
-              partners.map((partner) => (
-                <a
-                  key={partner.id}
-                  href={partner.website || "#"}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="flex items-center justify-center p-6 bg-slate-900/50 dark:bg-slate-800 rounded-xl border border-slate-700 hover:border-slate-600 hover:opacity-80 transition-all duration-300"
-                >
-                  <Image
-                    src={partner.logo || "/placeholder.svg"}
-                    alt={partner.name}
-                    width={120}
-                    height={60}
-                    className="object-contain filter grayscale hover:grayscale-0 transition-all duration-300"
-                  />
-                </a>
-              ))
-            ) : (
-              <div className="col-span-2 md:col-span-3 lg:col-span-5 text-center text-slate-500 py-8">
-                İş ortakları yükleniyor...
-              </div>
-            )}
+          <BeforeAfterSlider
+            projects={projects.map((p) => ({
+              title: p.title,
+              before: p.before_image_url || "",
+              after: p.after_image_url || "",
+            }))}
+          />
+
+          <div className="text-center mt-8">
+            <Link href="/projeler" className="text-blue-500 hover:text-blue-600 font-semibold">
+              Tüm Projelerimizi Görmek İçin →
+            </Link>
           </div>
+        </div>
+      </section>
+
+      {/* Partners */}
+      <section className="py-16 md:py-24 px-4 md:px-6 bg-background border-t">
+        <div className="max-w-7xl mx-auto">
+          <div className="text-center mb-12">
+            <p className="text-blue-500 font-bold uppercase tracking-wider mb-2">Ortaklarımız</p>
+            <h2 className="text-3xl md:text-4xl font-bold">İş Ortaklarımız</h2>
+          </div>
+
+          <SponsorsCarousel
+            sponsors={sponsors.map((s) => ({
+              name: s.name,
+              logo: s.logo_url || "",
+            }))}
+          />
         </div>
       </section>
 
