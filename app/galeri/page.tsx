@@ -1,50 +1,69 @@
+"use client"
+
+import { useState, useEffect } from "react"
 import Image from "next/image"
 import Link from "next/link"
 import { ThemeToggle } from "@/components/theme-toggle"
 import { Menu, X, Phone } from "lucide-react"
-import { fetchGalleryData } from "./gallery-data-fetcher"
+
+const CATEGORIES = [
+  { id: "tumu", label: "Tümü", slug: "tumu" },
+  { id: "celik-yapi", label: "Çelik Yapı", slug: "celik-yapi" },
+  { id: "merdiven", label: "Merdiven", slug: "merdiven" },
+  { id: "korkuluk", label: "Korkuluk", slug: "korkuluk" },
+  { id: "ferforje", label: "Ferforje", slug: "ferforje" },
+  { id: "kamyon-kasa", label: "Kamyon Kasa", slug: "kamyon-kasa" },
+  { id: "diger", label: "Diğer", slug: "diger" },
+]
 
 interface GalleryItem {
   src: string
   title: string
-  category: string
+  alt: string
 }
 
-export default async function GaleriPage() {
-  const { gallery: galleryData, categories } = await fetchGalleryData()
-
-  const defaultCategory = "Tümü"
-
-  return <GaleriContent initialGallery={galleryData} initialCategories={categories} defaultCategory={defaultCategory} />
-}
-;("use client")
-
-import React from "react"
-
-interface GaleriContentProps {
-  initialGallery: GalleryItem[]
-  initialCategories: string[]
-  defaultCategory: string
+interface GalleryData {
+  [key: string]: GalleryItem[]
 }
 
-function GaleriContent({ initialGallery, initialCategories, defaultCategory }: GaleriContentProps) {
-  const [selectedCategory, setSelectedCategory] = React.useState(defaultCategory)
-  const [mobileMenuOpen, setMobileMenuOpen] = React.useState(false)
-  const [isScrolled, setIsScrolled] = React.useState(false)
-  const [lightboxOpen, setLightboxOpen] = React.useState(false)
-  const [lightboxIndex, setLightboxIndex] = React.useState(0)
+export default function GaleriPage() {
+  const [galleryData, setGalleryData] = useState<GalleryData>({})
+  const [selectedCategory, setSelectedCategory] = useState("tumu")
+  const [isLoading, setIsLoading] = useState(true)
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
+  const [isScrolled, setIsScrolled] = useState(false)
+  const [lightboxOpen, setLightboxOpen] = useState(false)
+  const [lightboxIndex, setLightboxIndex] = useState(0)
 
-  React.useEffect(() => {
+  useEffect(() => {
+    const fetchGallery = async () => {
+      try {
+        const response = await fetch("/data/galeri.json", {
+          cache: "no-store",
+        })
+        if (!response.ok) throw new Error("Galeri verisi yüklenemedi")
+        const data = await response.json()
+        setGalleryData(data)
+      } catch (error) {
+        console.error("Galeri yükleme hatası:", error)
+      } finally {
+        setIsLoading(false)
+      }
+    }
+    fetchGallery()
+  }, [])
+
+  useEffect(() => {
     const handleScroll = () => setIsScrolled(window.scrollY > 50)
     window.addEventListener("scroll", handleScroll)
     return () => window.removeEventListener("scroll", handleScroll)
   }, [])
 
   const getFilteredItems = (): GalleryItem[] => {
-    if (selectedCategory === "Tümü") {
-      return initialGallery
+    if (selectedCategory === "tumu") {
+      return Object.values(galleryData).flat()
     }
-    return initialGallery.filter((item: GalleryItem) => item.category === selectedCategory)
+    return galleryData[selectedCategory] || []
   }
 
   const filteredItems = getFilteredItems()
@@ -187,24 +206,26 @@ function GaleriContent({ initialGallery, initialCategories, defaultCategory }: G
       <div className="max-w-7xl mx-auto px-4 md:px-6 py-12">
         <div className="mb-12 border-b border-slate-200 dark:border-slate-800">
           <div className="flex overflow-x-auto gap-0 -mx-4 px-4 md:gap-0 md:mx-0 md:px-0 scrollbar-hide">
-            {initialCategories.map((category) => (
+            {CATEGORIES.map((category) => (
               <button
-                key={category}
-                onClick={() => setSelectedCategory(category)}
+                key={category.id}
+                onClick={() => setSelectedCategory(category.id)}
                 className={`px-6 py-3 font-medium text-sm md:text-base transition-colors whitespace-nowrap border-b-2 ${
-                  selectedCategory === category
+                  selectedCategory === category.id
                     ? "text-blue-500 border-blue-500"
                     : "text-slate-600 dark:text-slate-400 border-transparent hover:text-slate-900 dark:hover:text-slate-200"
                 }`}
               >
-                {category}
+                {category.label}
               </button>
             ))}
           </div>
         </div>
 
         {/* Gallery Grid - 4:3 oran */}
-        {initialGallery.length > 0 ? (
+        {isLoading ? (
+          <div className="text-center py-12 text-slate-500">Galeri yükleniyor...</div>
+        ) : filteredItems.length > 0 ? (
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
             {filteredItems.map((item, index) => (
               <div
@@ -214,7 +235,7 @@ function GaleriContent({ initialGallery, initialCategories, defaultCategory }: G
               >
                 <Image
                   src={item.src || "/placeholder.svg?height=300&width=400&query=steel construction"}
-                  alt={item.title}
+                  alt={item.alt}
                   fill
                   className="object-cover group-hover:scale-105 transition-transform duration-300"
                 />
@@ -264,14 +285,14 @@ function GaleriContent({ initialGallery, initialCategories, defaultCategory }: G
             className="absolute left-4 top-1/2 -translate-y-1/2 text-white hover:text-slate-300 transition-colors p-2"
           >
             <svg className="w-10 h-10" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
             </svg>
           </button>
 
           <div className="relative max-w-5xl max-h-[85vh] w-full mx-4" onClick={(e) => e.stopPropagation()}>
             <Image
               src={filteredItems[lightboxIndex].src || "/placeholder.svg"}
-              alt={filteredItems[lightboxIndex].title}
+              alt={filteredItems[lightboxIndex].alt}
               width={1200}
               height={900}
               className="object-contain w-full h-full max-h-[85vh]"

@@ -94,5 +94,3 @@ export function BeforeAfterSlider({ projects }: { projects: Project[] }) {
     </div>
   )
 }
-
-export default BeforeAfterSlider

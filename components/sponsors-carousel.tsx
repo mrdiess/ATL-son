@@ -75,5 +75,3 @@ export function SponsorsCarousel({ sponsors }: { sponsors: Sponsor[] }) {
     </div>
   )
 }
-
-export default SponsorsCarousel
