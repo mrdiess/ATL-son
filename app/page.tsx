@@ -1,7 +1,5 @@
 "use client"
 
-import type React from "react"
-
 import { useState, useEffect } from "react"
 import Image from "next/image"
 import Link from "next/link"
@@ -9,9 +7,6 @@ import { Button } from "@/components/ui/button"
 import { ThemeToggle } from "@/components/theme-toggle"
 import { PhotoLightbox } from "@/components/photo-lightbox"
 import ConstructionProcess from "@/components/construction-process"
-import CustomManufacturing from "@/components/custom-manufacturing"
-import { BeforeAfterSlider } from "@/components/before-after-slider"
-import { SponsorsCarousel } from "@/components/sponsors-carousel"
 import {
   Phone,
   Mail,
@@ -48,17 +43,6 @@ interface Sponsor {
   sort_order: number
 }
 
-interface Partner {
-  id: number
-  name: string
-  logo: string
-  website?: string
-}
-
-interface PartnersData {
-  partners: Partner[]
-}
-
 interface Project {
   id: string
   title: string
@@ -70,13 +54,11 @@ interface Project {
   project_duration?: string
   featured_image_url?: string
   is_featured: boolean
-  before_image_url?: string
-  after_image_url?: string
 }
 
 const GOOGLE_MAPS_EMBED = `https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d753!2d31.1240669!3d40.8522558!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x409d9f3269fc678f%3A0xcd0d2bf0971b8ae4!2sATL%20%C3%87elik%20ve%20Metal%20%C4%B0%C5%9Fleme!5e0!3m2!1str!2str!4v1736012345678!5m2!1str!2str`
 
-export default function Home() {
+export default function HomePage() {
   const [currentSlide, setCurrentSlide] = useState(0)
   const [activePhotoTab, setActivePhotoTab] = useState("Tümü")
   const [lightboxOpen, setLightboxOpen] = useState(false)
@@ -84,7 +66,6 @@ export default function Home() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
   const [isScrolled, setIsScrolled] = useState(false)
   const [sponsors, setSponsors] = useState<Sponsor[]>([])
-  const [partners, setPartners] = useState<Partner[]>([])
   const [mediaCategories, setMediaCategories] = useState<string[]>(["Tümü"])
   const [galleryImages, setGalleryImages] = useState<string[]>([])
   const [allMediaItems, setAllMediaItems] = useState<MediaItem[]>([])
@@ -95,14 +76,6 @@ export default function Home() {
   const [phaseModalOpen, setPhaseModalOpen] = useState(false)
   const [phaseModalIndex, setPhaseModalIndex] = useState(0)
   const [currentPhaseImages, setCurrentPhaseImages] = useState<string[]>([])
-  const [quoteFormData, setQuoteFormData] = useState({
-    name: "",
-    email: "",
-    phone: "",
-    message: "",
-  })
-  const [quoteSubmitting, setQuoteSubmitting] = useState(false)
-  const [quoteMessage, setQuoteMessage] = useState<{ type: "success" | "error"; text: string } | null>(null)
 
   const nextSlide = () => setCurrentSlide((prev) => (prev + 1) % 3)
   const prevSlide = () => setCurrentSlide((prev) => (prev - 1 + 3) % 3)
@@ -165,40 +138,22 @@ export default function Home() {
 
     const fetchSponsors = async () => {
       try {
-        const apiUrl = process.env.NEXT_PUBLIC_GOOGLE_APPS_SCRIPT_URL
-        if (!apiUrl) {
-          console.warn("[v0] Google Apps Script URL not configured")
-          return
-        }
-        const response = await fetch(apiUrl, { cache: "no-store" })
+        const response = await fetch("/api/sponsors")
         if (response.ok) {
           const result = await response.json()
-          // API'den gelen sponsors verisi
-          if (result.sponsors && Array.isArray(result.sponsors)) {
-            setSponsors(result.sponsors)
-          }
+          setSponsors(result.data || [])
         }
       } catch (error) {
-        console.error("[v0] Sponsors fetch error:", error)
-        setSponsors([])
+        console.error("Sponsors fetch error:", error)
       }
     }
 
     const fetchProjects = async () => {
       try {
-        const apiUrl = process.env.NEXT_PUBLIC_GOOGLE_APPS_SCRIPT_URL
-        if (!apiUrl) {
-          console.warn("[v0] Google Apps Script URL not configured")
-          setProjectsLoading(false)
-          return
-        }
-        const response = await fetch(apiUrl, { cache: "no-store" })
+        const response = await fetch("/api/projects")
         if (response.ok) {
           const result = await response.json()
-          // API'den gelen projects verisi
-          if (result.projects && Array.isArray(result.projects)) {
-            setProjects(result.projects)
-          }
+          setProjects(result.data || [])
         }
       } catch (error) {
         console.error("Projects fetch error:", error)
@@ -227,71 +182,6 @@ export default function Home() {
     return () => window.removeEventListener("scroll", handleScroll)
   }, [])
 
-  useEffect(() => {
-    const fetchPartners = async () => {
-      try {
-        const response = await fetch("/data/partners.json", {
-          cache: "no-store",
-        })
-        if (!response.ok) throw new Error("Partners verisi yüklenemedi")
-        const data: PartnersData = await response.json()
-        setPartners(data.partners)
-      } catch (error) {
-        console.error("[v0] Partners yükleme hatası:", error)
-      }
-    }
-    fetchPartners()
-  }, [])
-
-  const handleQuoteSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
-    setQuoteSubmitting(true)
-    setQuoteMessage(null)
-
-    // Form validasyonu
-    if (
-      !quoteFormData.name.trim() ||
-      !quoteFormData.email.trim() ||
-      !quoteFormData.phone.trim() ||
-      !quoteFormData.message.trim()
-    ) {
-      setQuoteMessage({ type: "error", text: "Lütfen tüm alanları doldurunuz" })
-      setQuoteSubmitting(false)
-      return
-    }
-
-    try {
-      // Google Form endpoint - bu URL'yi kendi Google Form'unuzun action URL'siyle değiştirin
-      const GOOGLE_FORM_URL = "https://docs.google.com/forms/u/0/d/1FAIpQLSc_EXAMPLE_ID/formResponse"
-
-      // FormData oluştur - Google Forms entry.xxxxx mapping'i
-      const formData = new FormData()
-      formData.append("entry.123456789", quoteFormData.name) // Ad-Soyad
-      formData.append("entry.987654321", quoteFormData.email) // E-posta
-      formData.append("entry.555555555", quoteFormData.phone) // Telefon
-      formData.append("entry.777777777", quoteFormData.message) // Mesaj
-
-      // Google Forms'a POST et
-      const response = await fetch(GOOGLE_FORM_URL, {
-        method: "POST",
-        body: formData,
-        mode: "no-cors", // CORS hatalarını önle
-      })
-
-      // no-cors modunda response kontrolü yapılamaz, always success yap
-      setQuoteMessage({
-        type: "success",
-        text: "Teklif formu başarıyla gönderildi! En kısa sürede sizinle iletişime geçeceğiz.",
-      })
-      setQuoteFormData({ name: "", email: "", phone: "", message: "" })
-    } catch (error) {
-      console.error("Form submission error:", error)
-      setQuoteMessage({ type: "error", text: "Bağlantı hatası. Lütfen daha sonra tekrar deneyiniz." })
-    } finally {
-      setQuoteSubmitting(false)
-    }
-  }
-
   return (
     <div className="min-h-screen bg-background text-foreground">
       {/* Header */}
@@ -302,8 +192,8 @@ export default function Home() {
           <div className="flex items-center justify-between h-16 md:h-20">
             <div className="flex-shrink-0">
               <Link href="/">
-                <img src="/lightmodelogo.png" alt="ATL Çelik Yapı" className="h-12 md:h-16 dark:hidden" />
-                <img src="/darkmodelogo.png" alt="ATL Çelik Yapı" className="h-12 md:h-16 hidden dark:block" />
+                <img src="/images/logo.png" alt="ATL Çelik Yapı" className="h-12 md:h-16 dark:hidden" />
+                <img src="/images/logo.png" alt="ATL Çelik Yapı" className="h-12 md:h-16 hidden dark:block" />
               </Link>
             </div>
 
@@ -320,9 +210,6 @@ export default function Home() {
               <a href="#hakkimizda" className="text-foreground hover:text-blue-500 transition-colors font-medium">
                 Hakkımızda
               </a>
-              <Link href="/galeri" className="text-foreground hover:text-blue-500 transition-colors font-medium">
-                Galeri
-              </Link>
               <a href="#iletisim" className="text-foreground hover:text-blue-500 transition-colors font-medium">
                 İletişim
               </a>
@@ -374,13 +261,6 @@ export default function Home() {
                 >
                   Hakkımızda
                 </a>
-                <Link
-                  href="/galeri"
-                  onClick={handleNavClick}
-                  className="text-foreground hover:text-blue-500 transition-colors font-medium py-2"
-                >
-                  Galeri
-                </Link>
                 <a
                   href="#iletisim"
                   onClick={handleNavClick}
@@ -499,9 +379,13 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Construction Process */}
-      <section className="py-16 md:py-24 bg-gradient-to-b from-slate-900 to-slate-800 text-white overflow-hidden">
+      {/* Projects - Construction Process Showcase */}
+      <section
+        id="projeler"
+        className="py-16 md:py-24 bg-gradient-to-b from-slate-900 to-slate-800 text-white overflow-hidden"
+      >
         <div className="max-w-7xl mx-auto px-4 md:px-6">
+          {/* Section Header */}
           <div className="text-center mb-12">
             <span className="text-blue-400 font-semibold text-sm uppercase tracking-wider">Yapım Süreci</span>
             <h2 className="text-3xl md:text-4xl font-bold mt-2 mb-4">Projelerimiz Nasıl Hayata Geçiyor?</h2>
@@ -509,6 +393,29 @@ export default function Home() {
               Her projemiz 6 ana aşamadan geçerek profesyonel standartlarda tamamlanır.
             </p>
           </div>
+
+          {/* Premium Construction Process Component */}
+          <ConstructionProcess />
+        </div>
+      </section>
+
+      {/* Instagram Gallery - Construction Process Before/After */}
+      <section
+        id="galeri"
+        className="py-16 md:py-24 bg-gradient-to-b from-slate-950 to-slate-900 text-white overflow-hidden"
+      >
+        <div className="max-w-7xl mx-auto px-4 md:px-6">
+          {/* Section Header */}
+          <div className="text-center mb-12">
+            <span className="text-blue-400 font-semibold text-sm uppercase tracking-wider">Yapım Süreci</span>
+            <h2 className="text-3xl md:text-4xl font-bold mt-2 mb-4">Projelerimiz Nasıl Hayata Geçiyor?</h2>
+            <p className="text-slate-300 max-w-2xl mx-auto">
+              Her projemiz profesyonel yapı standartlarında gerçekleştirilir. İnstagram'dan yeni projelerimizi takip
+              edin.
+            </p>
+          </div>
+
+          {/* Premium Construction Process Component */}
           <ConstructionProcess />
         </div>
       </section>
@@ -552,58 +459,10 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Custom Manufacturing */}
-      <CustomManufacturing />
-
-      {/* Projeler / Özel Üretimler */}
-      <section id="projeler" className="py-16 md:py-24 bg-gradient-to-b from-background to-slate-900/20">
-        <div className="max-w-7xl mx-auto px-4 md:px-6">
-          <div className="text-center mb-12">
-            <p className="text-blue-500 font-bold uppercase tracking-wider mb-2">Seçkin Projeler</p>
-            <h2 className="text-3xl md:text-4xl font-bold mb-4">Özel Üretimler</h2>
-            <p className="text-muted-foreground max-w-2xl mx-auto">
-              Müşterilerimizin ihtiyaçlarına göre tasarladığımız özel üretim projelerimiz
-            </p>
-          </div>
-
-          <BeforeAfterSlider
-            projects={projects.map((p) => ({
-              title: p.title,
-              before: p.before_image_url || "",
-              after: p.after_image_url || "",
-            }))}
-          />
-
-          <div className="text-center mt-8">
-            <Link href="/projeler" className="text-blue-500 hover:text-blue-600 font-semibold">
-              Tüm Projelerimizi Görmek İçin →
-            </Link>
-          </div>
-        </div>
-      </section>
-
-      {/* Partners */}
-      <section className="py-16 md:py-24 px-4 md:px-6 bg-background border-t">
-        <div className="max-w-7xl mx-auto">
-          <div className="text-center mb-12">
-            <p className="text-blue-500 font-bold uppercase tracking-wider mb-2">Ortaklarımız</p>
-            <h2 className="text-3xl md:text-4xl font-bold">İş Ortaklarımız</h2>
-          </div>
-
-          <SponsorsCarousel
-            sponsors={sponsors.map((s) => ({
-              name: s.name,
-              logo: s.logo_url || "",
-            }))}
-          />
-        </div>
-      </section>
-
       {/* Contact */}
       <section id="iletisim" className="py-16 md:py-24 px-4 md:px-6 bg-secondary/10">
         <div className="max-w-7xl mx-auto">
           <div className="grid md:grid-cols-2 gap-12">
-            {/* Left side - Contact info */}
             <div>
               <p className="text-blue-500 font-bold uppercase tracking-wider mb-2">İletişim</p>
               <h2 className="text-3xl md:text-4xl font-bold mb-6">Bize Ulaşın</h2>
@@ -630,64 +489,30 @@ export default function Home() {
               </div>
             </div>
 
-            {/* Right side - Quote form */}
             <div className="bg-card border rounded-2xl p-6 md:p-8">
               <h3 className="text-xl font-bold mb-6">Teklif Formu</h3>
-
-              {/* Feedback message */}
-              {quoteMessage && (
-                <div
-                  className={`mb-4 p-3 rounded-lg text-sm ${
-                    quoteMessage.type === "success"
-                      ? "bg-green-500/10 text-green-700 dark:text-green-400"
-                      : "bg-red-500/10 text-red-700 dark:text-red-400"
-                  }`}
-                >
-                  {quoteMessage.text}
-                </div>
-              )}
-
-              {/* Quote form */}
-              <form className="space-y-4" onSubmit={handleQuoteSubmit}>
+              <form className="space-y-4">
                 <input
                   type="text"
                   placeholder="Adınız Soyadınız"
-                  value={quoteFormData.name}
-                  onChange={(e) => setQuoteFormData({ ...quoteFormData, name: e.target.value })}
                   className="w-full bg-secondary/50 border rounded-lg px-4 py-3 focus:outline-none focus:border-blue-500"
-                  required
                 />
                 <input
                   type="email"
                   placeholder="E-posta Adresiniz"
-                  value={quoteFormData.email}
-                  onChange={(e) => setQuoteFormData({ ...quoteFormData, email: e.target.value })}
                   className="w-full bg-secondary/50 border rounded-lg px-4 py-3 focus:outline-none focus:border-blue-500"
-                  required
                 />
                 <input
                   type="tel"
                   placeholder="Telefon Numaranız"
-                  value={quoteFormData.phone}
-                  onChange={(e) => setQuoteFormData({ ...quoteFormData, phone: e.target.value })}
                   className="w-full bg-secondary/50 border rounded-lg px-4 py-3 focus:outline-none focus:border-blue-500"
-                  required
                 />
                 <textarea
                   placeholder="Mesajınız"
-                  value={quoteFormData.message}
-                  onChange={(e) => setQuoteFormData({ ...quoteFormData, message: e.target.value })}
                   rows={4}
                   className="w-full bg-secondary/50 border rounded-lg px-4 py-3 focus:outline-none focus:border-blue-500 resize-none"
-                  required
                 />
-                <Button
-                  type="submit"
-                  disabled={quoteSubmitting}
-                  className="w-full bg-blue-500 hover:bg-blue-600 py-3 font-semibold"
-                >
-                  {quoteSubmitting ? "Gönderiliyor..." : "GÖNDER"}
-                </Button>
+                <Button className="w-full bg-blue-500 hover:bg-blue-600 py-3 font-semibold">GÖNDER</Button>
               </form>
             </div>
           </div>
@@ -695,140 +520,129 @@ export default function Home() {
       </section>
 
       {/* Footer */}
-      <footer className="bg-slate-900 text-white py-12 md:py-16 border-t border-slate-700">
-        <div className="max-w-7xl mx-auto px-4 md:px-6">
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-8 md:gap-12 mb-12">
-            {/* Logo Section */}
-            <div className="md:col-span-1">
-              <Link href="/">
-                <img src="/darkmodelogo.png" alt="ATL Çelik Yapı" className="h-12 md:h-16 mb-4" />
-              </Link>
-              <p className="text-slate-300 text-sm mb-4">
-                Düzce'de 12+ yıllık tecrübeyle profesyonel çelik yapı çözümleri.
-              </p>
-
-              <div className="flex gap-4 mt-6">
-                <a
-                  href="https://www.instagram.com/atl_muhendislik/"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="w-10 h-10 rounded-full bg-slate-700 hover:bg-blue-500 flex items-center justify-center transition-colors"
-                  title="Instagram"
-                >
-                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={1.5}
-                      d="M7.5 3h9c1.866 0 3 1.134 3 3v9c0 1.866-1.134 3-3 3h-9c-1.866 0-3-1.134-3-3v-9c0-1.866 1.134-3 3-3z"
-                    />
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={1.5}
-                      d="M12 9a3 3 0 100 6 3 3 0 000-6z"
-                    />
-                    <circle cx="18" cy="6" r="0.75" fill="currentColor" />
-                  </svg>
-                </a>
-                <a
-                  href="https://www.tiktok.com"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="w-10 h-10 rounded-full bg-slate-700 hover:bg-blue-500 flex items-center justify-center transition-colors"
-                  title="TikTok"
-                >
-                  <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
-                    <path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.68v13.67a2.4 2.4 0 0 1-2.4 2.4 2.4 2.4 0 0 1-2.4-2.4 2.4 2.4 0 0 1 2.4-2.4c.26 0 .52.04.77.12V9.24A5.1 5.1 0 0 0 9.14 9c-2.8 0-5.3 2.26-5.3 5.13 0 2.87 2.13 5.28 5 5.28s5.3-2.39 5.3-5.28v-5.02c1.86 1.43 4.35 2.33 7.07 2.33v-3.72c-1.45-.37-2.78-1.04-3.89-1.95z" />
-                  </svg>
-                </a>
+      <footer className="bg-primary text-primary-foreground py-12 px-4 md:px-6">
+        <div className="max-w-7xl mx-auto">
+          {sponsors.length > 0 && (
+            <div className="mb-12 pb-12 border-b border-white/20">
+              <h2 className="text-2xl font-bold text-white mb-6 text-center">İş Ortaklarımız</h2>
+              <div className="flex items-center justify-center gap-8 flex-wrap">
+                {sponsors.map((sponsor) => (
+                  <div key={sponsor.id} className="text-white/90 text-lg font-bold">
+                    {sponsor.name}
+                  </div>
+                ))}
               </div>
             </div>
+          )}
 
-            {/* Services Section */}
-            <div className="md:col-span-1">
-              <h3 className="font-bold mb-4">Hizmetler</h3>
-              <ul className="space-y-2 text-sm">
+          <div className="mb-12 pb-12 border-b border-white/20">
+            <h2 className="text-xl font-bold text-white mb-6 text-center">Biz Neredeyiz?</h2>
+            <div className="relative w-full h-64 rounded-lg overflow-hidden">
+              <iframe
+                width="100%"
+                height="100%"
+                frameBorder="0"
+                src={GOOGLE_MAPS_EMBED}
+                allowFullScreen
+                loading="lazy"
+                title="Konum"
+              ></iframe>
+            </div>
+          </div>
+
+          <div className="flex justify-center mb-8">
+            <img src="/images/logo.png" alt="ATL Çelik Yapı" className="h-20 md:h-24" />
+          </div>
+
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-8 pb-8 border-b border-white/20">
+            <div>
+              <h3 className="font-bold mb-4 text-white">Hizmetler</h3>
+              <ul className="space-y-2 text-white/80 text-sm">
                 {["Çelik Konstrüksiyon", "Sandviç Panel", "Metal İşleme", "Özel Üretim"].map((item) => (
                   <li key={item}>
-                    <a href="#" className="hover:text-blue-400">
+                    <a href="#" className="hover:text-white">
                       {item}
                     </a>
                   </li>
                 ))}
               </ul>
             </div>
-
-            {/* Corporate Section */}
-            <div className="md:col-span-1">
-              <h3 className="font-bold mb-4">Kurumsal</h3>
-              <ul className="space-y-2 text-sm">
+            <div>
+              <h3 className="font-bold mb-4 text-white">Kurumsal</h3>
+              <ul className="space-y-2 text-white/80 text-sm">
                 {["Hakkımızda", "Projeler", "Referanslar"].map((item) => (
                   <li key={item}>
-                    <a href="#" className="hover:text-blue-400">
+                    <a href="#" className="hover:text-white">
                       {item}
                     </a>
                   </li>
                 ))}
               </ul>
             </div>
-
-            {/* Support Section */}
-            <div className="md:col-span-1">
-              <h3 className="font-bold mb-4">Destek</h3>
-              <ul className="space-y-2 text-sm">
+            <div>
+              <h3 className="font-bold mb-4 text-white">Destek</h3>
+              <ul className="space-y-2 text-white/80 text-sm">
                 {["Teklif Al", "SSS", "İletişim"].map((item) => (
                   <li key={item}>
-                    <a href="#" className="hover:text-blue-400">
+                    <a href="#" className="hover:text-white">
                       {item}
                     </a>
                   </li>
                 ))}
+              </ul>
+            </div>
+            <div>
+              <h3 className="font-bold mb-4 text-white">İletişim</h3>
+              <ul className="space-y-2 text-white/80 text-sm">
+                <li>
+                  <a href="tel:+905373393947" className="hover:text-white">
+                    0537 339 39 47
+                  </a>
+                </li>
+                <li>
+                  <a href="mailto:info@atlcelikyapi.com" className="hover:text-white">
+                    info@atlcelikyapi.com
+                  </a>
+                </li>
               </ul>
             </div>
           </div>
 
-          <div className="pt-8 flex flex-col md:flex-row items-center justify-between gap-4 text-sm text-slate-300">
+          <div className="pt-8 flex flex-col md:flex-row items-center justify-between gap-4 text-sm text-white/80">
             <p>© 2025 ATL Çelik Yapı. Tüm hakları saklıdır.</p>
-            <div className="flex items-center gap-6">
-              <span className="text-slate-400">Tasarım: rootbarann</span>
-              <div className="flex items-center gap-4">
-                <a
-                  href="https://www.instagram.com/atl_muhendislik/"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-white hover:text-blue-400 transition-colors"
-                  title="Instagram"
-                >
-                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={1.5}
-                      d="M7.5 3h9c1.866 0 3 1.134 3 3v9c0 1.866-1.134 3-3 3h-9c-1.866 0-3-1.134-3-3v-9c0-1.866 1.134-3 3-3z"
-                    />
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={1.5}
-                      d="M12 9a3 3 0 100 6 3 3 0 000-6z"
-                    />
-                    <circle cx="18" cy="6" r="0.75" fill="currentColor" />
-                  </svg>
-                </a>
-                <a
-                  href="https://www.tiktok.com"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-white hover:text-blue-400 transition-colors"
-                  title="TikTok"
-                >
-                  <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
-                    <path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.68v13.67a2.4 2.4 0 0 1-2.4 2.4 2.4 2.4 0 0 1-2.4-2.4 2.4 2.4 0 0 1 2.4-2.4c.26 0 .52.04.77.12V9.24A5.1 5.1 0 0 0 9.14 9c-2.8 0-5.3 2.26-5.3 5.13 0 2.87 2.13 5.28 5 5.28s5.3-2.39 5.3-5.28v-5.02c1.86 1.43 4.35 2.33 7.07 2.33v-3.72c-1.45-.37-2.78-1.04-3.89-1.95z" />
-                  </svg>
-                </a>
-              </div>
+            <div className="flex items-center gap-4">
+              <a
+                href="https://www.instagram.com/atlcelikyapi"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-white hover:text-blue-400"
+              >
+                <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+                  <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919-.058 1.265-.069 1.645-.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.281-.073-1.689-.073-4.849 0-3.204.013-3.583.072-4.849.149-3.227 1.664-4.771 4.919-4.919 1.281-.057 1.689-.069 4.948-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.69-.073-4.949-.073z" />
+                </svg>
+              </a>
+              <a
+                href="https://www.tiktok.com/@atlcelikyapi"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-white hover:text-blue-400"
+              >
+                <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+                  <path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-5.2 1.74 2.89 2.89 0 0 1 2.31-4.64 2.93 2.93 0 0 1 .88.13V9.4a6.84 6.84 0 0 0-1-.05A6.33 6.33 0 0 0 5 20.1a6.34 6.34 0 0 0 10.86-4.43v-7a8.16 8.16 0 0 0 4.77 1.52v-3.4a4.85 4.85 0 0 1-1-.1z" />
+                </svg>
+              </a>
             </div>
+            <span className="text-white/60 text-xs">
+              Designed by{" "}
+              <a
+                href="https://github.com/rootbarann"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-blue-400 hover:text-blue-300 font-semibold"
+              >
+                @rootbarann
+              </a>
+            </span>
           </div>
         </div>
       </footer>
