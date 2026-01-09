@@ -1,60 +1,108 @@
-import Image from "next/image"
+"use client"
 
-type MediaItem = {
-  url?: string
-  file_type?: string
+import { useEffect, useState } from "react"
+import { useParams } from "next/navigation"
+
+type ProjectPhoto = {
+  id: string
+  url: string
 }
 
-type ApiResponse = {
-  gallery?: MediaItem[]
+type ProjectStep = {
+  id: string
+  project_id: string
+  step_number: number
+  title: string
+  description: string
+  project_photos: ProjectPhoto[]
 }
 
-async function getData(): Promise<ApiResponse> {
-  const res = await fetch(process.env.NEXT_PUBLIC_API_URL as string, {
-    cache: "no-store",
-  })
+const DEFAULT_PHASES = [
+  {
+    id: "phase-1",
+    step_number: 1,
+    title: "Keşif & Planlama",
+    description: "Proje alanı incelenir ve ihtiyaçlar belirlenir.",
+  },
+  {
+    id: "phase-2",
+    step_number: 2,
+    title: "Üretim",
+    description: "Çelik yapı ve bileşenler üretilir.",
+  },
+  {
+    id: "phase-3",
+    step_number: 3,
+    title: "Montaj",
+    description: "Sahada montaj işlemleri tamamlanır.",
+  },
+]
 
-  if (!res.ok) {
-    throw new Error("API fetch failed")
+export default function ProjectDetailPage() {
+  const { id } = useParams<{ id: string }>()
+  const [steps, setSteps] = useState<ProjectStep[]>([])
+  const [loading, setLoading] = useState(true)
+
+  useEffect(() => {
+    async function fetchProject() {
+      try {
+        const res = await fetch(
+          `${process.env.NEXT_PUBLIC_API_URL}?project_id=${id}`,
+          { cache: "no-store" },
+        )
+
+        const data = await res.json()
+
+        if (Array.isArray(data?.steps) && data.steps.length > 0) {
+          setSteps(data.steps)
+        } else {
+          // DEFAULT_PHASES → ProjectStep uyarlama
+          const fallbackSteps: ProjectStep[] = DEFAULT_PHASES.map(
+            (phase) => ({
+              ...phase,
+              project_id: id,
+              project_photos: [],
+            }),
+          )
+
+          setSteps(fallbackSteps)
+        }
+      } catch (error) {
+        console.error("Error fetching project:", error)
+
+        const fallbackSteps: ProjectStep[] = DEFAULT_PHASES.map((phase) => ({
+          ...phase,
+          project_id: id,
+          project_photos: [],
+        }))
+
+        setSteps(fallbackSteps)
+      } finally {
+        setLoading(false)
+      }
+    }
+
+    fetchProject()
+  }, [id])
+
+  if (loading) {
+    return <p className="p-8">Yükleniyor…</p>
   }
-
-  return res.json()
-}
-
-export default async function HomePage() {
-  const data = await getData()
-
-  const images: string[] =
-    data.gallery
-      ?.filter(
-        (item): item is Required<Pick<MediaItem, "url" | "file_type">> =>
-          typeof item.url === "string" &&
-          typeof item.file_type === "string" &&
-          item.file_type.startsWith("image"),
-      )
-      .map((item) => item.url) ?? []
 
   return (
     <main className="container mx-auto px-4 py-12">
-      <h1 className="text-3xl font-bold mb-8">Galeri</h1>
+      <h1 className="text-3xl font-bold mb-8">Proje Süreci</h1>
 
-      {images.length === 0 && (
-        <p className="text-muted-foreground">Görüntü bulunamadı.</p>
-      )}
-
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
-        {images.map((src, index) => (
+      <div className="space-y-6">
+        {steps.map((step) => (
           <div
-            key={index}
-            className="relative w-full aspect-[4/3] overflow-hidden rounded-lg"
+            key={step.id}
+            className="border rounded-lg p-6 bg-background"
           >
-            <Image
-              src={src}
-              alt={`Galeri ${index + 1}`}
-              fill
-              className="object-cover"
-              sizes="(max-width: 768px) 100vw, 33vw"
-            />
+            <h2 className="text-xl font-semibold mb-2">
+              {step.step_number}. {step.title}
+            </h2>
+            <p className="text-muted-foreground">{step.description}</p>
           </div>
         ))}
       </div>
