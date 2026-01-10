@@ -23,13 +23,22 @@ export default function Home() {
     )
       .then((res) => res.json())
       .then((json) => setData(json))
-      .catch(console.error)
+      .catch((err) => {
+        console.error("Drive data error:", err)
+      })
   }, [])
 
   return (
     <main>
-      {/* HERO – layout bozulmasın diye statik */}
-      <section style={{ position: "relative", height: "80vh" }}>
+      {/* ================= HERO ================= */}
+      <section
+        style={{
+          position: "relative",
+          height: "80vh",
+          width: "100%",
+          overflow: "hidden",
+        }}
+      >
         <Image
           src="/hero/hero1.jpg"
           alt="ATL Çelik Yapı"
@@ -37,6 +46,7 @@ export default function Home() {
           priority
           style={{ objectFit: "cover" }}
         />
+
         <div
           style={{
             position: "absolute",
@@ -46,39 +56,78 @@ export default function Home() {
             display: "flex",
             flexDirection: "column",
             justifyContent: "center",
-            paddingLeft: 60,
+            paddingLeft: 80,
+            paddingRight: 40,
           }}
         >
-          <h1 style={{ fontSize: 56 }}>Çelik Konstrüksiyon</h1>
-          <p>Endüstriyel tesis ve depo çözümleri</p>
+          <h1 style={{ fontSize: 56, fontWeight: 700, marginBottom: 16 }}>
+            Çelik Konstrüksiyon
+          </h1>
+          <p style={{ fontSize: 20, maxWidth: 600 }}>
+            Endüstriyel tesis, depo ve anahtar teslim çelik yapı çözümleri
+          </p>
         </div>
       </section>
 
-      {/* GALERİ – Drive’dan */}
-      <section style={{ padding: "80px 40px" }}>
-        <h2 style={{ fontSize: 36, marginBottom: 32 }}>Galeri</h2>
+      {/* ================= GALERİ ================= */}
+      <section
+        style={{
+          padding: "100px 60px",
+          backgroundColor: "#f8f9fa",
+        }}
+      >
+        <h2
+          style={{
+            fontSize: 42,
+            fontWeight: 700,
+            textAlign: "center",
+            marginBottom: 70,
+          }}
+        >
+          Galeri
+        </h2>
 
         {data &&
           Object.entries(data.gallery).map(([category, images]) => (
-            <div key={category} style={{ marginBottom: 60 }}>
-              <h3 style={{ fontSize: 24, marginBottom: 16 }}>{category}</h3>
+            <div key={category} style={{ marginBottom: 90 }}>
+              <h3
+                style={{
+                  fontSize: 28,
+                  marginBottom: 28,
+                  textTransform: "capitalize",
+                }}
+              >
+                {category}
+              </h3>
 
               <div
                 style={{
                   display: "grid",
-                  gridTemplateColumns: "repeat(auto-fill, minmax(260px, 1fr))",
-                  gap: 20,
+                  gridTemplateColumns: "repeat(auto-fill, minmax(300px, 1fr))",
+                  gap: 24,
                 }}
               >
                 {images.map((img, i) => (
-                  <Image
+                  <div
                     key={i}
-                    src={img.src}
-                    alt={img.alt}
-                    width={400}
-                    height={300}
-                    style={{ objectFit: "cover", borderRadius: 8 }}
-                  />
+                    style={{
+                      position: "relative",
+                      height: 220,
+                      borderRadius: 14,
+                      overflow: "hidden",
+                      cursor: "pointer",
+                    }}
+                  >
+                    <Image
+                      src={img.src}
+                      alt={img.alt}
+                      fill
+                      style={{
+                        objectFit: "cover",
+                        transition: "transform 0.4s ease",
+                      }}
+                    />
+                  </div>
                 ))}
               </div>
             </div>
