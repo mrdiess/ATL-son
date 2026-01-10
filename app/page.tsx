@@ -2,7 +2,6 @@
 
 import { useEffect, useState } from "react"
 import Image from "next/image"
-import Link from "next/link"
 
 type GalleryItem = {
   src: string
@@ -24,20 +23,20 @@ export default function Home() {
     )
       .then((res) => res.json())
       .then((json) => setData(json))
-      .catch(console.error)
+      .catch(() => null)
   }, [])
 
-  const previewImages =
-    data ? Object.values(data.gallery).flat().slice(0, 8) : []
+  // 👉 Anasayfada sadece 6 görsel (performans için)
+  const previewImages: GalleryItem[] =
+    data ? Object.values(data.gallery).flat().slice(0, 6) : []
 
   return (
-    <main>
+    <main style={{ background: "#020617", color: "white" }}>
       {/* ================= HERO ================= */}
       <section
         style={{
           position: "relative",
-          height: "80vh",
-          width: "100%",
+          height: "85vh",
           overflow: "hidden",
         }}
       >
@@ -53,48 +52,44 @@ export default function Home() {
           style={{
             position: "absolute",
             inset: 0,
-            background: "rgba(0,0,0,0.55)",
-            color: "white",
+            background:
+              "linear-gradient(to right, rgba(2,6,23,0.85), rgba(2,6,23,0.3))",
             display: "flex",
             flexDirection: "column",
             justifyContent: "center",
             paddingLeft: 80,
-            paddingRight: 40,
           }}
         >
-          <h1 style={{ fontSize: 56, fontWeight: 700, marginBottom: 16 }}>
+          <p style={{ color: "#38bdf8", marginBottom: 12 }}>
+            Endüstriyel tesis ve depo çözümleri
+          </p>
+          <h1 style={{ fontSize: 56, fontWeight: 800, marginBottom: 16 }}>
             Çelik Konstrüksiyon
           </h1>
-          <p style={{ fontSize: 20, maxWidth: 600 }}>
-            Endüstriyel tesis, depo ve anahtar teslim çelik yapı çözümleri
+          <p style={{ maxWidth: 520, opacity: 0.85 }}>
+            Düzce merkezli, 81 ile profesyonel çelik yapı ve metal işleme
+            hizmetleri.
           </p>
         </div>
       </section>
 
-      {/* ================= GALERİ ÖZET ================= */}
-      <section
-        style={{
-          padding: "100px 60px",
-          backgroundColor: "#f8f9fa",
-        }}
-      >
-        <h2
-          style={{
-            fontSize: 40,
-            fontWeight: 700,
-            textAlign: "center",
-            marginBottom: 50,
-          }}
-        >
-          Foto Galeri
-        </h2>
+      {/* ================= GALERİ ================= */}
+      <section style={{ padding: "100px 80px" }}>
+        <div style={{ textAlign: "center", marginBottom: 60 }}>
+          <p style={{ color: "#38bdf8", marginBottom: 8 }}>
+            PROJELERİMİZDEN KARELER
+          </p>
+          <h2 style={{ fontSize: 42, fontWeight: 700 }}>Foto Galeri</h2>
+          <p style={{ opacity: 0.7, marginTop: 12 }}>
+            Tamamladığımız projelerden seçilmiş kareler
+          </p>
+        </div>
 
         <div
           style={{
             display: "grid",
-            gridTemplateColumns: "repeat(auto-fill, minmax(280px, 1fr))",
+            gridTemplateColumns: "repeat(auto-fill, minmax(320px, 1fr))",
             gap: 24,
-            marginBottom: 40,
           }}
         >
           {previewImages.map((img, i) => (
@@ -102,9 +97,10 @@ export default function Home() {
               key={i}
               style={{
                 position: "relative",
-                height: 200,
-                borderRadius: 14,
+                height: 220,
+                borderRadius: 16,
                 overflow: "hidden",
+                background: "#0f172a",
               }}
             >
               <Image
@@ -115,23 +111,6 @@ export default function Home() {
               />
             </div>
           ))}
-        </div>
-
-        <div style={{ textAlign: "center" }}>
-          <Link
-            href="/galeri"
-            style={{
-              display: "inline-block",
-              padding: "14px 32px",
-              background: "#0ea5e9",
-              color: "white",
-              borderRadius: 999,
-              fontWeight: 600,
-              textDecoration: "none",
-            }}
-          >
-            Tüm Galeriyi Gör
-          </Link>
         </div>
       </section>
     </main>
