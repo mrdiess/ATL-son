@@ -34,62 +34,108 @@ export default async function Home() {
   const data = await getData()
 
   return (
-    <main style={{ padding: 40 }}>
-      <h1>ATL Çelik Yapı</h1>
+    <main className="bg-background text-foreground">
+      {/* HERO */}
+      <section className="py-20 bg-gradient-to-b from-slate-900 to-slate-800 text-white">
+        <div className="max-w-7xl mx-auto px-4 text-center">
+          <h1 className="text-4xl md:text-6xl font-bold mb-4">
+            ATL Çelik Yapı
+          </h1>
+          <p className="text-slate-300 max-w-2xl mx-auto">
+            Google Drive altyapılı, hızlı ve sürdürülebilir çelik yapı çözümleri
+          </p>
+        </div>
+      </section>
 
       {/* PROJELER */}
-      <section>
-        <h2>Projeler</h2>
-        {data.projects.map((p, i) => (
-          <div key={i} style={{ marginBottom: 40 }}>
-            <h3>{p.title}</h3>
-            <div style={{ display: "flex", gap: 20 }}>
-              <Image src={p.before} alt="Before" width={400} height={300} />
-              <Image src={p.after} alt="After" width={400} height={300} />
-            </div>
+      <section className="py-16">
+        <div className="max-w-7xl mx-auto px-4">
+          <h2 className="text-3xl font-bold mb-10 text-center">
+            Projelerimiz
+          </h2>
+
+          <div className="space-y-16">
+            {data.projects.map((p, i) => (
+              <div key={i} className="grid md:grid-cols-2 gap-8 items-center">
+                <div>
+                  <h3 className="text-xl font-semibold mb-4">{p.title}</h3>
+                  <div className="grid grid-cols-2 gap-4">
+                    <Image
+                      src={p.before}
+                      alt="Önce"
+                      width={500}
+                      height={350}
+                      className="rounded-xl object-cover"
+                    />
+                    <Image
+                      src={p.after}
+                      alt="Sonra"
+                      width={500}
+                      height={350}
+                      className="rounded-xl object-cover"
+                    />
+                  </div>
+                </div>
+              </div>
+            ))}
           </div>
-        ))}
+        </div>
       </section>
 
       {/* GALERİ */}
-      <section>
-        <h2>Galeri</h2>
+      <section className="py-16 bg-slate-50 dark:bg-slate-900">
+        <div className="max-w-7xl mx-auto px-4">
+          <h2 className="text-3xl font-bold mb-10 text-center">
+            Galeri
+          </h2>
 
-        {Object.entries(data.gallery).map(([category, images]) => (
-          <div key={category} style={{ marginBottom: 30 }}>
-            <h3>{category}</h3>
+          {Object.entries(data.gallery).map(([category, images]) => (
+            <div key={category} className="mb-14">
+              <h3 className="text-xl font-semibold mb-6">{category}</h3>
 
-            <div style={{ display: "flex", gap: 20, flexWrap: "wrap" }}>
-              {images.map((img, i) => (
-                <Image
-                  key={i}
-                  src={img.src}
-                  alt={img.alt}
-                  width={300}
-                  height={200}
-                />
-              ))}
+              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
+                {images.map((img, i) => (
+                  <Image
+                    key={i}
+                    src={img.src}
+                    alt={img.alt}
+                    width={400}
+                    height={300}
+                    className="rounded-xl object-cover hover:scale-105 transition-transform"
+                  />
+                ))}
+              </div>
             </div>
-          </div>
-        ))}
-      </section>
-
-      {/* İŞ ORTAKLARI */}
-      <section>
-        <h2>İş Ortakları</h2>
-
-        <div style={{ display: "flex", gap: 40 }}>
-          {data.sponsors.map((s, i) => (
-            <Image
-              key={i}
-              src={s.logo}
-              alt={s.name}
-              width={150}
-              height={80}
-            />
           ))}
         </div>
       </section>
+
+      {/* İŞ ORTAKLARI */}
+      <section className="py-16">
+        <div className="max-w-7xl mx-auto px-4">
+          <h2 className="text-3xl font-bold mb-10 text-center">
+            İş Ortaklarımız
+          </h2>
+
+          <div className="flex flex-wrap justify-center gap-12">
+            {data.sponsors.map((s, i) => (
+              <Image
+                key={i}
+                src={s.logo}
+                alt={s.name}
+                width={160}
+                height={80}
+                className="object-contain grayscale hover:grayscale-0 transition"
+              />
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* FOOTER */}
+      <footer className="py-10 bg-slate-900 text-slate-300 text-center text-sm">
+        © {new Date().getFullYear()} ATL Çelik Yapı
+      </footer>
     </main>
   )
 }
