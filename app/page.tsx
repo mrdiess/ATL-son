@@ -1,20 +1,19 @@
 "use client"
 
-import Image from "next/image"
 import { useEffect, useState } from "react"
+import { BeforeAfterModal } from "@/components/BeforeAfterModal"
 
 type Project = {
   id: string
+  title: string
   before: string
   after: string
-  title: string
 }
 
 export default function HomePage() {
   const [projects, setProjects] = useState<Project[]>([])
 
   useEffect(() => {
-    // Şimdilik statik – sonra Drive API’den çekeceğiz
     setProjects([
       {
         id: "1",
@@ -31,31 +30,12 @@ export default function HomePage() {
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         {projects.map((p) => (
-          <div
+          <BeforeAfterModal
             key={p.id}
-            className="rounded-xl overflow-hidden border hover:shadow-lg transition"
-          >
-            <div className="grid grid-cols-2">
-              <Image
-                src={p.before}
-                alt="Önce"
-                width={600}
-                height={400}
-                className="object-cover h-full"
-              />
-              <Image
-                src={p.after}
-                alt="Sonra"
-                width={600}
-                height={400}
-                className="object-cover h-full"
-              />
-            </div>
-
-            <div className="p-4 font-semibold text-center">
-              {p.title}
-            </div>
-          </div>
+            before={p.before}
+            after={p.after}
+            title={p.title}
+          />
         ))}
       </div>
     </main>

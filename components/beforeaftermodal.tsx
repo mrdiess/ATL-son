@@ -1,115 +1,49 @@
 "use client"
 
-import { useState } from "react"
 import Image from "next/image"
+import { useState } from "react"
 
 type Props = {
-  title: string
   before: string
   after: string
+  title?: string
 }
 
-export default function BeforeAfterModal({ title, before, after }: Props) {
+export function BeforeAfterModal({ before, after, title }: Props) {
   const [open, setOpen] = useState(false)
-  const [slider, setSlider] = useState(50)
-
-  if (!open) return null
 
   return (
-    <div
-      style={{
-        position: "fixed",
-        inset: 0,
-        background: "rgba(2,6,23,0.85)",
-        zIndex: 9999,
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "center",
-        padding: 20,
-      }}
-    >
-      <div
-        style={{
-          width: "100%",
-          maxWidth: 1100,
-          background: "#020617",
-          borderRadius: 16,
-          overflow: "hidden",
-          position: "relative",
-        }}
+    <>
+      <button
+        onClick={() => setOpen(true)}
+        className="w-full text-left"
       >
-        {/* KAPAT */}
-        <button
-          onClick={() => setOpen(false)}
-          style={{
-            position: "absolute",
-            top: 16,
-            right: 16,
-            background: "#020617",
-            color: "white",
-            border: "none",
-            fontSize: 18,
-            cursor: "pointer",
-            zIndex: 10,
-          }}
-        >
-          ✕
-        </button>
+        <div className="grid grid-cols-2 rounded-xl overflow-hidden border hover:shadow-lg transition">
+          <Image src={before} alt="Önce" width={600} height={400} />
+          <Image src={after} alt="Sonra" width={600} height={400} />
+        </div>
+        {title && (
+          <div className="mt-2 font-semibold text-center">{title}</div>
+        )}
+      </button>
 
-        {/* GÖRSEL */}
-        <div style={{ position: "relative", height: 520 }}>
-          <Image src={after} alt="After" fill style={{ objectFit: "cover" }} />
-          <div
-            style={{
-              position: "absolute",
-              inset: 0,
-              overflow: "hidden",
-              width: `${slider}%`,
-            }}
-          >
-            <Image
-              src={before}
-              alt="Before"
-              fill
-              style={{ objectFit: "cover" }}
-            />
+      {open && (
+        <div className="fixed inset-0 z-50 bg-black/70 flex items-center justify-center">
+          <div className="bg-white rounded-xl max-w-5xl w-full p-4 relative">
+            <button
+              onClick={() => setOpen(false)}
+              className="absolute top-3 right-4 text-xl font-bold"
+            >
+              ×
+            </button>
+
+            <div className="grid grid-cols-2 gap-2">
+              <Image src={before} alt="Önce" width={1000} height={700} />
+              <Image src={after} alt="Sonra" width={1000} height={700} />
+            </div>
           </div>
-
-          {/* SLIDER */}
-          <input
-            type="range"
-            min={0}
-            max={100}
-            value={slider}
-            onChange={(e) => setSlider(Number(e.target.value))}
-            style={{
-              position: "absolute",
-              bottom: 20,
-              left: "50%",
-              transform: "translateX(-50%)",
-              width: "60%",
-            }}
-          />
         </div>
-
-        {/* ALT BİLGİ */}
-        <div style={{ padding: 24 }}>
-          <p style={{ color: "#38bdf8", fontWeight: 600 }}>Before / After</p>
-          <h3 style={{ fontSize: 26, fontWeight: 800 }}>{title}</h3>
-        </div>
-      </div>
-    </div>
+      )}
+    </>
   )
-}
-
-/* Hook gibi kullanabilmek için */
-export function useBeforeAfterModal() {
-  const [data, setData] = useState<Props | null>(null)
-  return {
-    modal: data ? (
-      <BeforeAfterModal {...data} />
-    ) : null,
-    open: (p: Props) => setData(p),
-    close: () => setData(null),
-  }
 }
