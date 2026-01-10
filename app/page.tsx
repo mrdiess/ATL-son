@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react"
 import Image from "next/image"
+import Link from "next/link"
 
 type GalleryItem = {
   src: string
@@ -14,20 +15,8 @@ type SiteData = {
   }
 }
 
-const FILTERS = [
-  { key: "all", label: "Tümü" },
-  { key: "depo", label: "Depo" },
-  { key: "fabrika", label: "Fabrika" },
-  { key: "hangar", label: "Hangar" },
-  { key: "ticari", label: "Ticari" },
-  { key: "tarimsal", label: "Tarım" },
-  { key: "spor", label: "Spor" },
-]
-
 export default function Home() {
   const [data, setData] = useState<SiteData | null>(null)
-  const [activeFilter, setActiveFilter] = useState("all")
-  const [activeImage, setActiveImage] = useState<GalleryItem | null>(null)
 
   useEffect(() => {
     fetch(
@@ -38,147 +27,113 @@ export default function Home() {
       .catch(console.error)
   }, [])
 
-  const images =
-    data &&
-    (activeFilter === "all"
-      ? Object.values(data.gallery).flat()
-      : data.gallery[activeFilter] || [])
+  const previewImages =
+    data ? Object.values(data.gallery).flat().slice(0, 8) : []
 
   return (
-    <main style={{ background: "#020c1b", color: "white" }}>
-      {/* GALERİ */}
-      <section style={{ padding: "120px 80px" }}>
-        <p
+    <main>
+      {/* ================= HERO ================= */}
+      <section
+        style={{
+          position: "relative",
+          height: "80vh",
+          width: "100%",
+          overflow: "hidden",
+        }}
+      >
+        <Image
+          src="/hero/hero1.jpg"
+          alt="ATL Çelik Yapı"
+          fill
+          priority
+          style={{ objectFit: "cover" }}
+        />
+
+        <div
           style={{
-            textAlign: "center",
-            color: "#3ea6ff",
-            letterSpacing: 2,
-            fontSize: 14,
-            marginBottom: 12,
+            position: "absolute",
+            inset: 0,
+            background: "rgba(0,0,0,0.55)",
+            color: "white",
+            display: "flex",
+            flexDirection: "column",
+            justifyContent: "center",
+            paddingLeft: 80,
+            paddingRight: 40,
           }}
         >
-          PROJELERİMİZDEN KARELER
-        </p>
+          <h1 style={{ fontSize: 56, fontWeight: 700, marginBottom: 16 }}>
+            Çelik Konstrüksiyon
+          </h1>
+          <p style={{ fontSize: 20, maxWidth: 600 }}>
+            Endüstriyel tesis, depo ve anahtar teslim çelik yapı çözümleri
+          </p>
+        </div>
+      </section>
 
+      {/* ================= GALERİ ÖZET ================= */}
+      <section
+        style={{
+          padding: "100px 60px",
+          backgroundColor: "#f8f9fa",
+        }}
+      >
         <h2
           style={{
-            textAlign: "center",
-            fontSize: 44,
+            fontSize: 40,
             fontWeight: 700,
-            marginBottom: 16,
+            textAlign: "center",
+            marginBottom: 50,
           }}
         >
           Foto Galeri
         </h2>
 
-        <p
-          style={{
-            textAlign: "center",
-            maxWidth: 700,
-            margin: "0 auto 40px",
-            opacity: 0.75,
-          }}
-        >
-          Tamamladığımız projelerin fotoğraflarını inceleyerek işçiliğimiz
-          hakkında fikir edinin.
-        </p>
-
-        {/* FİLTRELER */}
-        <div
-          style={{
-            display: "flex",
-            justifyContent: "center",
-            gap: 12,
-            flexWrap: "wrap",
-            marginBottom: 50,
-          }}
-        >
-          {FILTERS.map((f) => (
-            <button
-              key={f.key}
-              onClick={() => setActiveFilter(f.key)}
-              style={{
-                padding: "10px 18px",
-                borderRadius: 999,
-                border: "none",
-                cursor: "pointer",
-                background:
-                  activeFilter === f.key ? "#0ea5e9" : "#0b1c2d",
-                color: "white",
-                fontWeight: 500,
-              }}
-            >
-              {f.label}
-            </button>
-          ))}
-        </div>
-
-        {/* GRID */}
         <div
           style={{
             display: "grid",
             gridTemplateColumns: "repeat(auto-fill, minmax(280px, 1fr))",
             gap: 24,
+            marginBottom: 40,
           }}
         >
-          {images?.map((img, i) => (
+          {previewImages.map((img, i) => (
             <div
               key={i}
-              onClick={() => setActiveImage(img)}
               style={{
                 position: "relative",
-                height: 220,
-                borderRadius: 16,
+                height: 200,
+                borderRadius: 14,
                 overflow: "hidden",
-                cursor: "pointer",
               }}
             >
               <Image
                 src={img.src}
                 alt={img.alt}
                 fill
-                style={{
-                  objectFit: "cover",
-                  transition: "transform .4s ease",
-                }}
+                style={{ objectFit: "cover" }}
               />
             </div>
           ))}
         </div>
-      </section>
 
-      {/* LIGHTBOX */}
-      {activeImage && (
-        <div
-          onClick={() => setActiveImage(null)}
-          style={{
-            position: "fixed",
-            inset: 0,
-            background: "rgba(0,0,0,0.9)",
-            zIndex: 9999,
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            padding: 40,
-          }}
-        >
-          <div
+        <div style={{ textAlign: "center" }}>
+          <Link
+            href="/galeri"
             style={{
-              position: "relative",
-              width: "100%",
-              maxWidth: 1200,
-              height: "80vh",
+              display: "inline-block",
+              padding: "14px 32px",
+              background: "#0ea5e9",
+              color: "white",
+              borderRadius: 999,
+              fontWeight: 600,
+              textDecoration: "none",
             }}
           >
-            <Image
-              src={activeImage.src}
-              alt={activeImage.alt}
-              fill
-              style={{ objectFit: "contain" }}
-            />
-          </div>
+            Tüm Galeriyi Gör
+          </Link>
         </div>
-      )}
+      </section>
     </main>
   )
 }
