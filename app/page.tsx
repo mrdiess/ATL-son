@@ -14,8 +14,20 @@ type SiteData = {
   }
 }
 
+const FILTERS = [
+  { key: "all", label: "Tümü" },
+  { key: "depo", label: "Depo" },
+  { key: "fabrika", label: "Fabrika" },
+  { key: "hangar", label: "Hangar" },
+  { key: "ticari", label: "Ticari" },
+  { key: "tarimsal", label: "Tarım" },
+  { key: "spor", label: "Spor" },
+]
+
 export default function Home() {
   const [data, setData] = useState<SiteData | null>(null)
+  const [activeFilter, setActiveFilter] = useState("all")
+  const [activeImage, setActiveImage] = useState<GalleryItem | null>(null)
 
   useEffect(() => {
     fetch(
@@ -23,116 +35,150 @@ export default function Home() {
     )
       .then((res) => res.json())
       .then((json) => setData(json))
-      .catch((err) => {
-        console.error("Drive data error:", err)
-      })
+      .catch(console.error)
   }, [])
 
-  return (
-    <main>
-      {/* ================= HERO ================= */}
-      <section
-        style={{
-          position: "relative",
-          height: "80vh",
-          width: "100%",
-          overflow: "hidden",
-        }}
-      >
-        <Image
-          src="/hero/hero1.jpg"
-          alt="ATL Çelik Yapı"
-          fill
-          priority
-          style={{ objectFit: "cover" }}
-        />
+  const images =
+    data &&
+    (activeFilter === "all"
+      ? Object.values(data.gallery).flat()
+      : data.gallery[activeFilter] || [])
 
-        <div
+  return (
+    <main style={{ background: "#020c1b", color: "white" }}>
+      {/* GALERİ */}
+      <section style={{ padding: "120px 80px" }}>
+        <p
           style={{
-            position: "absolute",
-            inset: 0,
-            background: "rgba(0,0,0,0.55)",
-            color: "white",
-            display: "flex",
-            flexDirection: "column",
-            justifyContent: "center",
-            paddingLeft: 80,
-            paddingRight: 40,
+            textAlign: "center",
+            color: "#3ea6ff",
+            letterSpacing: 2,
+            fontSize: 14,
+            marginBottom: 12,
           }}
         >
-          <h1 style={{ fontSize: 56, fontWeight: 700, marginBottom: 16 }}>
-            Çelik Konstrüksiyon
-          </h1>
-          <p style={{ fontSize: 20, maxWidth: 600 }}>
-            Endüstriyel tesis, depo ve anahtar teslim çelik yapı çözümleri
-          </p>
+          PROJELERİMİZDEN KARELER
+        </p>
+
+        <h2
+          style={{
+            textAlign: "center",
+            fontSize: 44,
+            fontWeight: 700,
+            marginBottom: 16,
+          }}
+        >
+          Foto Galeri
+        </h2>
+
+        <p
+          style={{
+            textAlign: "center",
+            maxWidth: 700,
+            margin: "0 auto 40px",
+            opacity: 0.75,
+          }}
+        >
+          Tamamladığımız projelerin fotoğraflarını inceleyerek işçiliğimiz
+          hakkında fikir edinin.
+        </p>
+
+        {/* FİLTRELER */}
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "center",
+            gap: 12,
+            flexWrap: "wrap",
+            marginBottom: 50,
+          }}
+        >
+          {FILTERS.map((f) => (
+            <button
+              key={f.key}
+              onClick={() => setActiveFilter(f.key)}
+              style={{
+                padding: "10px 18px",
+                borderRadius: 999,
+                border: "none",
+                cursor: "pointer",
+                background:
+                  activeFilter === f.key ? "#0ea5e9" : "#0b1c2d",
+                color: "white",
+                fontWeight: 500,
+              }}
+            >
+              {f.label}
+            </button>
+          ))}
+        </div>
+
+        {/* GRID */}
+        <div
+          style={{
+            display: "grid",
+            gridTemplateColumns: "repeat(auto-fill, minmax(280px, 1fr))",
+            gap: 24,
+          }}
+        >
+          {images?.map((img, i) => (
+            <div
+              key={i}
+              onClick={() => setActiveImage(img)}
+              style={{
+                position: "relative",
+                height: 220,
+                borderRadius: 16,
+                overflow: "hidden",
+                cursor: "pointer",
+              }}
+            >
+              <Image
+                src={img.src}
+                alt={img.alt}
+                fill
+                style={{
+                  objectFit: "cover",
+                  transition: "transform .4s ease",
+                }}
+              />
+            </div>
+          ))}
         </div>
       </section>
 
-      {/* ================= GALERİ ================= */}
-      <section
-        style={{
-          padding: "100px 60px",
-          backgroundColor: "#f8f9fa",
-        }}
-      >
-        <h2
+      {/* LIGHTBOX */}
+      {activeImage && (
+        <div
+          onClick={() => setActiveImage(null)}
           style={{
-            fontSize: 42,
-            fontWeight: 700,
-            textAlign: "center",
-            marginBottom: 70,
+            position: "fixed",
+            inset: 0,
+            background: "rgba(0,0,0,0.9)",
+            zIndex: 9999,
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            padding: 40,
           }}
         >
-          Galeri
-        </h2>
-
-        {data &&
-          Object.entries(data.gallery).map(([category, images]) => (
-            <div key={category} style={{ marginBottom: 90 }}>
-              <h3
-                style={{
-                  fontSize: 28,
-                  marginBottom: 28,
-                  textTransform: "capitalize",
-                }}
-              >
-                {category}
-              </h3>
-
-              <div
-                style={{
-                  display: "grid",
-                  gridTemplateColumns: "repeat(auto-fill, minmax(300px, 1fr))",
-                  gap: 24,
-                }}
-              >
-                {images.map((img, i) => (
-                  <div
-                    key={i}
-                    style={{
-                      position: "relative",
-                      height: 220,
-                      borderRadius: 14,
-                      overflow: "hidden",
-                      cursor: "pointer",
-                    }}
-                  >
-                    <Image
-                      src={img.src}
-                      alt={img.alt}
-                      fill
-                      style={{
-                        objectFit: "cover",
-                        transition: "transform 0.4s ease",
-                      }}
-                    />
-                  </div>
-                ))}
-              </div>
-            </div>
-          ))}
-      </section>
+          <div
+            style={{
+              position: "relative",
+              width: "100%",
+              maxWidth: 1200,
+              height: "80vh",
+            }}
+          >
+            <Image
+              src={activeImage.src}
+              alt={activeImage.alt}
+              fill
+              style={{ objectFit: "contain" }}
+            />
+          </div>
+        </div>
+      )}
     </main>
   )
 }
