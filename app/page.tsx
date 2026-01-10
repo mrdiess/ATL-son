@@ -2,7 +2,6 @@
 
 import { useEffect, useState } from "react"
 import Image from "next/image"
-import { useBeforeAfterModal } from "@/components/BeforeAfterModal"
 
 type GalleryItem = {
   src: string
@@ -16,15 +15,15 @@ type Project = {
 }
 
 type SiteData = {
-  projects: Project[]
   gallery: {
     [key: string]: GalleryItem[]
   }
+  projects: Project[]
 }
 
-export default function HomePage() {
+export default function Home() {
   const [data, setData] = useState<SiteData | null>(null)
-  const modal = useBeforeAfterModal()
+  const [activeProject, setActiveProject] = useState<Project | null>(null)
 
   useEffect(() => {
     fetch(
@@ -36,11 +35,9 @@ export default function HomePage() {
   }, [])
 
   return (
-    <main style={{ background: "#020617", color: "white" }}>
-      {modal.modal}
-
+    <main>
       {/* HERO */}
-      <section style={{ position: "relative", height: "85vh" }}>
+      <section style={{ position: "relative", height: "80vh" }}>
         <Image
           src="/hero/hero1.jpg"
           alt="ATL Çelik Yapı"
@@ -48,66 +45,143 @@ export default function HomePage() {
           priority
           style={{ objectFit: "cover" }}
         />
+        <div
+          style={{
+            position: "absolute",
+            inset: 0,
+            background: "rgba(0,0,0,0.55)",
+            color: "white",
+            display: "flex",
+            flexDirection: "column",
+            justifyContent: "center",
+            paddingLeft: 60,
+          }}
+        >
+          <h1 style={{ fontSize: 56 }}>ATL Çelik Yapı</h1>
+          <p>Anahtar teslim çelik konstrüksiyon çözümleri</p>
+        </div>
       </section>
 
-      {/* PROJELER */}
+      {/* PROJELER – BEFORE / AFTER */}
       {data?.projects && (
-        <section style={{ padding: "120px 60px" }}>
-          <div style={{ textAlign: "center", marginBottom: 60 }}>
-            <p style={{ color: "#38bdf8", fontWeight: 600 }}>YAPIM SÜRECİ</p>
-            <h2 style={{ fontSize: 42, fontWeight: 800 }}>
-              Projelerimiz Nasıl Hayata Geçiyor?
-            </h2>
-          </div>
+        <section style={{ padding: "80px 40px" }}>
+          <h2 style={{ fontSize: 36, marginBottom: 32 }}>Projeler</h2>
 
           <div
             style={{
               display: "grid",
-              gridTemplateColumns:
-                "repeat(auto-fill, minmax(160px, 1fr))",
-              gap: 20,
-              maxWidth: 1400,
-              margin: "0 auto",
+              gridTemplateColumns: "repeat(auto-fill, minmax(300px, 1fr))",
+              gap: 24,
             }}
           >
-            {data.projects.map((p, i) => (
+            {data.projects.map((project, i) => (
               <div
                 key={i}
-                onClick={() => modal.open(p)}
-                style={{
-                  cursor: "pointer",
-                  position: "relative",
-                  aspectRatio: "1 / 1",
-                  borderRadius: 16,
-                  overflow: "hidden",
-                  background: "#e5e7eb",
-                }}
+                style={{ cursor: "pointer" }}
+                onClick={() => setActiveProject(project)}
               >
                 <Image
-                  src={p.after}
-                  alt={p.title}
-                  fill
-                  style={{ objectFit: "cover" }}
+                  src={project.after}
+                  alt={project.title}
+                  width={600}
+                  height={400}
+                  style={{ borderRadius: 12, objectFit: "cover" }}
                 />
-
-                <div
-                  style={{
-                    position: "absolute",
-                    bottom: 10,
-                    right: 10,
-                    background: "#2563eb",
-                    color: "white",
-                    fontWeight: 700,
-                    padding: "6px 10px",
-                    borderRadius: 6,
-                  }}
-                >
-                  {String(i + 1).padStart(2, "0")}
-                </div>
+                <h3 style={{ marginTop: 12 }}>{project.title}</h3>
               </div>
             ))}
           </div>
         </section>
+      )}
+
+      {/* GALERİ */}
+      {data?.gallery && (
+        <section style={{ padding: "80px 40px" }}>
+          <h2 style={{ fontSize: 36, marginBottom: 32 }}>Galeri</h2>
+
+          {Object.entries(data.gallery).map(([category, images]) => (
+            <div key={category} style={{ marginBottom: 60 }}>
+              <h3 style={{ fontSize: 24, marginBottom: 16 }}>{category}</h3>
+
+              <div
+                style={{
+                  display: "grid",
+                  gridTemplateColumns: "repeat(auto-fill, minmax(260px, 1fr))",
+                  gap: 20,
+                }}
+              >
+                {images.map((img, i) => (
+                  <Image
+                    key={i}
+                    src={img.src}
+                    alt={img.alt}
+                    width={400}
+                    height={300}
+                    style={{ objectFit: "cover", borderRadius: 8 }}
+                  />
+                ))}
+              </div>
+            </div>
+          ))}
+        </section>
+      )}
+
+      {/* MODAL – BEFORE / AFTER */}
+      {activeProject && (
+        <div
+          onClick={() => setActiveProject(null)}
+          style={{
+            position: "fixed",
+            inset: 0,
+            background: "rgba(0,0,0,0.7)",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            zIndex: 50,
+          }}
+        >
+          <div
+            onClick={(e) => e.stopPropagation()}
+            style={{
+              background: "#fff",
+              padding: 20,
+              borderRadius: 12,
+              maxWidth: 1000,
+              width: "90%",
+            }}
+          >
+            <h3 style={{ marginBottom: 16 }}>{activeProject.title}</h3>
+
+            <div
+              style={{
+                display: "grid",
+                gridTemplateColumns: "1fr 1fr",
+                gap: 16,
+              }}
+            >
+              <div>
+                <p>Önce</p>
+                <Image
+                  src={activeProject.before}
+                  alt="Before"
+                  width={500}
+                  height={350}
+                  style={{ borderRadius: 8 }}
+                />
+              </div>
+              <div>
+                <p>Sonra</p>
+                <Image
+                  src={activeProject.after}
+                  alt="After"
+                  width={500}
+                  height={350}
+                  style={{ borderRadius: 8 }}
+                />
+              </div>
+            </div>
+          </div>
+        </div>
       )}
     </main>
   )
