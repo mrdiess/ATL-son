@@ -1,32 +1,44 @@
-export default function HomePage() {
+import Image from "next/image"
+
+export default function Home() {
   return (
     <main>
+      {/* HEADER */}
+      <header style={{ padding: 20, display: "flex", alignItems: "center", gap: 20 }}>
+        <Image src="/logo.png" alt="ATL Çelik Yapı" width={140} height={50} />
+        <nav style={{ display: "flex", gap: 16 }}>
+          <a href="#">Ana Sayfa</a>
+          <a href="#">Hizmetler</a>
+          <a href="#">Projeler</a>
+          <a href="#">İletişim</a>
+        </nav>
+      </header>
+
       {/* HERO */}
-      <section
-        style={{
-          height: "70vh",
-          backgroundImage: "url(/images/hero/hero-1.jpg)",
-          backgroundSize: "cover",
-          backgroundPosition: "center",
-        }}
-      />
-
-      {/* GALERİ */}
-      <section style={{ padding: "40px" }}>
-        <h2>Galeri</h2>
-
+      <section style={{ position: "relative", height: "80vh" }}>
+        <Image
+          src="/hero/hero1.jpg"
+          alt="Hero"
+          fill
+          style={{ objectFit: "cover" }}
+          priority
+        />
         <div
           style={{
-            display: "grid",
-            gridTemplateColumns: "repeat(auto-fill, minmax(200px, 1fr))",
-            gap: "16px",
+            position: "absolute",
+            inset: 0,
+            background: "rgba(0,0,0,0.5)",
+            color: "white",
+            display: "flex",
+            flexDirection: "column",
+            justifyContent: "center",
+            paddingLeft: 60,
           }}
         >
-          <img src="/images/gallery/01.jpg" />
-          <img src="/images/gallery/02.jpg" />
-          <img src="/images/gallery/03.jpg" />
+          <h1 style={{ fontSize: 56 }}>Çelik Konstrüksiyon</h1>
+          <p>Endüstriyel tesis ve depo çözümleri</p>
         </div>
       </section>
     </main>
-  );
+  )
 }
