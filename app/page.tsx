@@ -2,26 +2,20 @@
 
 import { useEffect, useState } from "react"
 import Image from "next/image"
+import BeforeAfter from "@/components/before-after"
 
 type GalleryItem = {
   src: string
   alt: string
 }
 
-type ProjectItem = {
-  title: string
-  before: string
-  after: string
-}
-
 type SiteData = {
   gallery: {
     [key: string]: GalleryItem[]
   }
-  projects: ProjectItem[]
 }
 
-export default function Home() {
+export default function HomePage() {
   const [data, setData] = useState<SiteData | null>(null)
 
   useEffect(() => {
@@ -36,7 +30,7 @@ export default function Home() {
   return (
     <main style={{ background: "#020617", color: "white" }}>
       {/* ================= HERO ================= */}
-      <section style={{ position: "relative", height: "80vh" }}>
+      <section style={{ position: "relative", height: "85vh" }}>
         <Image
           src="/hero/hero1.jpg"
           alt="ATL Çelik Yapı"
@@ -54,108 +48,100 @@ export default function Home() {
             flexDirection: "column",
             justifyContent: "center",
             paddingLeft: 80,
+            maxWidth: 900,
           }}
         >
-          <h1 style={{ fontSize: 56, fontWeight: 800 }}>
+          <p style={{ color: "#38bdf8", fontWeight: 600 }}>
+            Endüstriyel Çözümler
+          </p>
+          <h1 style={{ fontSize: 56, fontWeight: 800, lineHeight: 1.1 }}>
             Çelik Konstrüksiyon
           </h1>
-          <p style={{ fontSize: 18, opacity: 0.9 }}>
-            Endüstriyel tesis ve depo çözümleri
+          <p style={{ marginTop: 20, fontSize: 18, color: "#cbd5f5" }}>
+            Anahtar teslim endüstriyel yapı ve depo projeleri
           </p>
         </div>
       </section>
 
       {/* ================= PROJELER ================= */}
-      {data?.projects && (
-        <section
+      <section style={{ padding: "120px 60px" }}>
+        <div style={{ textAlign: "center", marginBottom: 60 }}>
+          <p style={{ color: "#38bdf8", fontWeight: 600 }}>
+            YAPIM SÜRECİ
+          </p>
+          <h2 style={{ fontSize: 42, fontWeight: 800 }}>
+            Projelerimiz Nasıl Hayata Geçiyor?
+          </h2>
+          <p style={{ marginTop: 12, color: "#94a3b8" }}>
+            Her proje profesyonel aşamalardan geçerek tamamlanır.
+          </p>
+        </div>
+
+        <div
           style={{
-            padding: "120px 60px",
-            background:
-              "radial-gradient(circle at top, #020617, #020617 60%, #020617)",
+            display: "grid",
+            gridTemplateColumns: "repeat(auto-fill, minmax(220px, 1fr))",
+            gap: 20,
           }}
         >
-          <div style={{ textAlign: "center", marginBottom: 50 }}>
-            <p style={{ color: "#38bdf8", fontWeight: 600 }}>
-              YAPIM SÜRECİ
-            </p>
-            <h2 style={{ fontSize: 42, fontWeight: 800 }}>
-              Projelerimiz Nasıl Hayata Geçiyor?
-            </h2>
-            <p style={{ opacity: 0.8, marginTop: 12 }}>
-              Her projemiz profesyonel standartlarda tamamlanır.
-            </p>
-          </div>
+          {[...Array(10)].map((_, i) => (
+            <div
+              key={i}
+              style={{
+                background: "#1e293b",
+                height: 160,
+                borderRadius: 16,
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                color: "#38bdf8",
+                fontWeight: 700,
+              }}
+            >
+              {String(i + 1).padStart(2, "0")}
+            </div>
+          ))}
+        </div>
+      </section>
 
-          <div
-            style={{
-              display: "grid",
-              gridTemplateColumns:
-                "repeat(auto-fill, minmax(160px, 1fr))",
-              gap: 20,
-              maxWidth: 1400,
-              margin: "0 auto",
-            }}
-          >
-            {data.projects.map((p, i) => (
-              <div
-                key={i}
-                style={{
-                  position: "relative",
-                  aspectRatio: "1 / 1",
-                  borderRadius: 16,
-                  overflow: "hidden",
-                  background: "#e5e7eb",
-                }}
-              >
-                <Image
-                  src={p.after}
-                  alt={p.title}
-                  fill
-                  style={{ objectFit: "cover" }}
-                />
+      {/* ================= BEFORE / AFTER ================= */}
+      <section style={{ padding: "120px 60px", background: "#020617" }}>
+        <div style={{ textAlign: "center", marginBottom: 50 }}>
+          <p style={{ color: "#38bdf8", fontWeight: 600 }}>
+            BEFORE / AFTER
+          </p>
+          <h2 style={{ fontSize: 42, fontWeight: 800 }}>
+            Yapım Süreci Karşılaştırması
+          </h2>
+        </div>
 
-                <div
-                  style={{
-                    position: "absolute",
-                    bottom: 10,
-                    right: 10,
-                    background: "#2563eb",
-                    color: "white",
-                    fontSize: 14,
-                    fontWeight: 700,
-                    padding: "6px 10px",
-                    borderRadius: 6,
-                  }}
-                >
-                  {String(i + 1).padStart(2, "0")}
-                </div>
-              </div>
-            ))}
-          </div>
-        </section>
-      )}
+        <BeforeAfter
+          title="Depo Projesi – Faz 1"
+          before="https://drive.google.com/uc?id=BEFORE_ID"
+          after="https://drive.google.com/uc?id=AFTER_ID"
+        />
+      </section>
 
       {/* ================= GALERİ ================= */}
-      {data?.gallery && (
-        <section style={{ padding: "100px 60px" }}>
-          <h2
-            style={{
-              fontSize: 42,
-              fontWeight: 800,
-              textAlign: "center",
-              marginBottom: 50,
-            }}
-          >
+      <section style={{ padding: "120px 60px" }}>
+        <div style={{ textAlign: "center", marginBottom: 60 }}>
+          <p style={{ color: "#38bdf8", fontWeight: 600 }}>
+            PROJELERİMİZDEN KARELER
+          </p>
+          <h2 style={{ fontSize: 42, fontWeight: 800 }}>
             Foto Galeri
           </h2>
+        </div>
 
-          {Object.entries(data.gallery).map(([category, images]) => (
-            <div key={category} style={{ marginBottom: 70 }}>
+        {data &&
+          Object.entries(data.gallery).map(([category, images]) => (
+            <div key={category} style={{ marginBottom: 80 }}>
               <h3
                 style={{
-                  fontSize: 24,
-                  marginBottom: 20,
-                  color: "#38bdf8",
+                  fontSize: 26,
+                  fontWeight: 700,
+                  marginBottom: 24,
+                  textTransform: "capitalize",
                 }}
               >
                 {category}
@@ -164,9 +150,8 @@ export default function Home() {
               <div
                 style={{
                   display: "grid",
-                  gridTemplateColumns:
-                    "repeat(auto-fill, minmax(260px, 1fr))",
-                  gap: 20,
+                  gridTemplateColumns: "repeat(auto-fill, minmax(260px, 1fr))",
+                  gap: 24,
                 }}
               >
                 {images.map((img, i) => (
@@ -177,16 +162,17 @@ export default function Home() {
                     width={400}
                     height={300}
                     style={{
+                      width: "100%",
+                      height: "auto",
+                      borderRadius: 16,
                       objectFit: "cover",
-                      borderRadius: 14,
                     }}
                   />
                 ))}
               </div>
             </div>
           ))}
-        </section>
-      )}
+      </section>
     </main>
   )
 }
