@@ -20,9 +20,7 @@ type SiteData = {
 async function getData(): Promise<SiteData> {
   const res = await fetch(
     "https://script.google.com/macros/s/AKfycbyvmIgjGp0qXucZ6yIC2Tj1d2kBJNfXhuNSYZ52mEWcE-IWCOgiGv-aLR14JvDMyxIA/exec",
-    {
-      cache: "no-store",
-    }
+    { cache: "no-store" }
   )
 
   if (!res.ok) {
@@ -56,5 +54,42 @@ export default async function Home() {
       {/* GALERİ */}
       <section>
         <h2>Galeri</h2>
+
         {Object.entries(data.gallery).map(([category, images]) => (
-          <div key={catego
+          <div key={category} style={{ marginBottom: 30 }}>
+            <h3>{category}</h3>
+
+            <div style={{ display: "flex", gap: 20, flexWrap: "wrap" }}>
+              {images.map((img, i) => (
+                <Image
+                  key={i}
+                  src={img.src}
+                  alt={img.alt}
+                  width={300}
+                  height={200}
+                />
+              ))}
+            </div>
+          </div>
+        ))}
+      </section>
+
+      {/* İŞ ORTAKLARI */}
+      <section>
+        <h2>İş Ortakları</h2>
+
+        <div style={{ display: "flex", gap: 40 }}>
+          {data.sponsors.map((s, i) => (
+            <Image
+              key={i}
+              src={s.logo}
+              alt={s.name}
+              width={150}
+              height={80}
+            />
+          ))}
+        </div>
+      </section>
+    </main>
+  )
+}
