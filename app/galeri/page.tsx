@@ -1,29 +1,21 @@
-import Image from "next/image"
+import { Hero } from "@/components/hero"
+import { BeforeAfterGrid } from "@/components/BeforeAfterGrid"
 
-const images = [
-  "/gallery/görsel1.jpg",
-  "/gallery/görsel2.jpg",
-  "/gallery/görsel3.jpg",
-  "/gallery/görsel4.jpg",
-  "/gallery/görsel5.jpg",
-]
-
-export default function GaleriPage() {
+export default function Page() {
   return (
-    <main style={{ padding: 40 }}>
-      <h1>Galeri</h1>
-      <div
-        style={{
-          display: "grid",
-          gridTemplateColumns: "repeat(auto-fill, minmax(260px,1fr))",
-          gap: 20,
-          marginTop: 24,
-        }}
-      >
-        {images.map((src) => (
-          <Image key={src} src={src} alt="" width={400} height={300} />
-        ))}
-      </div>
+    <main>
+      <Hero />
+
+      <BeforeAfterGrid
+        projects={[
+          {
+            id: "1",
+            title: "Fabrika Projesi",
+            before: "/projects/proje1/before.jpg",
+            after: "/projects/proje1/after.jpg",
+          },
+        ]}
+      />
     </main>
   )
 }
