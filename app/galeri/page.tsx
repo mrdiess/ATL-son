@@ -1,53 +1,89 @@
-import Image from "next/image"
-import { Header } from "@/components/Header"
+"use client"
 
-const categories = {
-  Fabrika: [
-    "/gallery/görsel1.jpg",
-    "/gallery/görsel2.jpg",
-  ],
-  Depo: [
-    "/gallery/görsel3.jpg",
-    "/gallery/görsel4.jpg",
-  ],
-  Ticari: [
-    "/gallery/görsel5.jpg",
-  ],
+import { useEffect, useState } from "react"
+import Image from "next/image"
+
+type GalleryItem = {
+  src: string
+  category: string
 }
 
-export default function GaleriPage() {
+export default function GalleryPage() {
+  const [items, setItems] = useState<GalleryItem[]>([])
+  const [active, setActive] = useState("Tümü")
+
+  useEffect(() => {
+    fetch("GOOGLE_SCRIPT_URL")
+      .then(res => res.json())
+      .then(data => {
+        // beklenen format: data.gallery = { Depo: [], Fabrika: [] }
+        const flat: GalleryItem[] = []
+        Object.entries(data.gallery).forEach(([cat, images]: any) => {
+          images.forEach((img: any) =>
+            flat.push({ src: img.src, category: cat })
+          )
+        })
+        setItems(flat)
+      })
+  }, [])
+
+  const categories = ["Tümü", ...Array.from(new Set(items.map(i => i.category)))]
+  const filtered =
+    active === "Tümü" ? items : items.filter(i => i.category === active)
+
   return (
-    <>
-      <Header />
+    <main style={{ padding: "120px 40px" }}>
+      <h1 style={{ fontSize: 42, textAlign: "center", marginBottom: 24 }}>
+        Foto Galeri
+      </h1>
 
-      <main style={{ padding: "80px 40px" }}>
-        <h1 style={{ fontSize: 40, marginBottom: 40 }}>Foto Galeri</h1>
-
-        {Object.entries(categories).map(([category, images]) => (
-          <section key={category} style={{ marginBottom: 60 }}>
-            <h2 style={{ fontSize: 28, marginBottom: 20 }}>{category}</h2>
-
-            <div
-              style={{
-                display: "grid",
-                gridTemplateColumns: "repeat(auto-fill, minmax(260px, 1fr))",
-                gap: 20,
-              }}
-            >
-              {images.map((src, i) => (
-                <Image
-                  key={i}
-                  src={src}
-                  alt={category}
-                  width={400}
-                  height={300}
-                  style={{ borderRadius: 12, objectFit: "cover" }}
-                />
-              ))}
-            </div>
-          </section>
+      {/* FİLTRE */}
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "center",
+          gap: 12,
+          marginBottom: 40,
+          flexWrap: "wrap",
+        }}
+      >
+        {categories.map(cat => (
+          <button
+            key={cat}
+            onClick={() => setActive(cat)}
+            style={{
+              padding: "8px 18px",
+              borderRadius: 20,
+              border: "none",
+              cursor: "pointer",
+              background: active === cat ? "#0ea5e9" : "#1f2933",
+              color: "white",
+            }}
+          >
+            {cat}
+          </button>
         ))}
-      </main>
-    </>
+      </div>
+
+      {/* GALERİ GRID */}
+      <div
+        style={{
+          display: "grid",
+          gridTemplateColumns: "repeat(auto-fill, minmax(260px, 1fr))",
+          gap: 20,
+        }}
+      >
+        {filtered.map((img, i) => (
+          <div key={i} style={{ position: "relative", height: 220 }}>
+            <Image
+              src={img.src}
+              alt={img.category}
+              fill
+              style={{ objectFit: "cover", borderRadius: 12 }}
+            />
+          </div>
+        ))}
+      </div>
+    </main>
   )
 }
