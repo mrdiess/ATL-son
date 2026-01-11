@@ -1,13 +1,17 @@
-import "./globals.css";
+import "./globals.css"
+import { Header } from "@/components/Header"
 
 export default function RootLayout({
   children,
 }: {
-  children: React.ReactNode;
+  children: React.ReactNode
 }) {
   return (
     <html lang="tr">
-      <body>{children}</body>
+      <body>
+        <Header />
+        <div style={{ paddingTop: 80 }}>{children}</div>
+      </body>
     </html>
-  );
+  )
 }
