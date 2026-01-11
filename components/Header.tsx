@@ -1,12 +1,19 @@
-"use client"
-
 import Link from "next/link"
 
 export function Header() {
   return (
-    <header style={{ padding: "16px 32px", borderBottom: "1px solid #eee" }}>
-      <nav style={{ display: "flex", gap: 16 }}>
-        <Link href="/">Ana Sayfa</Link>
+    <header
+      style={{
+        display: "flex",
+        justifyContent: "space-between",
+        padding: "20px 40px",
+        borderBottom: "1px solid #eee",
+      }}
+    >
+      <strong>ATL Çelik Yapı</strong>
+
+      <nav style={{ display: "flex", gap: 20 }}>
+        <Link href="/">Anasayfa</Link>
         <Link href="/galeri">Galeri</Link>
       </nav>
     </header>
