@@ -1,43 +1,33 @@
 "use client"
 
-import { useEffect, useState } from "react"
-import { BeforeAfterModal } from "@/components/BeforeAfterModal"
+import { useState } from "react"
+import BeforeAfterGrid from "../../components/BeforeAfterGrid"
+import BeforeAfterModal from "../../components/BeforeAfterModal"
 
-type Project = {
-  title: string
-  before: string
-  after: string
-}
+const items = [
+  {
+    id: "1",
+    before: "/before/1.jpg",
+    after: "/after/1.jpg",
+  },
+]
 
 export default function ProjectsPage() {
-  const [projects, setProjects] = useState<Project[]>([])
-
-  useEffect(() => {
-    fetch("https://script.google.com/macros/s/AKfycbyvmIgjGp0qXucZ6yIC2Tj1d2kBJNfXhuNSYZ52mEWcE-IWCOgiGv-aLR14JvDMyxIA/exec")
-      .then(res => res.json())
-      .then(data => setProjects(data.projects))
-  }, [])
+  const [selected, setSelected] = useState(null)
 
   return (
-    <main style={{ padding: "120px 40px" }}>
-      <h1 style={{ textAlign: "center", fontSize: 42, marginBottom: 40 }}>
-        Projelerimiz
-      </h1>
+    <section className="container py-20 space-y-10">
+      <h1 className="text-3xl font-bold">Projeler</h1>
 
-      <div
-        style={{
-          display: "grid",
-          gridTemplateColumns: "repeat(auto-fill, minmax(280px, 1fr))",
-          gap: 24,
-        }}
-      >
-        {projects.map((p, i) => (
-          <div key={i}>
-            <BeforeAfterModal before={p.before} after={p.after} />
-            <p style={{ textAlign: "center", marginTop: 10 }}>{p.title}</p>
-          </div>
-        ))}
-      </div>
-    </main>
+      <BeforeAfterGrid
+        items={items}
+        onSelect={setSelected}
+      />
+
+      <BeforeAfterModal
+        item={selected}
+        onClose={() => setSelected(null)}
+      />
+    </section>
   )
 }

@@ -1,9 +1,7 @@
-// app/galeri/page.tsx
 "use client"
 
 import { useState } from "react"
 import Image from "next/image"
-import { cn } from "@/lib/utils"
 
 const categories = ["tümü", "villa", "fabrika", "cati", "ic-mekan"]
 
@@ -31,10 +29,9 @@ export default function GalleryPage() {
           <button
             key={c}
             onClick={() => setActive(c)}
-            className={cn(
-              "px-4 py-2 border rounded-full text-sm",
-              active === c && "bg-black text-white"
-            )}
+            className={`px-4 py-2 border rounded-full text-sm ${
+              active === c ? "bg-black text-white" : ""
+            }`}
           >
             {c}
           </button>

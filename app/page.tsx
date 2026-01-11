@@ -1,7 +1,7 @@
 // app/page.tsx
 import Link from "next/link"
-import { Button } from "@/components/ui/button"
-import ProjectGrid from "@/components/projects/ProjectGrid"
+import { Button } from "../components/ui/button"
+import ProjectGrid from "../components/projects/ProjectGrid"
 
 export default function HomePage() {
   return (
@@ -11,6 +11,7 @@ export default function HomePage() {
         <h1 className="text-4xl md:text-6xl font-bold">
           ATL Çelik Yapı
         </h1>
+
         <p className="mt-6 text-muted-foreground max-w-2xl mx-auto">
           Anahtar teslim çelik yapı, villa, fabrika ve endüstriyel projeler.
         </p>
@@ -19,6 +20,7 @@ export default function HomePage() {
           <Button asChild size="lg">
             <Link href="/projeler">Projeler</Link>
           </Button>
+
           <Button asChild size="lg" variant="outline">
             <Link href="/galeri">Galeri</Link>
           </Button>
