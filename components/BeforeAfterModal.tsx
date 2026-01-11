@@ -1,45 +1,64 @@
 "use client"
 
-import Image from "next/image"
 import { useState } from "react"
+import Image from "next/image"
 
 type Props = {
   before: string
   after: string
-  title?: string
 }
 
-export function BeforeAfterModal({ before, after, title }: Props) {
+export function BeforeAfterModal({ before, after }: Props) {
   const [open, setOpen] = useState(false)
 
   return (
     <>
-      <button
+      <div
         onClick={() => setOpen(true)}
-        className="w-full text-left"
+        style={{ cursor: "pointer", borderRadius: 8, overflow: "hidden" }}
       >
-        <div className="grid grid-cols-2 rounded-xl overflow-hidden border hover:shadow-lg transition">
-          <Image src={before} alt="Önce" width={600} height={400} />
-          <Image src={after} alt="Sonra" width={600} height={400} />
-        </div>
-        {title && (
-          <div className="mt-2 font-semibold text-center">{title}</div>
-        )}
-      </button>
+        <Image
+          src={after}
+          alt="Proje Sonrası"
+          width={400}
+          height={300}
+          style={{ objectFit: "cover" }}
+        />
+      </div>
 
       {open && (
-        <div className="fixed inset-0 z-50 bg-black/70 flex items-center justify-center">
-          <div className="bg-white rounded-xl max-w-5xl w-full p-4 relative">
-            <button
-              onClick={() => setOpen(false)}
-              className="absolute top-3 right-4 text-xl font-bold"
+        <div
+          onClick={() => setOpen(false)}
+          style={{
+            position: "fixed",
+            inset: 0,
+            background: "rgba(0,0,0,0.8)",
+            zIndex: 100,
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
+            padding: 20,
+          }}
+        >
+          <div
+            onClick={(e) => e.stopPropagation()}
+            style={{
+              background: "#000",
+              padding: 20,
+              borderRadius: 8,
+              maxWidth: 900,
+              width: "100%",
+            }}
+          >
+            <div
+              style={{
+                display: "grid",
+                gridTemplateColumns: "1fr 1fr",
+                gap: 12,
+              }}
             >
-              ×
-            </button>
-
-            <div className="grid grid-cols-2 gap-2">
-              <Image src={before} alt="Önce" width={1000} height={700} />
-              <Image src={after} alt="Sonra" width={1000} height={700} />
+              <Image src={before} alt="Önce" width={450} height={300} />
+              <Image src={after} alt="Sonra" width={450} height={300} />
             </div>
           </div>
         </div>
