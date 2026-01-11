@@ -1,89 +1,62 @@
+// app/galeri/page.tsx
 "use client"
 
-import { useEffect, useState } from "react"
+import { useState } from "react"
 import Image from "next/image"
+import { cn } from "@/lib/utils"
 
-type GalleryItem = {
-  src: string
-  category: string
-}
+const categories = ["tümü", "villa", "fabrika", "cati", "ic-mekan"]
+
+const gallery = [
+  { id: "1", src: "/gallery/1.jpg", category: "villa" },
+  { id: "2", src: "/gallery/2.jpg", category: "fabrika" },
+  { id: "3", src: "/gallery/3.jpg", category: "cati" },
+]
 
 export default function GalleryPage() {
-  const [items, setItems] = useState<GalleryItem[]>([])
-  const [active, setActive] = useState("Tümü")
+  const [active, setActive] = useState("tümü")
 
-  useEffect(() => {
-    fetch("https://script.google.com/macros/s/AKfycbyvmIgjGp0qXucZ6yIC2Tj1d2kBJNfXhuNSYZ52mEWcE-IWCOgiGv-aLR14JvDMyxIA/exec")
-      .then(res => res.json())
-      .then(data => {
-        // beklenen format: data.gallery = { Depo: [], Fabrika: [] }
-        const flat: GalleryItem[] = []
-        Object.entries(data.gallery).forEach(([cat, images]: any) => {
-          images.forEach((img: any) =>
-            flat.push({ src: img.src, category: cat })
-          )
-        })
-        setItems(flat)
-      })
-  }, [])
-
-  const categories = ["Tümü", ...Array.from(new Set(items.map(i => i.category)))]
   const filtered =
-    active === "Tümü" ? items : items.filter(i => i.category === active)
+    active === "tümü"
+      ? gallery
+      : gallery.filter((i) => i.category === active)
 
   return (
-    <main style={{ padding: "120px 40px" }}>
-      <h1 style={{ fontSize: 42, textAlign: "center", marginBottom: 24 }}>
-        Foto Galeri
-      </h1>
+    <section className="container py-20 space-y-10">
+      <h1 className="text-3xl font-bold">Galeri</h1>
 
-      {/* FİLTRE */}
-      <div
-        style={{
-          display: "flex",
-          justifyContent: "center",
-          gap: 12,
-          marginBottom: 40,
-          flexWrap: "wrap",
-        }}
-      >
-        {categories.map(cat => (
+      {/* Filtre */}
+      <div className="flex gap-2 flex-wrap">
+        {categories.map((c) => (
           <button
-            key={cat}
-            onClick={() => setActive(cat)}
-            style={{
-              padding: "8px 18px",
-              borderRadius: 20,
-              border: "none",
-              cursor: "pointer",
-              background: active === cat ? "#0ea5e9" : "#1f2933",
-              color: "white",
-            }}
+            key={c}
+            onClick={() => setActive(c)}
+            className={cn(
+              "px-4 py-2 border rounded-full text-sm",
+              active === c && "bg-black text-white"
+            )}
           >
-            {cat}
+            {c}
           </button>
         ))}
       </div>
 
-      {/* GALERİ GRID */}
-      <div
-        style={{
-          display: "grid",
-          gridTemplateColumns: "repeat(auto-fill, minmax(260px, 1fr))",
-          gap: 20,
-        }}
-      >
-        {filtered.map((img, i) => (
-          <div key={i} style={{ position: "relative", height: 220 }}>
+      {/* Grid */}
+      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+        {filtered.map((item) => (
+          <div
+            key={item.id}
+            className="relative aspect-square overflow-hidden rounded-lg"
+          >
             <Image
-              src={img.src}
-              alt={img.category}
+              src={item.src}
+              alt=""
               fill
-              style={{ objectFit: "cover", borderRadius: 12 }}
+              className="object-cover hover:scale-105 transition"
             />
           </div>
         ))}
       </div>
-    </main>
+    </section>
   )
 }
