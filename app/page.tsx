@@ -1,7 +1,13 @@
 "use client"
 
+import { useEffect, useState } from "react"
 import Image from "next/image"
-import { useState } from "react"
+import { BeforeAfterGrid } from "@/components/BeforeAfterGrid"
+
+type GalleryItem = {
+  src: string
+  alt: string
+}
 
 type Project = {
   id: string
@@ -10,106 +16,94 @@ type Project = {
   after: string
 }
 
-type Props = {
-  projects: Project[]
+type SiteData = {
+  projects?: Project[]
+  gallery?: {
+    [key: string]: GalleryItem[]
+  }
 }
 
-export function BeforeAfterGrid({ projects }: Props) {
-  const [active, setActive] = useState<Project | null>(null)
+export default function Page() {
+  const [data, setData] = useState<SiteData | null>(null)
+
+  useEffect(() => {
+    fetch(
+      "https://script.google.com/macros/s/AKfycbyvmIgjGp0qXucZ6yIC2Tj1d2kBJNfXhuNSYZ52mEWcE-IWCOgiGv-aLR14JvDMyxIA/exec"
+    )
+      .then((res) => res.json())
+      .then((json) => setData(json))
+      .catch(console.error)
+  }, [])
 
   return (
-    <>
-      <section style={{ padding: "80px 40px" }}>
-        <h2 style={{ textAlign: "center", fontSize: 36, marginBottom: 40 }}>
-          Projelerimiz
-        </h2>
-
+    <main>
+      {/* HERO */}
+      <section style={{ position: "relative", height: "80vh" }}>
+        <Image
+          src="/hero/hero1.jpg"
+          alt="ATL Çelik Yapı"
+          fill
+          priority
+          style={{ objectFit: "cover" }}
+        />
         <div
           style={{
-            display: "grid",
-            gridTemplateColumns: "repeat(auto-fill, minmax(260px, 1fr))",
-            gap: 20,
+            position: "absolute",
+            inset: 0,
+            background: "rgba(0,0,0,0.55)",
+            color: "white",
+            display: "flex",
+            flexDirection: "column",
+            justifyContent: "center",
+            paddingLeft: 60,
           }}
         >
-          {projects.map((p) => (
-            <div
-              key={p.id}
-              style={{ cursor: "pointer" }}
-              onClick={() => setActive(p)}
-            >
-              <Image
-                src={p.after}
-                alt={p.title}
-                width={400}
-                height={300}
-                style={{ objectFit: "cover", borderRadius: 8 }}
-              />
-              <p style={{ marginTop: 8, textAlign: "center" }}>{p.title}</p>
-            </div>
-          ))}
+          <h1 style={{ fontSize: 56 }}>ATL Çelik Yapı</h1>
+          <p style={{ fontSize: 20, marginTop: 12 }}>
+            Çelik konstrüksiyon • Anahtar teslim çözümler
+          </p>
         </div>
       </section>
 
-      {/* MODAL */}
-      {active && (
-        <div
-          onClick={() => setActive(null)}
-          style={{
-            position: "fixed",
-            inset: 0,
-            background: "rgba(0,0,0,0.7)",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            zIndex: 50,
-          }}
-        >
-          <div
-            onClick={(e) => e.stopPropagation()}
-            style={{
-              background: "#fff",
-              padding: 20,
-              borderRadius: 12,
-              maxWidth: 900,
-              width: "100%",
-            }}
-          >
-            <h3 style={{ textAlign: "center", marginBottom: 16 }}>
-              {active.title}
-            </h3>
+      {/* PROJELER */}
+      {data?.projects && data.projects.length > 0 && (
+        <BeforeAfterGrid projects={data.projects} />
+      )}
 
-            <div
-              style={{
-                display: "grid",
-                gridTemplateColumns: "1fr 1fr",
-                gap: 16,
-              }}
-            >
-              <div>
-                <p style={{ textAlign: "center", marginBottom: 8 }}>Önce</p>
-                <Image
-                  src={active.before}
-                  alt="Before"
-                  width={400}
-                  height={300}
-                  style={{ objectFit: "cover", borderRadius: 8 }}
-                />
-              </div>
+      {/* GALERİ */}
+      {data?.gallery && (
+        <section style={{ padding: "80px 40px" }}>
+          <h2 style={{ fontSize: 36, marginBottom: 32 }}>Galeri</h2>
 
-              <div>
-                <p style={{ textAlign: "center", marginBottom: 8 }}>Sonra</p>
-                <Image
-                  src={active.after}
-                  alt="After"
-                  width={400}
-                  height={300}
-                  style={{ objectFit: "cover", borderRadius: 8 }}
-                />
+          {Object.entries(data.gallery).map(([category, images]) => (
+            <div key={category} style={{ marginBottom: 48 }}>
+              <h3 style={{ fontSize: 22, marginBottom: 16 }}>
+                {category.toUpperCase()}
+              </h3>
+
+              <div
+                style={{
+                  display: "grid",
+                  gridTemplateColumns:
+                    "repeat(auto-fill, minmax(240px, 1fr))",
+                  gap: 16,
+                }}
+              >
+                {images.slice(0, 4).map((img, i) => (
+                  <Image
+                    key={i}
+                    src={img.src}
+                    alt={img.alt}
+                    width={400}
+                    height={300}
+                    style={{ objectFit: "cover", borderRadius: 8 }}
+                  />
+                ))}
               </div>
             </div>
-          </div>
-        </div>
+          ))}
+        </section>
       )}
-    </>
+    </main>
   )
 }
