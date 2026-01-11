@@ -1,6 +1,5 @@
 // app/page.tsx
 import Link from "next/link"
-import { Button } from "../components/ui/button"
 import ProjectGrid from "../components/projects/ProjectGrid"
 
 export default function HomePage() {
@@ -17,13 +16,19 @@ export default function HomePage() {
         </p>
 
         <div className="mt-10 flex justify-center gap-4">
-          <Button asChild size="lg">
-            <Link href="/projeler">Projeler</Link>
-          </Button>
+          <Link
+            href="/projeler"
+            className="px-6 py-3 rounded-lg bg-black text-white font-medium hover:bg-black/90 transition"
+          >
+            Projeler
+          </Link>
 
-          <Button asChild size="lg" variant="outline">
-            <Link href="/galeri">Galeri</Link>
-          </Button>
+          <Link
+            href="/galeri"
+            className="px-6 py-3 rounded-lg border font-medium hover:bg-gray-100 transition"
+          >
+            Galeri
+          </Link>
         </div>
       </section>
 
@@ -31,7 +36,11 @@ export default function HomePage() {
       <section className="container">
         <div className="flex items-center justify-between mb-8">
           <h2 className="text-2xl font-semibold">Son Projeler</h2>
-          <Link href="/projeler" className="text-sm underline">
+
+          <Link
+            href="/projeler"
+            className="text-sm underline"
+          >
             Tümünü Gör
           </Link>
         </div>
