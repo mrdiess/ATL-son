@@ -32,6 +32,8 @@ export function Header() {
         <Link href="/galeri">Galeri</Link>
         <Link href="/iletisim">İletişim</Link>
         <Link href="/galeri">Galeri</Link>
+        <Link href="/projeler">Projeler</Link>
+
         
 
       </nav>

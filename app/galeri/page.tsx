@@ -13,7 +13,7 @@ export default function GalleryPage() {
   const [active, setActive] = useState("Tümü")
 
   useEffect(() => {
-    fetch("GOOGLE_SCRIPT_URL")
+    fetch("https://script.google.com/macros/s/AKfycbyvmIgjGp0qXucZ6yIC2Tj1d2kBJNfXhuNSYZ52mEWcE-IWCOgiGv-aLR14JvDMyxIA/exec")
       .then(res => res.json())
       .then(data => {
         // beklenen format: data.gallery = { Depo: [], Fabrika: [] }
