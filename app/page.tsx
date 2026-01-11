@@ -1,7 +1,7 @@
 "use client"
 
 import { useEffect, useState } from "react"
-import { BeforeAfterModal } from "@/components/BeforeAfterModal"
+import { BeforeAfterGrid } from "@/components/before-after"
 
 type Project = {
   id: string
@@ -10,34 +10,35 @@ type Project = {
   after: string
 }
 
+type ApiResponse = {
+  beforeAfter: Project[]
+}
+
 export default function HomePage() {
   const [projects, setProjects] = useState<Project[]>([])
 
   useEffect(() => {
-    setProjects([
-      {
-        id: "1",
-        title: "Anahtar Teslim Daire",
-        before: "/before.jpg",
-        after: "/after.jpg",
-      },
-    ])
+    fetch(
+      "https://script.google.com/macros/s/AKfycbyvmIgjGp0qXucZ6yIC2Tj1d2kBJNfXhuNSYZ52mEWcE-IWCOgiGv-aLR14JvDMyxIA/exec"
+    )
+      .then((res) => res.json())
+      .then((data: ApiResponse) => {
+        if (data.beforeAfter) {
+          setProjects(data.beforeAfter)
+        }
+      })
+      .catch(console.error)
   }, [])
 
   return (
-    <main className="container mx-auto px-4 py-12">
-      <h1 className="text-3xl font-bold mb-8">Projelerimiz</h1>
+    <>
+      {/* HERO */}
+      {/* SERVICES */}
+      {/* GALERİ */}
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        {projects.map((p) => (
-          <BeforeAfterModal
-            key={p.id}
-            before={p.before}
-            after={p.after}
-            title={p.title}
-          />
-        ))}
-      </div>
-    </main>
+      {projects.length > 0 && (
+        <BeforeAfterGrid projects={projects} />
+      )}
+    </>
   )
 }
