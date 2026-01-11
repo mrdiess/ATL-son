@@ -1,71 +1,80 @@
 "use client"
 
-import { useState } from "react"
 import Image from "next/image"
+import { useEffect } from "react"
 
 type Props = {
   before: string
   after: string
+  open: boolean
+  onClose: () => void
 }
 
-export function BeforeAfterModal({ before, after }: Props) {
-  const [open, setOpen] = useState(false)
-  const [showAfter, setShowAfter] = useState(false)
+export function BeforeAfterModal({ before, after, open, onClose }: Props) {
+  // Sayfa değişince body kilidi temizlensin
+  useEffect(() => {
+    if (open) {
+      document.body.style.overflow = "hidden"
+    } else {
+      document.body.style.overflow = ""
+    }
+
+    return () => {
+      document.body.style.overflow = ""
+    }
+  }, [open])
+
+  if (!open) return null
 
   return (
-    <>
+    <div
+      onClick={onClose}
+      style={{
+        position: "fixed",
+        inset: 0,
+        background: "rgba(0,0,0,0.85)",
+        zIndex: 9999,
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+      }}
+    >
       <div
-        onClick={() => setOpen(true)}
-        style={{ cursor: "pointer", borderRadius: 12, overflow: "hidden" }}
+        onClick={(e) => e.stopPropagation()}
+        style={{
+          width: "90%",
+          maxWidth: 1100,
+          background: "#0b1a2a",
+          borderRadius: 16,
+          padding: 20,
+        }}
       >
-        <Image src={before} alt="Before" width={500} height={350} />
-      </div>
-
-      {open && (
         <div
-          onClick={() => setOpen(false)}
           style={{
-            position: "fixed",
-            inset: 0,
-            background: "rgba(0,0,0,.8)",
-            zIndex: 50,
-            display: "flex",
-            justifyContent: "center",
-            alignItems: "center",
+            display: "grid",
+            gridTemplateColumns: "1fr 1fr",
+            gap: 20,
           }}
         >
-          <div
-            onClick={(e) => e.stopPropagation()}
-            style={{ position: "relative", width: "80%", maxWidth: 900 }}
-          >
-            <Image
-              src={showAfter ? after : before}
-              alt="Project"
-              width={900}
-              height={600}
-              style={{ borderRadius: 12 }}
-            />
-
-            <button
-              onClick={() => setShowAfter(!showAfter)}
-              style={{
-                position: "absolute",
-                bottom: 20,
-                left: "50%",
-                transform: "translateX(-50%)",
-                padding: "10px 20px",
-                background: "#0ea5e9",
-                color: "white",
-                borderRadius: 20,
-                border: "none",
-                cursor: "pointer",
-              }}
-            >
-              {showAfter ? "Önce" : "Sonra"}
-            </button>
-          </div>
+          <Image src={before} alt="Önce" width={500} height={350} />
+          <Image src={after} alt="Sonra" width={500} height={350} />
         </div>
-      )}
-    </>
+
+        <button
+          onClick={onClose}
+          style={{
+            marginTop: 20,
+            padding: "10px 24px",
+            background: "#0ea5e9",
+            color: "white",
+            borderRadius: 8,
+            border: "none",
+            cursor: "pointer",
+          }}
+        >
+          Kapat
+        </button>
+      </div>
+    </div>
   )
 }

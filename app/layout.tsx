@@ -8,9 +8,11 @@ export default function RootLayout({
 }) {
   return (
     <html lang="tr">
-      <body>
+      <body style={{ margin: 0 }}>
         <Header />
-        {children}
+        <div style={{ paddingTop: 80 }}>
+          {children}
+        </div>
       </body>
     </html>
   )

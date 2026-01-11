@@ -1,6 +1,8 @@
 "use client"
 
+import { useState } from "react"
 import { BeforeAfterModal } from "./BeforeAfterModal"
+import Image from "next/image"
 
 type Project = {
   id: string
@@ -9,15 +11,13 @@ type Project = {
   after: string
 }
 
-type Props = {
-  projects: Project[]
-}
+export function BeforeAfterGrid({ projects }: { projects: Project[] }) {
+  const [active, setActive] = useState<Project | null>(null)
 
-export function BeforeAfterGrid({ projects }: Props) {
   return (
     <section style={{ padding: "80px 40px" }}>
       <h2 style={{ textAlign: "center", fontSize: 36, marginBottom: 40 }}>
-        Projelerimiz Nasıl Hayata Geçiyor?
+        Öne Çıkan Projeler
       </h2>
 
       <div
@@ -28,12 +28,29 @@ export function BeforeAfterGrid({ projects }: Props) {
         }}
       >
         {projects.map((p) => (
-          <div key={p.id}>
-            <BeforeAfterModal before={p.before} after={p.after} />
+          <div
+            key={p.id}
+            style={{ cursor: "pointer" }}
+            onClick={() => setActive(p)}
+          >
+            <Image
+              src={p.after}
+              alt={p.title}
+              width={400}
+              height={260}
+              style={{ borderRadius: 12, objectFit: "cover" }}
+            />
             <p style={{ marginTop: 8, textAlign: "center" }}>{p.title}</p>
           </div>
         ))}
       </div>
+
+      <BeforeAfterModal
+        open={!!active}
+        before={active?.before || ""}
+        after={active?.after || ""}
+        onClose={() => setActive(null)}
+      />
     </section>
   )
 }
