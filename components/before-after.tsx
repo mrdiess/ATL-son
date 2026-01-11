@@ -1,87 +1,39 @@
 "use client"
 
-import { useState } from "react"
-import Image from "next/image"
+import { BeforeAfterModal } from "@/components/BeforeAfterModal"
 
-type Props = {
+type Project = {
+  id: string
+  title: string
   before: string
   after: string
-  title?: string
 }
 
-export default function BeforeAfter({ before, after, title }: Props) {
-  const [value, setValue] = useState(50)
+type Props = {
+  projects: Project[]
+}
 
+export function BeforeAfterGrid({ projects }: Props) {
   return (
-    <div
-      style={{
-        position: "relative",
-        width: "100%",
-        maxWidth: 900,
-        margin: "0 auto",
-        borderRadius: 20,
-        overflow: "hidden",
-        background: "#020617",
-      }}
-    >
-      {title && (
-        <div
-          style={{
-            position: "absolute",
-            top: 20,
-            left: 20,
-            zIndex: 5,
-            color: "white",
-            fontWeight: 700,
-          }}
-        >
-          {title}
-        </div>
-      )}
+    <section style={{ padding: "80px 40px" }}>
+      <h2 style={{ textAlign: "center", fontSize: 36, marginBottom: 40 }}>
+        Projelerimiz Nasıl Hayata Geçiyor?
+      </h2>
 
-      {/* AFTER */}
-      <Image
-        src={after}
-        alt="After"
-        width={1200}
-        height={700}
-        style={{ width: "100%", height: "auto", display: "block" }}
-      />
-
-      {/* BEFORE */}
       <div
         style={{
-          position: "absolute",
-          inset: 0,
-          width: `${value}%`,
-          overflow: "hidden",
+          display: "grid",
+          gridTemplateColumns: "repeat(auto-fill, minmax(260px, 1fr))",
+          gap: 20,
         }}
       >
-        <Image
-          src={before}
-          alt="Before"
-          width={1200}
-          height={700}
-          style={{ width: "100%", height: "auto" }}
-        />
+        {projects.map((p) => (
+          <div key={p.id}>
+            <BeforeAfterModal before={p.before} after={p.after} />
+            <p style={{ marginTop: 8, textAlign: "center" }}>{p.title}</p>
+          </div>
+        ))}
       </div>
-
-      {/* SLIDER */}
-      <input
-        type="range"
-        min={0}
-        max={100}
-        value={value}
-        onChange={(e) => setValue(Number(e.target.value))}
-        style={{
-          position: "absolute",
-          bottom: 20,
-          left: "50%",
-          transform: "translateX(-50%)",
-          width: "60%",
-          zIndex: 10,
-        }}
-      />
-    </div>
+    </section>
   )
 }
