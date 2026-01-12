@@ -46,24 +46,27 @@ export default function HomePage() {
       <section className="py-20 bg-white">
         <div className="container mx-auto px-6 text-center">
           <h2 className="text-3xl font-bold mb-8">
-            Çelik Yapı Çözümleri
+            Anahtar Teslim Çelik Yapı Çözümleri
           </h2>
           <div className="grid gap-8 md:grid-cols-3">
             {[
               {
                 title: "Çelik Konstrüksiyon",
-                desc: "Endüstriyel ve ticari yapı çelik çerçeve çözümleri",
-              },
-              {
-                title: "Sandviç Panel",
-                desc: "Panel tedariki ve montaj hizmetlerimiz",
+                desc: "Endüstriyel ve ticari yapılar için dayanıklı çelik çözümler",
               },
               {
                 title: "Metal İşleme",
-                desc: "Metal kesim, bükme, kaynak ve özel üretim",
+                desc: "Kesim, büküm, kaynak ve özel metal imalatları",
+              },
+              {
+                title: "Anahtar Teslim",
+                desc: "Projelendirme, üretim ve montaj dahil uçtan uca hizmet",
               },
             ].map((item) => (
-              <div key={item.title} className="border p-6 rounded-xl hover:shadow-lg">
+              <div
+                key={item.title}
+                className="border p-6 rounded-xl hover:shadow-lg transition"
+              >
                 <h3 className="text-xl font-semibold mb-2">
                   {item.title}
                 </h3>
@@ -74,44 +77,8 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* PROJELER VİTRİN */}
-      <section className="py-20 bg-gray-50">
-        <div className="container mx-auto px-6">
-          <h2 className="text-3xl font-bold text-center mb-8">
-            Projelerimizden Öne Çıkanlar
-          </h2>
-          <div className="grid gap-6 md:grid-cols-3">
-            {[
-              "/projects/1.jpg",
-              "/projects/2.jpg",
-              "/projects/3.jpg",
-            ].map((src, i) => (
-              <div
-                key={i}
-                className="h-56 relative rounded-xl overflow-hidden"
-              >
-                <Image
-                  src={src}
-                  alt="Proje"
-                  fill
-                  className="object-cover"
-                />
-              </div>
-            ))}
-          </div>
-          <div className="text-center mt-8">
-            <Link
-              href="/projeler"
-              className="bg-sky-500 text-white px-8 py-3 rounded-lg font-semibold hover:bg-sky-600 transition"
-            >
-              Tüm Projeler
-            </Link>
-          </div>
-        </div>
-      </section>
-
       {/* HAKKIMIZDA */}
-      <section className="py-20 bg-white">
+      <section className="py-20 bg-gray-50">
         <div className="container mx-auto px-6 md:flex md:items-center md:gap-12">
           <div className="md:w-1/2">
             <Image
@@ -127,7 +94,9 @@ export default function HomePage() {
               Hakkımızda
             </h2>
             <p className="text-gray-700 leading-relaxed">
-              Düzce merkezli ATL Çelik Yapı olarak çelik konstrüksiyon, metal işleme ve anahtar teslim projelerde 81 ile hizmet veriyoruz. :contentReference[oaicite:0]{index=0}
+              Düzce merkezli ATL Çelik Yapı olarak çelik konstrüksiyon,
+              metal işleme ve anahtar teslim projelerde Türkiye genelinde
+              hizmet veriyoruz.
             </p>
             <Link
               href="/hakkimizda"
