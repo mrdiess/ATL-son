@@ -1,15 +1,9 @@
 "use client"
 
 import { useState } from "react"
-import Image from "next/image"
+import { gallery } from "../../data/gallery"
 
 const categories = ["tümü", "villa", "fabrika", "cati", "ic-mekan"]
-
-const gallery = [
-  { id: "1", src: "/gallery/1.jpg", category: "villa" },
-  { id: "2", src: "/gallery/2.jpg", category: "fabrika" },
-  { id: "3", src: "/gallery/3.jpg", category: "cati" },
-]
 
 export default function GalleryPage() {
   const [active, setActive] = useState("tümü")
@@ -45,11 +39,10 @@ export default function GalleryPage() {
             key={item.id}
             className="relative aspect-square overflow-hidden rounded-lg"
           >
-            <Image
+            <img
               src={item.src}
-              alt=""
-              fill
-              className="object-cover hover:scale-105 transition"
+              alt="ATL Çelik Yapı"
+              className="w-full h-full object-cover hover:scale-105 transition"
             />
           </div>
         ))}

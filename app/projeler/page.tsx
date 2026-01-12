@@ -1,31 +1,28 @@
 "use client"
 
 import { useState } from "react"
+import { beforeAfterItems } from "../../data/beforeAfter"
 import BeforeAfterGrid from "../../components/BeforeAfterGrid"
 import BeforeAfterModal from "../../components/BeforeAfterModal"
 
-const items = [
-  {
-    id: "1",
-    before: "/before/1.jpg",
-    after: "/after/1.jpg",
-  },
-]
-
 export default function ProjectsPage() {
-  const [selected, setSelected] = useState(null)
+  const [selected, setSelected] = useState<any>(null)
 
   return (
     <section className="container py-20 space-y-10">
       <h1 className="text-3xl font-bold">Projeler</h1>
 
       <BeforeAfterGrid
-        items={items}
+        items={beforeAfterItems}
         onSelect={setSelected}
       />
 
       <BeforeAfterModal
-        item={selected}
+        item={
+          selected
+            ? { before: selected.before, after: selected.after }
+            : null
+        }
         onClose={() => setSelected(null)}
       />
     </section>

@@ -16,8 +16,8 @@ export default function BeforeAfterModal({
     <div className="fixed inset-0 z-50 bg-black/70 flex items-center justify-center">
       <div className="bg-white p-4 rounded-xl max-w-4xl w-full">
         <div className="grid grid-cols-2 gap-4">
-          <img src={item.before} />
-          <img src={item.after} />
+          <img src={item.before} className="w-full" />
+          <img src={item.after} className="w-full" />
         </div>
 
         <button
