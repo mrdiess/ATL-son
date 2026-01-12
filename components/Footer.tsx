@@ -102,4 +102,24 @@ export default function Footer() {
         </div>
       </div>
 
-      {/
+      {/* ALT BAR */}
+      <div className="border-t border-border py-6">
+        <div className="container flex flex-col md:flex-row items-center justify-between gap-4 text-sm text-muted-foreground">
+          <span>
+            © {new Date().getFullYear()} ATL Çelik Yapı. Tüm hakları saklıdır.
+          </span>
+
+          <a
+            href="https://instagram.com/rootbaran"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="hover:text-primary transition"
+          >
+            Designed & Developed by{" "}
+            <span className="text-foreground">rootbaran</span>
+          </a>
+        </div>
+      </div>
+    </footer>
+  )
+}
