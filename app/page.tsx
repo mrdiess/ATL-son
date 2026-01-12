@@ -3,57 +3,101 @@ import Link from "next/link"
 
 export default function HomePage() {
   return (
-    <main className="w-full">
-      {/* HERO */}
-      <section className="relative h-[90vh] w-full overflow-hidden">
+    <main>
+      <section
+        style={{
+          position: "relative",
+          width: "100%",
+          height: "90vh",
+          overflow: "hidden",
+        }}
+      >
         {/* Background Image */}
         <Image
           src="/hero/hero-1.jpg"
           alt="Çelik Konstrüksiyon"
           fill
           priority
-          className="object-cover"
+          style={{ objectFit: "cover" }}
         />
 
-        {/* Strong Overlay */}
-        <div className="absolute inset-0 bg-gradient-to-r from-black/80 via-black/60 to-black/30" />
+        {/* Overlay */}
+        <div
+          style={{
+            position: "absolute",
+            inset: 0,
+            background:
+              "linear-gradient(to right, rgba(0,0,0,0.8), rgba(0,0,0,0.5), rgba(0,0,0,0.2))",
+          }}
+        />
 
         {/* Content */}
-        <div className="relative z-10 flex h-full items-center">
-          <div className="container mx-auto px-6">
-            <div className="max-w-3xl">
-              <span className="mb-4 inline-block text-sm md:text-base font-medium text-sky-400">
-                Endüstriyel tesis ve depo çözümleriniz için
-              </span>
+        <div
+          style={{
+            position: "relative",
+            zIndex: 2,
+            height: "100%",
+            display: "flex",
+            alignItems: "center",
+            paddingLeft: "64px",
+            paddingRight: "64px",
+            color: "#ffffff",
+            maxWidth: "1200px",
+          }}
+        >
+          <div>
+            <div
+              style={{
+                marginBottom: "16px",
+                fontSize: "14px",
+                color: "#38bdf8",
+                fontWeight: 500,
+              }}
+            >
+              Endüstriyel tesis ve depo çözümleriniz için
+            </div>
 
-              <h1 className="mb-8 text-4xl font-bold leading-tight text-white md:text-6xl lg:text-7xl">
-                Çelik <br /> Konstrüksiyon
-              </h1>
+            <h1
+              style={{
+                fontSize: "64px",
+                fontWeight: 800,
+                lineHeight: 1.1,
+                marginBottom: "32px",
+              }}
+            >
+              Çelik <br /> Konstrüksiyon
+            </h1>
 
-              <div className="flex flex-wrap gap-4">
-                <Link
-                  href="/projeler"
-                  className="rounded-xl bg-sky-500 px-8 py-4 font-semibold text-white transition hover:bg-sky-600"
-                >
-                  Keşfet →
-                </Link>
+            <div style={{ display: "flex", gap: "16px" }}>
+              <Link
+                href="/projeler"
+                style={{
+                  padding: "14px 32px",
+                  backgroundColor: "#0ea5e9",
+                  color: "#ffffff",
+                  borderRadius: "12px",
+                  fontWeight: 600,
+                  textDecoration: "none",
+                }}
+              >
+                Keşfet →
+              </Link>
 
-                <Link
-                  href="/iletisim"
-                  className="rounded-xl border border-white/40 px-8 py-4 font-semibold text-white transition hover:bg-white/10"
-                >
-                  İletişime Geç
-                </Link>
-              </div>
+              <Link
+                href="/iletisim"
+                style={{
+                  padding: "14px 32px",
+                  border: "1px solid rgba(255,255,255,0.5)",
+                  color: "#ffffff",
+                  borderRadius: "12px",
+                  fontWeight: 600,
+                  textDecoration: "none",
+                }}
+              >
+                İletişime Geç
+              </Link>
             </div>
           </div>
-        </div>
-
-        {/* Slider Indicator (Mock) */}
-        <div className="absolute bottom-8 left-1/2 flex -translate-x-1/2 items-center gap-3">
-          <span className="h-2 w-2 rounded-full bg-white/40" />
-          <span className="h-2 w-8 rounded-full bg-sky-400" />
-          <span className="h-2 w-2 rounded-full bg-white/40" />
         </div>
       </section>
     </main>
