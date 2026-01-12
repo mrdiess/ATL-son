@@ -1,5 +1,5 @@
 import "./globals.css"
-import { Header } from "@/components/Header"
+import Header from "../components/Header"
 
 export default function RootLayout({
   children,
@@ -8,11 +8,9 @@ export default function RootLayout({
 }) {
   return (
     <html lang="tr">
-      <body style={{ margin: 0 }}>
+      <body className="m-0">
         <Header />
-        <div style={{ paddingTop: 80 }}>
-          {children}
-        </div>
+        {children}
       </body>
     </html>
   )

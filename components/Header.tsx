@@ -1,57 +1,69 @@
 "use client"
 
+import { useEffect, useState } from "react"
 import Link from "next/link"
-import Image from "next/image"
 
-export function Header() {
+export default function Header() {
+  const [scrolled, setScrolled] = useState(false)
+
+  useEffect(() => {
+    const onScroll = () => {
+      setScrolled(window.scrollY > 20)
+    }
+
+    window.addEventListener("scroll", onScroll)
+    return () => window.removeEventListener("scroll", onScroll)
+  }, [])
+
   return (
     <header
-      style={{
-        position: "fixed",
-        top: 0,
-        left: 0,
-        width: "100%",
-        zIndex: 50,
-        background: "rgba(0,0,0,0.6)",
-        backdropFilter: "blur(8px)",
-      }}
+      className={`fixed top-0 left-0 w-full z-50 transition-all duration-300 ${
+        scrolled
+          ? "bg-black/80 backdrop-blur border-b border-white/10"
+          : "bg-transparent"
+      }`}
     >
-      <div
-        style={{
-          maxWidth: 1200,
-          margin: "0 auto",
-          padding: "14px 32px",
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "space-between",
-        }}
-      >
+      <div className="container h-20 flex items-center justify-between">
         {/* LOGO */}
-        <Link href="/">
-          <Image
-            src="/logo.png"
+        <Link href="/" className="flex items-center gap-2">
+          <img
+            src="/logo.svg"
             alt="ATL Çelik Yapı"
-            width={160}
-            height={50}
-            priority
+            className="h-8 w-auto"
           />
         </Link>
 
-        {/* MENU */}
-        <nav
-          style={{
-            display: "flex",
-            gap: 28,
-            color: "white",
-            fontSize: 15,
-            fontWeight: 500,
-          }}
-        >
-          <Link href="/">Ana Sayfa</Link>
-          <Link href="/projeler">Projeler</Link>
-          <Link href="/galeri">Galeri</Link>
-          <Link href="/iletisim">İletişim</Link>
+        {/* NAV */}
+        <nav className="hidden md:flex items-center gap-8 text-sm">
+          {[
+            { href: "/", label: "Ana Sayfa" },
+            { href: "/hizmetler", label: "Hizmetler" },
+            { href: "/projeler", label: "Projeler" },
+            { href: "/hakkimizda", label: "Hakkımızda" },
+            { href: "/iletisim", label: "İletişim" },
+          ].map((item) => (
+            <Link
+              key={item.href}
+              href={item.href}
+              className="text-white/90 hover:text-white transition"
+            >
+              {item.label}
+            </Link>
+          ))}
         </nav>
+
+        {/* CTA */}
+        <a
+          href="tel:+90XXXXXXXXXX"
+          className="hidden md:inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-sky-500 text-white text-sm font-medium hover:bg-sky-600 transition"
+        >
+          📞 Hemen Ara
+        </a>
+
+        {/* MOBILE MENU (placeholder) */}
+        <button className="md:hidden text-white text-2xl">
+          ☰
+        </button>
       </div>
     </header>
   )
