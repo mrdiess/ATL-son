@@ -16,3 +16,18 @@ export default function HomePage() {
     </>
   )
 }
+import HomeProjects from "@/components/HomeProjects"
+
+export default function HomePage() {
+  return (
+    <>
+      {/* HERO burada */}
+
+      {/* Şirket Profili / Neden ATL vs */}
+
+      <HomeProjects />
+
+      {/* Footer zaten layout’ta */}
+    </>
+  )
+}
