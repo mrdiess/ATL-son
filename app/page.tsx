@@ -1,57 +1,101 @@
+import HeroSlider from "../components/HeroSlider"
 import Link from "next/link"
 
 export default function HomePage() {
   return (
-    <main>
-      {/* HERO */}
-      <section className="relative h-screen w-full overflow-hidden">
-        {/* Background */}
-        <img
-          src="https://images.unsplash.com/photo-1581091870627-3c8c6c4f88b1?q=80&w=1920"
-          alt="Lazer Kesim"
-          className="absolute inset-0 w-full h-full object-cover"
-        />
+    <main className="w-full">
+      {/* HERO SLIDER */}
+      <HeroSlider />
 
-        {/* Overlay */}
-        <div className="absolute inset-0 bg-black/50" />
+      {/* HİZMETLER */}
+      <section className="container py-24">
+        <h2 className="text-2xl md:text-3xl font-semibold mb-12 text-center">
+          Hizmet Alanlarımız
+        </h2>
 
-        {/* Content */}
-        <div className="relative z-10 h-full flex items-center">
-          <div className="container">
-            <p className="text-sky-400 text-sm md:text-base mb-4">
-              Yüksek hassasiyet ve teknoloji ile metal işleme
-            </p>
-
-            <h1 className="text-white text-4xl md:text-6xl font-bold max-w-3xl">
-              Lazer Kesim
-            </h1>
-
-            <div className="mt-10 flex gap-4">
-              <Link
-                href="/projeler"
-                className="inline-flex items-center gap-2 px-6 py-3 rounded-lg bg-sky-500 text-white font-medium hover:bg-sky-600 transition"
-              >
-                Keşfet →
-              </Link>
-
-              <Link
-                href="/iletisim"
-                className="inline-flex items-center gap-2 px-6 py-3 rounded-lg border border-white/40 text-white hover:bg-white/10 transition"
-              >
-                İletişime Geç
-              </Link>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+          {[
+            {
+              title: "Çelik Yapı",
+              desc: "Dayanıklı, uzun ömürlü ve mühendislik odaklı çelik yapı çözümleri.",
+            },
+            {
+              title: "Ferforje Sistemler",
+              desc: "Estetik ve sağlam ferforje korkuluk, kapı ve özel tasarımlar.",
+            },
+            {
+              title: "Merdiven & Özel İmalat",
+              desc: "Projeye özel ölçü, modern ve fonksiyonel metal imalatlar.",
+            },
+          ].map((item) => (
+            <div
+              key={item.title}
+              className="border rounded-xl p-8 text-center hover:shadow-lg transition"
+            >
+              <h3 className="text-lg font-medium mb-3">{item.title}</h3>
+              <p className="text-sm text-muted-foreground">{item.desc}</p>
             </div>
-          </div>
+          ))}
         </div>
+      </section>
 
-        {/* Slider Arrows (UI only) */}
-        <button className="absolute left-6 top-1/2 -translate-y-1/2 z-10 w-10 h-10 rounded-full bg-black/40 text-white flex items-center justify-center hover:bg-black/60">
-          ‹
-        </button>
+      {/* PROJELERE YÖNLENDİRME */}
+      <section className="container py-24">
+        <div className="rounded-2xl bg-gray-100 p-10 md:p-16 text-center">
+          <h2 className="text-2xl md:text-3xl font-semibold">
+            Projelerimizi İnceleyin
+          </h2>
 
-        <button className="absolute right-6 top-1/2 -translate-y-1/2 z-10 w-10 h-10 rounded-full bg-black/40 text-white flex items-center justify-center hover:bg-black/60">
-          ›
-        </button>
+          <p className="mt-4 text-muted-foreground max-w-2xl mx-auto">
+            Gerçekleştirdiğimiz projelerle kalite ve işçiliğimizi yakından görün.
+          </p>
+
+          <Link
+            href="/projeler"
+            className="inline-block mt-8 px-8 py-3 rounded-lg bg-black text-white font-medium hover:bg-black/90 transition"
+          >
+            Projelere Git
+          </Link>
+        </div>
+      </section>
+
+      {/* GALERİ YÖNLENDİRME */}
+      <section className="container py-24">
+        <div className="flex flex-col md:flex-row items-center justify-between gap-10">
+          <div>
+            <h2 className="text-2xl md:text-3xl font-semibold">
+              Galerimiz
+            </h2>
+            <p className="mt-4 text-muted-foreground max-w-xl">
+              Üretim ve uygulama süreçlerimizden seçilmiş görselleri inceleyin.
+            </p>
+          </div>
+
+          <Link
+            href="/galeri"
+            className="px-8 py-3 rounded-lg border font-medium hover:bg-gray-100 transition"
+          >
+            Galeriye Git
+          </Link>
+        </div>
+      </section>
+
+      {/* CTA */}
+      <section className="container py-32 text-center">
+        <h2 className="text-2xl md:text-3xl font-semibold">
+          Projeniz İçin Teklif Alın
+        </h2>
+
+        <p className="mt-4 text-muted-foreground max-w-xl mx-auto">
+          İhtiyacınıza özel çözümler ve fiyatlandırma için bizimle iletişime geçin.
+        </p>
+
+        <Link
+          href="/iletisim"
+          className="inline-block mt-8 px-10 py-4 rounded-lg bg-sky-500 text-white font-medium hover:bg-sky-600 transition"
+        >
+          İletişime Geç
+        </Link>
       </section>
     </main>
   )
