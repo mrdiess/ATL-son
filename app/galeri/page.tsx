@@ -3,7 +3,7 @@
 import { useState } from "react"
 import { gallery } from "../../data/gallery"
 
-const categories = ["tümü", "villa", "fabrika", "cati", "ic-mekan"]
+const categories = ["tümü", "ferforje", "merdiven"]
 
 export default function GalleryPage() {
   const [active, setActive] = useState("tümü")
@@ -17,7 +17,6 @@ export default function GalleryPage() {
     <section className="container py-20 space-y-10">
       <h1 className="text-3xl font-bold">Galeri</h1>
 
-      {/* Filtre */}
       <div className="flex gap-2 flex-wrap">
         {categories.map((c) => (
           <button
@@ -32,7 +31,6 @@ export default function GalleryPage() {
         ))}
       </div>
 
-      {/* Grid */}
       <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
         {filtered.map((item) => (
           <div
@@ -41,7 +39,7 @@ export default function GalleryPage() {
           >
             <img
               src={item.src}
-              alt="ATL Çelik Yapı"
+              alt={item.category}
               className="w-full h-full object-cover hover:scale-105 transition"
             />
           </div>
