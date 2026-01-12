@@ -1,81 +1,124 @@
 "use client"
 
 import { useEffect, useState } from "react"
+import Image from "next/image"
 import Link from "next/link"
 
 export default function Header() {
   const [scrolled, setScrolled] = useState(false)
 
   useEffect(() => {
-    const handleScroll = () => {
-      setScrolled(window.scrollY > 20)
+    const onScroll = () => {
+      setScrolled(window.scrollY > 40)
     }
 
-    window.addEventListener("scroll", handleScroll)
-    return () => window.removeEventListener("scroll", handleScroll)
+    window.addEventListener("scroll", onScroll)
+    return () => window.removeEventListener("scroll", onScroll)
   }, [])
 
   return (
     <header
-      className={`fixed top-0 left-0 w-full z-50 transition-all duration-300 ${
-        scrolled
-          ? "bg-black/80 backdrop-blur border-b border-white/10"
-          : "bg-transparent"
-      }`}
+      style={{
+        position: "fixed",
+        top: 0,
+        left: 0,
+        width: "100%",
+        zIndex: 50,
+        transition: "all 0.3s ease",
+        backgroundColor: scrolled ? "rgba(10,22,40,0.95)" : "transparent",
+        boxShadow: scrolled ? "0 4px 30px rgba(0,0,0,0.1)" : "none",
+      }}
     >
-      <div className="container h-20 flex items-center justify-between">
+      <div
+        style={{
+          maxWidth: "1280px",
+          margin: "0 auto",
+          padding: "16px 24px",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "space-between",
+        }}
+      >
         {/* LOGO */}
-        <Link href="/" className="flex items-center gap-2">
-          <img
-            src="/logo.svg"
+        <Link href="/" style={{ display: "flex", alignItems: "center" }}>
+          <Image
+            src="/logo.png"
             alt="ATL Çelik Yapı"
-            className="h-8 w-auto"
+            width={140}
+            height={40}
+            priority
+            style={{
+              filter: scrolled ? "none" : "brightness(0) invert(1)",
+              transition: "filter 0.3s ease",
+            }}
           />
         </Link>
 
-        {/* DESKTOP MENU */}
-        <nav className="hidden md:flex items-center gap-8 text-sm">
-          <Link href="/" className="text-white/90 hover:text-white transition">
+        {/* NAV */}
+        <nav
+          style={{
+            display: "flex",
+            gap: "32px",
+            alignItems: "center",
+            fontWeight: 500,
+          }}
+        >
+          <Link
+            href="/"
+            style={{
+              color: "#ffffff",
+              textDecoration: "none",
+              opacity: 0.9,
+            }}
+          >
             Ana Sayfa
           </Link>
           <Link
+            href="/hakkimizda"
+            style={{
+              color: "#ffffff",
+              textDecoration: "none",
+              opacity: 0.9,
+            }}
+          >
+            Hakkımızda
+          </Link>
+          <Link
             href="/hizmetler"
-            className="text-white/90 hover:text-white transition"
+            style={{
+              color: "#ffffff",
+              textDecoration: "none",
+              opacity: 0.9,
+            }}
           >
             Hizmetler
           </Link>
           <Link
             href="/projeler"
-            className="text-white/90 hover:text-white transition"
+            style={{
+              color: "#ffffff",
+              textDecoration: "none",
+              opacity: 0.9,
+            }}
           >
             Projeler
           </Link>
-          <Link
-            href="/hakkimizda"
-            className="text-white/90 hover:text-white transition"
-          >
-            Hakkımızda
-          </Link>
+
+          {/* CTA */}
           <Link
             href="/iletisim"
-            className="text-white/90 hover:text-white transition"
+            style={{
+              padding: "10px 20px",
+              backgroundColor: "#0ea5e9",
+              color: "#ffffff",
+              borderRadius: "10px",
+              textDecoration: "none",
+              fontWeight: 600,
+            }}
           >
-            İletişim
+            Hemen Ara
           </Link>
         </nav>
-
-        {/* CTA */}
-        <a
-          href="tel:+905388789073"
-          className="hidden md:inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-sky-500 text-white text-sm font-medium hover:bg-sky-600 transition"
-        >
-          Hemen Ara
-        </a>
-
-        {/* MOBILE MENU ICON (şimdilik pasif) */}
-        <button className="md:hidden text-white text-2xl">
-          ☰
-        </button>
       </div>
     </header>
   )

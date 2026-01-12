@@ -4,11 +4,12 @@ import Link from "next/link"
 export default function HomePage() {
   return (
     <main>
+      {/* HERO */}
       <section
         style={{
           position: "relative",
           width: "100%",
-          height: "90vh",
+          height: "100vh",
           overflow: "hidden",
         }}
       >
@@ -27,7 +28,7 @@ export default function HomePage() {
             position: "absolute",
             inset: 0,
             background:
-              "linear-gradient(to right, rgba(0,0,0,0.8), rgba(0,0,0,0.5), rgba(0,0,0,0.2))",
+              "linear-gradient(90deg, rgba(0,0,0,0.85) 0%, rgba(0,0,0,0.6) 40%, rgba(0,0,0,0.25) 70%, rgba(0,0,0,0.1) 100%)",
           }}
         />
 
@@ -39,65 +40,96 @@ export default function HomePage() {
             height: "100%",
             display: "flex",
             alignItems: "center",
-            paddingLeft: "64px",
-            paddingRight: "64px",
-            color: "#ffffff",
-            maxWidth: "1200px",
           }}
         >
-          <div>
-            <div
-              style={{
-                marginBottom: "16px",
-                fontSize: "14px",
-                color: "#38bdf8",
-                fontWeight: 500,
-              }}
-            >
-              Endüstriyel tesis ve depo çözümleriniz için
-            </div>
-
-            <h1
-              style={{
-                fontSize: "64px",
-                fontWeight: 800,
-                lineHeight: 1.1,
-                marginBottom: "32px",
-              }}
-            >
-              Çelik <br /> Konstrüksiyon
-            </h1>
-
-            <div style={{ display: "flex", gap: "16px" }}>
-              <Link
-                href="/projeler"
+          <div
+            style={{
+              maxWidth: "1280px",
+              width: "100%",
+              margin: "0 auto",
+              paddingLeft: "64px",
+              paddingRight: "64px",
+            }}
+          >
+            <div style={{ maxWidth: "720px" }}>
+              {/* Subtitle */}
+              <div
                 style={{
-                  padding: "14px 32px",
-                  backgroundColor: "#0ea5e9",
-                  color: "#ffffff",
-                  borderRadius: "12px",
-                  fontWeight: 600,
-                  textDecoration: "none",
+                  marginBottom: "20px",
+                  fontSize: "15px",
+                  fontWeight: 500,
+                  color: "#38bdf8",
+                  letterSpacing: "0.4px",
                 }}
               >
-                Keşfet →
-              </Link>
+                Endüstriyel tesis ve depo çözümleriniz için
+              </div>
 
-              <Link
-                href="/iletisim"
+              {/* Title */}
+              <h1
                 style={{
-                  padding: "14px 32px",
-                  border: "1px solid rgba(255,255,255,0.5)",
+                  marginBottom: "36px",
+                  fontSize: "72px",
+                  fontWeight: 800,
+                  lineHeight: 1.05,
                   color: "#ffffff",
-                  borderRadius: "12px",
-                  fontWeight: 600,
-                  textDecoration: "none",
                 }}
               >
-                İletişime Geç
-              </Link>
+                Çelik
+                <br />
+                Konstrüksiyon
+              </h1>
+
+              {/* Buttons */}
+              <div style={{ display: "flex", gap: "20px" }}>
+                <Link
+                  href="/projeler"
+                  style={{
+                    padding: "16px 36px",
+                    backgroundColor: "#0ea5e9",
+                    color: "#ffffff",
+                    borderRadius: "14px",
+                    fontWeight: 600,
+                    fontSize: "16px",
+                    textDecoration: "none",
+                  }}
+                >
+                  Keşfet →
+                </Link>
+
+                <Link
+                  href="/iletisim"
+                  style={{
+                    padding: "16px 36px",
+                    border: "1px solid rgba(255,255,255,0.6)",
+                    color: "#ffffff",
+                    borderRadius: "14px",
+                    fontWeight: 600,
+                    fontSize: "16px",
+                    textDecoration: "none",
+                    backgroundColor: "rgba(255,255,255,0.05)",
+                  }}
+                >
+                  İletişime Geç
+                </Link>
+              </div>
             </div>
           </div>
+        </div>
+
+        {/* Scroll Hint */}
+        <div
+          style={{
+            position: "absolute",
+            bottom: "32px",
+            left: "50%",
+            transform: "translateX(-50%)",
+            color: "rgba(255,255,255,0.6)",
+            fontSize: "13px",
+            letterSpacing: "1px",
+          }}
+        >
+          KAYDIR
         </div>
       </section>
     </main>
