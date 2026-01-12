@@ -3,185 +3,138 @@ import Link from "next/link"
 
 export default function HomePage() {
   return (
-    <main>
+    <main className="w-full">
       {/* HERO */}
-      <section
-        style={{
-          position: "relative",
-          width: "100%",
-          height: "100vh",
-          overflow: "hidden",
-        }}
-      >
+      <section className="relative h-screen w-full">
         <Image
           src="/hero/hero-1.jpg"
           alt="Çelik Konstrüksiyon"
           fill
+          className="object-cover"
           priority
-          style={{ objectFit: "cover" }}
         />
+        <div className="absolute inset-0 bg-black/60" />
+        <div className="relative z-10 container mx-auto px-6 flex h-full items-center">
+          <div className="max-w-3xl text-white">
+            <span className="block text-sky-400 text-sm md:text-base mb-3">
+              Endüstriyel tesis ve depo çözümleriniz için
+            </span>
 
-        <div
-          style={{
-            position: "absolute",
-            inset: 0,
-            background:
-              "linear-gradient(90deg, rgba(0,0,0,0.85) 0%, rgba(0,0,0,0.6) 40%, rgba(0,0,0,0.25) 70%, rgba(0,0,0,0.1) 100%)",
-          }}
-        />
+            <h1 className="text-5xl md:text-7xl font-extrabold leading-tight mb-6">
+              Çelik <br /> Konstrüksiyon
+            </h1>
 
-        <div
-          style={{
-            position: "relative",
-            zIndex: 2,
-            height: "100%",
-            display: "flex",
-            alignItems: "center",
-          }}
-        >
-          <div
-            style={{
-              maxWidth: "1280px",
-              width: "100%",
-              margin: "0 auto",
-              padding: "0 64px",
-            }}
-          >
-            <div style={{ maxWidth: "720px" }}>
-              <div
-                style={{
-                  marginBottom: "20px",
-                  fontSize: "15px",
-                  fontWeight: 500,
-                  color: "#38bdf8",
-                }}
+            <div className="flex gap-4">
+              <Link
+                href="/projeler"
+                className="bg-sky-500 text-white px-6 py-3 rounded-lg font-semibold hover:bg-sky-600 transition"
               >
-                Endüstriyel tesis ve depo çözümleriniz için
-              </div>
-
-              <h1
-                style={{
-                  marginBottom: "36px",
-                  fontSize: "72px",
-                  fontWeight: 800,
-                  lineHeight: 1.05,
-                  color: "#ffffff",
-                }}
+                Keşfet
+              </Link>
+              <Link
+                href="/iletisim"
+                className="border border-white px-6 py-3 rounded-lg text-white font-semibold hover:bg-white/20 transition"
               >
-                Çelik
-                <br />
-                Konstrüksiyon
-              </h1>
-
-              <div style={{ display: "flex", gap: "20px" }}>
-                <Link
-                  href="/projeler"
-                  style={{
-                    padding: "16px 36px",
-                    backgroundColor: "#0ea5e9",
-                    color: "#ffffff",
-                    borderRadius: "14px",
-                    fontWeight: 600,
-                    textDecoration: "none",
-                  }}
-                >
-                  Keşfet →
-                </Link>
-
-                <Link
-                  href="/iletisim"
-                  style={{
-                    padding: "16px 36px",
-                    border: "1px solid rgba(255,255,255,0.6)",
-                    color: "#ffffff",
-                    borderRadius: "14px",
-                    fontWeight: 600,
-                    textDecoration: "none",
-                    backgroundColor: "rgba(255,255,255,0.05)",
-                  }}
-                >
-                  İletişime Geç
-                </Link>
-              </div>
+                İletişime Geç
+              </Link>
             </div>
           </div>
         </div>
       </section>
 
-      {/* NE YAPIYORUZ */}
-      <section
-        style={{
-          backgroundColor: "#ffffff",
-          padding: "96px 24px",
-        }}
-      >
-        <div
-          style={{
-            maxWidth: "1280px",
-            margin: "0 auto",
-          }}
-        >
-          <div style={{ maxWidth: "720px", marginBottom: "64px" }}>
-            <h2
-              style={{
-                fontSize: "40px",
-                fontWeight: 700,
-                marginBottom: "20px",
-              }}
-            >
-              Anahtar Teslim Çelik Yapı Çözümleri
-            </h2>
-            <p style={{ fontSize: "16px", lineHeight: 1.7, color: "#475569" }}>
-              ATL Çelik Yapı olarak endüstriyel tesisler, depolar, ferforje ve
-              özel metal imalatlarında projelendirmeden montaja kadar tüm
-              süreci tek çatı altında yürütüyoruz.
-            </p>
-          </div>
-
-          <div
-            style={{
-              display: "grid",
-              gridTemplateColumns: "repeat(auto-fit, minmax(260px, 1fr))",
-              gap: "32px",
-            }}
-          >
+      {/* HIZMETLER */}
+      <section className="py-20 bg-white">
+        <div className="container mx-auto px-6 text-center">
+          <h2 className="text-3xl font-bold mb-8">
+            Çelik Yapı Çözümleri
+          </h2>
+          <div className="grid gap-8 md:grid-cols-3">
             {[
               {
                 title: "Çelik Konstrüksiyon",
-                desc: "Endüstriyel ve ticari yapılar için dayanıklı çelik çözümler",
+                desc: "Endüstriyel ve ticari yapı çelik çerçeve çözümleri",
               },
               {
-                title: "Ferforje & Merdiven",
-                desc: "Özel tasarım, estetik ve fonksiyonel metal imalatları",
+                title: "Sandviç Panel",
+                desc: "Panel tedariki ve montaj hizmetlerimiz",
               },
               {
-                title: "Anahtar Teslim",
-                desc: "Projelendirme, üretim ve montaj dahil uçtan uca hizmet",
+                title: "Metal İşleme",
+                desc: "Metal kesim, bükme, kaynak ve özel üretim",
               },
             ].map((item) => (
-              <div
-                key={item.title}
-                style={{
-                  padding: "32px",
-                  borderRadius: "20px",
-                  backgroundColor: "#f8fafc",
-                  border: "1px solid #e5e7eb",
-                }}
-              >
-                <h3
-                  style={{
-                    fontSize: "20px",
-                    fontWeight: 600,
-                    marginBottom: "12px",
-                  }}
-                >
+              <div key={item.title} className="border p-6 rounded-xl hover:shadow-lg">
+                <h3 className="text-xl font-semibold mb-2">
                   {item.title}
                 </h3>
-                <p style={{ fontSize: "15px", color: "#475569" }}>
-                  {item.desc}
-                </p>
+                <p className="text-gray-600">{item.desc}</p>
               </div>
             ))}
+          </div>
+        </div>
+      </section>
+
+      {/* PROJELER VİTRİN */}
+      <section className="py-20 bg-gray-50">
+        <div className="container mx-auto px-6">
+          <h2 className="text-3xl font-bold text-center mb-8">
+            Projelerimizden Öne Çıkanlar
+          </h2>
+          <div className="grid gap-6 md:grid-cols-3">
+            {[
+              "/projects/1.jpg",
+              "/projects/2.jpg",
+              "/projects/3.jpg",
+            ].map((src, i) => (
+              <div
+                key={i}
+                className="h-56 relative rounded-xl overflow-hidden"
+              >
+                <Image
+                  src={src}
+                  alt="Proje"
+                  fill
+                  className="object-cover"
+                />
+              </div>
+            ))}
+          </div>
+          <div className="text-center mt-8">
+            <Link
+              href="/projeler"
+              className="bg-sky-500 text-white px-8 py-3 rounded-lg font-semibold hover:bg-sky-600 transition"
+            >
+              Tüm Projeler
+            </Link>
+          </div>
+        </div>
+      </section>
+
+      {/* HAKKIMIZDA */}
+      <section className="py-20 bg-white">
+        <div className="container mx-auto px-6 md:flex md:items-center md:gap-12">
+          <div className="md:w-1/2">
+            <Image
+              src="/about/about-1.jpg"
+              alt="Hakkımızda"
+              width={800}
+              height={500}
+              className="rounded-xl object-cover"
+            />
+          </div>
+          <div className="md:w-1/2 mt-8 md:mt-0">
+            <h2 className="text-3xl font-bold mb-4">
+              Hakkımızda
+            </h2>
+            <p className="text-gray-700 leading-relaxed">
+              Düzce merkezli ATL Çelik Yapı olarak çelik konstrüksiyon, metal işleme ve anahtar teslim projelerde 81 ile hizmet veriyoruz. :contentReference[oaicite:0]{index=0}
+            </p>
+            <Link
+              href="/hakkimizda"
+              className="mt-6 inline-block bg-sky-500 text-white px-6 py-3 rounded-lg font-semibold hover:bg-sky-600 transition"
+            >
+              Devamını Oku
+            </Link>
           </div>
         </div>
       </section>

@@ -1,21 +1,23 @@
 import type { Config } from "tailwindcss"
 
 const config: Config = {
+  darkMode: ["class"],
   content: [
     "./app/**/*.{js,ts,jsx,tsx}",
     "./components/**/*.{js,ts,jsx,tsx}",
   ],
   theme: {
+    container: {
+      center: true,
+      padding: "1.5rem",
+      screens: {
+        "2xl": "1280px",
+      },
+    },
     extend: {
       colors: {
-        atl: {
-          bg: "#071827",        // ana arka plan
-          bgSoft: "#0B2238",    // kart arka plan
-          border: "#12324D",
-          primary: "#0EA5E9",   // mavi vurgu
-          text: "#E5EEF6",
-          muted: "#9FB3C8",
-        },
+        primary: "#0ea5e9",
+        dark: "#0a1628",
       },
     },
   },
