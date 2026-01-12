@@ -1,124 +1,76 @@
-import Link from "next/link"
-
 export default function Footer() {
   return (
-    <footer className="bg-background border-t border-border">
-      {/* ÜST FOOTER */}
-      <div className="container py-20 grid grid-cols-1 md:grid-cols-4 gap-12">
-        {/* LOGO & HAKKINDA */}
-        <div className="space-y-4">
-          <img
-            src="/logo.svg"
-            alt="ATL Çelik Yapı"
-            className="h-8 w-auto"
-          />
-          <p className="text-sm text-muted-foreground leading-relaxed">
-            ATL Çelik Yapı; çelik konstrüksiyon, ferforje, merdiven ve özel metal
-            imalatlarında mühendislik odaklı çözümler sunar.
+    <footer style={{ backgroundColor: "#0a1628", color: "#e5e7eb" }}>
+      <div
+        style={{
+          maxWidth: "1280px",
+          margin: "0 auto",
+          padding: "80px 24px",
+          display: "grid",
+          gridTemplateColumns: "repeat(auto-fit, minmax(240px, 1fr))",
+          gap: "56px",
+        }}
+      >
+        <div>
+          <h3 style={{ fontSize: "20px", color: "#fff", marginBottom: "16px" }}>
+            ATL Çelik Yapı
+          </h3>
+          <p style={{ fontSize: "14px", lineHeight: 1.7, opacity: 0.85 }}>
+            Çelik konstrüksiyon, ferforje, merdiven ve özel metal imalatlarında
+            mühendislik odaklı çözümler sunar.
           </p>
         </div>
 
-        {/* KURUMSAL */}
         <div>
-          <h3 className="text-sm font-semibold mb-4 text-foreground">
-            Kurumsal
-          </h3>
-          <ul className="space-y-3 text-sm text-muted-foreground">
-            <li>
-              <Link href="/" className="hover:text-primary transition">
-                Ana Sayfa
-              </Link>
-            </li>
-            <li>
-              <Link href="/hakkimizda" className="hover:text-primary transition">
-                Hakkımızda
-              </Link>
-            </li>
-            <li>
-              <Link href="/hizmetler" className="hover:text-primary transition">
-                Hizmetler
-              </Link>
-            </li>
-            <li>
-              <Link href="/projeler" className="hover:text-primary transition">
-                Projeler
-              </Link>
-            </li>
+          <h4 style={{ color: "#fff", marginBottom: "16px" }}>Kurumsal</h4>
+          <ul style={{ listStyle: "none", padding: 0, fontSize: "14px" }}>
+            {["Ana Sayfa", "Hakkımızda", "Hizmetler", "Projeler"].map(
+              (item) => (
+                <li key={item} style={{ marginBottom: "10px", opacity: 0.85 }}>
+                  {item}
+                </li>
+              )
+            )}
           </ul>
         </div>
 
-        {/* İLETİŞİM */}
         <div>
-          <h3 className="text-sm font-semibold mb-4 text-foreground">
-            İletişim
-          </h3>
-          <ul className="space-y-3 text-sm text-muted-foreground">
-            <li>📍 Düzce / Türkiye</li>
-            <li>
-              📞{" "}
-              <a
-                href="tel:+90XXXXXXXXXX"
-                className="hover:text-primary transition"
-              >
-                +90 XXX XXX XX XX
-              </a>
-            </li>
-            <li>
-              ✉️{" "}
-              <a
-                href="mailto:info@atlcelikyapi.com"
-                className="hover:text-primary transition"
-              >
-                info@atlcelikyapi.com
-              </a>
-            </li>
-          </ul>
-        </div>
-
-        {/* HARİTA */}
-        <div>
-          <h3 className="text-sm font-semibold mb-4 text-foreground">
-            Konum
-          </h3>
-
-          <div className="rounded-xl overflow-hidden border border-border">
-            <iframe
-              src="https://www.google.com/maps?q=Düzce%20Küçük%20Sanayi%20Sitesi&output=embed"
-              width="100%"
-              height="220"
-              loading="lazy"
-              referrerPolicy="no-referrer-when-downgrade"
-            />
-          </div>
-
-          <a
-            href="https://maps.app.goo.gl/qSeSM8RMnX9Q7Frt5"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="inline-block mt-3 text-sm text-primary hover:underline"
-          >
-            Google Maps’te Aç →
-          </a>
+          <h4 style={{ color: "#fff", marginBottom: "16px" }}>İletişim</h4>
+          <p style={{ fontSize: "14px", marginBottom: "10px" }}>
+            📍 Düzce / Türkiye
+          </p>
+          <p style={{ fontSize: "14px", marginBottom: "10px" }}>
+            📞 +90 XXX XXX XX XX
+          </p>
+          <p style={{ fontSize: "14px" }}>✉️ info@atlcelikyapi.com</p>
         </div>
       </div>
 
-      {/* ALT BAR */}
-      <div className="border-t border-border py-6">
-        <div className="container flex flex-col md:flex-row items-center justify-between gap-4 text-sm text-muted-foreground">
-          <span>
-            © {new Date().getFullYear()} ATL Çelik Yapı. Tüm hakları saklıdır.
-          </span>
+      <div
+        style={{
+          height: "300px",
+          borderTop: "1px solid #1e293b",
+        }}
+      >
+        <iframe
+          src="https://www.google.com/maps?q=Düzce%20Küçük%20Sanayi&output=embed"
+          width="100%"
+          height="100%"
+          loading="lazy"
+          style={{ border: 0 }}
+        />
+      </div>
 
-          <a
-            href="https://instagram.com/rootbaran"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="hover:text-primary transition"
-          >
-            Designed & Developed by{" "}
-            <span className="text-foreground">rootbaran</span>
-          </a>
-        </div>
+      <div
+        style={{
+          backgroundColor: "#020617",
+          textAlign: "center",
+          padding: "16px",
+          fontSize: "13px",
+          color: "#94a3b8",
+        }}
+      >
+        © {new Date().getFullYear()} ATL Çelik Yapı. Tüm hakları saklıdır.
       </div>
     </footer>
   )

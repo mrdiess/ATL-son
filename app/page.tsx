@@ -13,7 +13,6 @@ export default function HomePage() {
           overflow: "hidden",
         }}
       >
-        {/* Background Image */}
         <Image
           src="/hero/hero-1.jpg"
           alt="Çelik Konstrüksiyon"
@@ -22,7 +21,6 @@ export default function HomePage() {
           style={{ objectFit: "cover" }}
         />
 
-        {/* Overlay */}
         <div
           style={{
             position: "absolute",
@@ -32,7 +30,6 @@ export default function HomePage() {
           }}
         />
 
-        {/* Content */}
         <div
           style={{
             position: "relative",
@@ -47,25 +44,21 @@ export default function HomePage() {
               maxWidth: "1280px",
               width: "100%",
               margin: "0 auto",
-              paddingLeft: "64px",
-              paddingRight: "64px",
+              padding: "0 64px",
             }}
           >
             <div style={{ maxWidth: "720px" }}>
-              {/* Subtitle */}
               <div
                 style={{
                   marginBottom: "20px",
                   fontSize: "15px",
                   fontWeight: 500,
                   color: "#38bdf8",
-                  letterSpacing: "0.4px",
                 }}
               >
                 Endüstriyel tesis ve depo çözümleriniz için
               </div>
 
-              {/* Title */}
               <h1
                 style={{
                   marginBottom: "36px",
@@ -80,7 +73,6 @@ export default function HomePage() {
                 Konstrüksiyon
               </h1>
 
-              {/* Buttons */}
               <div style={{ display: "flex", gap: "20px" }}>
                 <Link
                   href="/projeler"
@@ -90,7 +82,6 @@ export default function HomePage() {
                     color: "#ffffff",
                     borderRadius: "14px",
                     fontWeight: 600,
-                    fontSize: "16px",
                     textDecoration: "none",
                   }}
                 >
@@ -105,7 +96,6 @@ export default function HomePage() {
                     color: "#ffffff",
                     borderRadius: "14px",
                     fontWeight: 600,
-                    fontSize: "16px",
                     textDecoration: "none",
                     backgroundColor: "rgba(255,255,255,0.05)",
                   }}
@@ -116,20 +106,83 @@ export default function HomePage() {
             </div>
           </div>
         </div>
+      </section>
 
-        {/* Scroll Hint */}
+      {/* NE YAPIYORUZ */}
+      <section
+        style={{
+          backgroundColor: "#ffffff",
+          padding: "96px 24px",
+        }}
+      >
         <div
           style={{
-            position: "absolute",
-            bottom: "32px",
-            left: "50%",
-            transform: "translateX(-50%)",
-            color: "rgba(255,255,255,0.6)",
-            fontSize: "13px",
-            letterSpacing: "1px",
+            maxWidth: "1280px",
+            margin: "0 auto",
           }}
         >
-          KAYDIR
+          <div style={{ maxWidth: "720px", marginBottom: "64px" }}>
+            <h2
+              style={{
+                fontSize: "40px",
+                fontWeight: 700,
+                marginBottom: "20px",
+              }}
+            >
+              Anahtar Teslim Çelik Yapı Çözümleri
+            </h2>
+            <p style={{ fontSize: "16px", lineHeight: 1.7, color: "#475569" }}>
+              ATL Çelik Yapı olarak endüstriyel tesisler, depolar, ferforje ve
+              özel metal imalatlarında projelendirmeden montaja kadar tüm
+              süreci tek çatı altında yürütüyoruz.
+            </p>
+          </div>
+
+          <div
+            style={{
+              display: "grid",
+              gridTemplateColumns: "repeat(auto-fit, minmax(260px, 1fr))",
+              gap: "32px",
+            }}
+          >
+            {[
+              {
+                title: "Çelik Konstrüksiyon",
+                desc: "Endüstriyel ve ticari yapılar için dayanıklı çelik çözümler",
+              },
+              {
+                title: "Ferforje & Merdiven",
+                desc: "Özel tasarım, estetik ve fonksiyonel metal imalatları",
+              },
+              {
+                title: "Anahtar Teslim",
+                desc: "Projelendirme, üretim ve montaj dahil uçtan uca hizmet",
+              },
+            ].map((item) => (
+              <div
+                key={item.title}
+                style={{
+                  padding: "32px",
+                  borderRadius: "20px",
+                  backgroundColor: "#f8fafc",
+                  border: "1px solid #e5e7eb",
+                }}
+              >
+                <h3
+                  style={{
+                    fontSize: "20px",
+                    fontWeight: 600,
+                    marginBottom: "12px",
+                  }}
+                >
+                  {item.title}
+                </h3>
+                <p style={{ fontSize: "15px", color: "#475569" }}>
+                  {item.desc}
+                </p>
+              </div>
+            ))}
+          </div>
         </div>
       </section>
     </main>
