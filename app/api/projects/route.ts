@@ -8,34 +8,36 @@ const auth = new google.auth.GoogleAuth({
 
 const drive = google.drive({ version: "v3", auth })
 
-const PROJECTS_FOLDER_ID = process.env.GOOGLE_PROJECTS_FOLDER_ID!
+const FOLDER_ID = process.env.GOOGLE_PROJECTS_FOLDER_ID!
 
-function driveImageUrl(fileId: string) {
-  return `https://drive.google.com/uc?id=${fileId}`
-}
+const img = (id: string) =>
+  `https://drive.google.com/uc?id=${id}`
 
 export async function GET() {
   try {
-    // 1) PROJELER klasöründeki alt klasörleri al
+    if (!FOLDER_ID) {
+      throw new Error("GOOGLE_PROJECTS_FOLDER_ID missing")
+    }
+
     const foldersRes = await drive.files.list({
-      q: `'${PROJECTS_FOLDER_ID}' in parents and mimeType='application/vnd.google-apps.folder' and trashed=false`,
+      q: `'${FOLDER_ID}' in parents and mimeType='application/vnd.google-apps.folder' and trashed=false`,
       fields: "files(id, name)",
     })
 
     const projects = []
 
     for (const folder of foldersRes.data.files || []) {
-      // 2) Her proje klasörünün içindeki dosyaları al
       const filesRes = await drive.files.list({
         q: `'${folder.id}' in parents and trashed=false`,
         fields: "files(id, name)",
       })
 
-      const before = filesRes.data.files?.find(
-        (f) => f.name?.toLowerCase().startsWith("before")
+      const before = filesRes.data.files?.find(f =>
+        f.name?.toLowerCase().startsWith("before")
       )
-      const after = filesRes.data.files?.find(
-        (f) => f.name?.toLowerCase().startsWith("after")
+
+      const after = filesRes.data.files?.find(f =>
+        f.name?.toLowerCase().startsWith("after")
       )
 
       if (!before || !after) continue
@@ -43,14 +45,21 @@ export async function GET() {
       projects.push({
         id: folder.id,
         title: folder.name,
-        before: driveImageUrl(before.id!),
-        after: driveImageUrl(after.id!),
+        before: img(before.id!),
+        after: img(after.id!),
       })
     }
 
-    return NextResponse.json(projects)
-  } catch (error) {
-    console.error("Drive projects error:", error)
-    return NextResponse.json({ error: "Projects fetch failed" }, { status: 500 })
+    return NextResponse.json({
+      success: true,
+      data: projects,
+    })
+  } catch (err: any) {
+    console.error("PROJECT API ERROR:", err)
+
+    return NextResponse.json(
+      { success: false, error: err.message },
+      { status: 500 }
+    )
   }
 }
