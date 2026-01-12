@@ -87,3 +87,54 @@ export default function HomePage() {
               </div>
             </div>
           ))}
+        </div>
+      </section>
+
+      {/* GALERİDEN SEÇMELER */}
+      <section className="container">
+        <div className="flex items-center justify-between mb-8">
+          <h2 className="text-2xl font-semibold">
+            Galeriden Seçmeler
+          </h2>
+
+          <Link href="/galeri" className="text-sm underline">
+            Tüm Galeri
+          </Link>
+        </div>
+
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+          {gallery.slice(0, 4).map((item) => (
+            <div
+              key={item.id}
+              className="relative aspect-square overflow-hidden rounded-lg"
+            >
+              <img
+                src={item.src}
+                alt={item.category}
+                className="w-full h-full object-cover"
+              />
+            </div>
+          ))}
+        </div>
+      </section>
+
+      {/* CTA */}
+      <section className="container pb-32 text-center">
+        <h2 className="text-2xl font-semibold">
+          Projeniz İçin Teklif Alın
+        </h2>
+
+        <p className="mt-4 text-muted-foreground">
+          İhtiyacınıza özel çözümler için bizimle iletişime geçin.
+        </p>
+
+        <Link
+          href="/iletisim"
+          className="inline-block mt-6 px-8 py-3 rounded-lg bg-black text-white font-medium hover:bg-black/90 transition"
+        >
+          İletişime Geç
+        </Link>
+      </section>
+    </main>
+  )
+}
