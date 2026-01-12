@@ -1,33 +1,14 @@
-import HeroSlider from "../components/HeroSlider"
-import CompanyProfile from "../components/CompanyProfile"
-import WhyATL from "../components/WhyATL"
+import HeroSlider from "@/components/HeroSlider"
+import HomeProjects from "@/components/HomeProjects"
 
-export default function HomePage() {
+export default function Page() {
   return (
     <>
       {/* HERO */}
       <HeroSlider />
 
-      {/* ŞİRKET PROFİLİ */}
-      <CompanyProfile />
-
-      {/* NEDEN ATL */}
-      <WhyATL />
-    </>
-  )
-}
-import HomeProjects from "@/components/HomeProjects"
-
-export default function HomePage() {
-  return (
-    <>
-      {/* HERO burada */}
-
-      {/* Şirket Profili / Neden ATL vs */}
-
+      {/* PROJELER */}
       <HomeProjects />
-
-      {/* Footer zaten layout’ta */}
     </>
   )
 }
