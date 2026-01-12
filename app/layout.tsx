@@ -1,6 +1,12 @@
 import "./globals.css"
-import Header from "../components/Header"
-import Footer from "../components/Footer"
+import type { Metadata } from "next"
+import { Header } from "@/components/Header"
+import { Footer } from "@/components/Footer"
+
+export const metadata: Metadata = {
+  title: "ATL Çelik Yapı",
+  description: "ATL Çelik Yapı – Endüstriyel çelik yapı ve depo çözümleri",
+}
 
 export default function RootLayout({
   children,
@@ -9,7 +15,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="tr" className="dark">
-      <body className="min-h-screen flex flex-col">
+      <body className="min-h-screen flex flex-col bg-background text-foreground">
         <Header />
 
         <main className="flex-1">
