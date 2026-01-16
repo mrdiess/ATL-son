@@ -2,37 +2,20 @@
 @tailwind components;
 @tailwind utilities;
 
-/* =========================
-   THEME VARIABLES
-========================= */
-
+/* ===== ATL DARK THEME ===== */
 :root {
   --background: #071829;
   --foreground: #f8fafc;
-
-  --primary: #0ea5e9;
-  --secondary: #0b2238;
-  --muted: #0f2a44;
-
-  --border: rgba(255, 255, 255, 0.08);
-  --radius: 0.75rem;
 }
 
-/* =========================
-   BASE RESET
-========================= */
+html,
+body {
+  height: 100%;
+}
 
-@layer base {
-  html,
-  body {
-    min-height: 100%;
-    background: transparent; /* ⬅️ KRİTİK */
-  }
-
-  body {
-    color: var(--foreground);
-    font-family: ui-sans-serif, system-ui, -apple-system,
-      BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial;
-    line-height: 1.6;
-  }
+body {
+  background-color: var(--background);
+  color: var(--foreground);
+  font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont,
+    "Segoe UI", Roboto, Helvetica, Arial;
 }
