@@ -1,16 +1,14 @@
-"use client"
-
 import Link from "next/link"
 
 export default function Header() {
   return (
-    <header className="fixed top-0 left-0 w-full z-50 bg-[#071829]/90 backdrop-blur border-b border-white/10">
-      <div className="max-w-7xl mx-auto px-6 h-20 flex items-center justify-between">
-        <Link href="/" className="font-bold text-lg">
-          ATL Çelik Yapı
+    <header className="fixed top-0 z-50 w-full bg-gradient-to-b from-black/70 to-transparent backdrop-blur">
+      <div className="mx-auto flex h-20 max-w-7xl items-center justify-between px-6">
+        <Link href="/" className="font-bold tracking-wide">
+          ATL ÇELİK YAPI
         </Link>
 
-        <nav className="hidden md:flex items-center gap-8 text-sm text-white/80">
+        <nav className="hidden gap-8 md:flex">
           <Link href="/">Ana Sayfa</Link>
           <Link href="/hizmetler">Hizmetler</Link>
           <Link href="/projeler">Projeler</Link>
@@ -20,7 +18,7 @@ export default function Header() {
 
         <a
           href="tel:+905373393947"
-          className="bg-sky-500 hover:bg-sky-600 text-white px-4 py-2 rounded-md text-sm"
+          className="rounded-xl bg-sky-500 px-5 py-2 text-sm font-semibold text-white"
         >
           Hemen Ara
         </a>
