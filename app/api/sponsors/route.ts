@@ -7,16 +7,18 @@ export async function GET() {
     const res = await fetch(DRIVE_API_URL, { cache: "no-store" })
     const data = await res.json()
 
-    const sponsors = (data.isOrtaklari || []).map(
-      (url: string, index: number) => ({
-        id: index,
-        name: `İş Ortağı ${index + 1}`,
-        logo_url: url,
-        sort_order: index,
-      })
-    )
+    const sponsors =
+      (data.isOrtaklari || []).map((item: any, index: number) => ({
+        id: String(index + 1),
+        name: item.name || `İş Ortağı ${index + 1}`,
+        logo_url: item.logo,          // 👈 UI bunu kullanıyor
+        website_url: item.website || undefined,
+        sort_order: index + 1,
+      })) || []
 
-    return NextResponse.json({ data: sponsors })
+    return NextResponse.json({
+      data: sponsors,
+    })
   } catch (error) {
     console.error("Sponsors API error:", error)
     return NextResponse.json({ data: [] }, { status: 500 })
