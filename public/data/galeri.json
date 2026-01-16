@@ -1,0 +1,74 @@
+{
+  "celik-yapi": [
+    {
+      "src": "/images/galeri/celik-yapi/celik-yapi-1.webp",
+      "title": "Endüstriyel Çelik Yapı",
+      "alt": "ATL Çelik Yapı endüstriyel çelik konstrüksiyon"
+    },
+    {
+      "src": "/images/galeri/celik-yapi/celik-yapi-2.webp",
+      "title": "Fabrika Çelik Yapı",
+      "alt": "ATL Çelik Yapı fabrika projesi"
+    },
+    {
+      "src": "/images/galeri/celik-yapi/celik-yapi-3.webp",
+      "title": "Depo Çelik Konstrüksiyon",
+      "alt": "ATL Çelik Yapı depo projesi"
+    }
+  ],
+  "merdiven": [
+    {
+      "src": "/images/galeri/merdiven/merdiven-1.webp",
+      "title": "Çelik Merdiven",
+      "alt": "ATL Çelik Yapı özel tasarım çelik merdiven"
+    },
+    {
+      "src": "/images/galeri/merdiven/merdiven-2.webp",
+      "title": "Endüstriyel Merdiven",
+      "alt": "ATL Çelik Yapı endüstriyel merdiven"
+    }
+  ],
+  "korkuluk": [
+    {
+      "src": "/images/galeri/korkuluk/korkuluk-1.webp",
+      "title": "Çelik Korkuluk",
+      "alt": "ATL Çelik Yapı çelik korkuluk sistemi"
+    },
+    {
+      "src": "/images/galeri/korkuluk/korkuluk-2.webp",
+      "title": "Balkon Korkuluk",
+      "alt": "ATL Çelik Yapı balkon korkuluk"
+    }
+  ],
+  "ferforje": [
+    {
+      "src": "/images/galeri/ferforje/ferforje-1.webp",
+      "title": "Ferforje Kapı",
+      "alt": "ATL Çelik Yapı ferforje kapı tasarımı"
+    },
+    {
+      "src": "/images/galeri/ferforje/ferforje-2.webp",
+      "title": "Ferforje Bahçe Kapısı",
+      "alt": "ATL Çelik Yapı ferforje bahçe kapısı"
+    }
+  ],
+  "kamyon-kasa": [
+    {
+      "src": "/images/galeri/kamyon-kasa/kamyon-kasa-1.webp",
+      "title": "Kamyon Kasası",
+      "alt": "ATL Çelik Yapı özel üretim kamyon kasası"
+    },
+    {
+      "src": "/images/galeri/kamyon-kasa/kamyon-kasa-2.webp",
+      "title": "Tır Dorsesi",
+      "alt": "ATL Çelik Yapı tır dorsesi"
+    }
+  ],
+  "diger": [
+    {
+      "src": "/images/galeri/diger/diger-1.webp",
+      "title": "Özel Proje",
+      "alt": "ATL Çelik Yapı özel proje"
+    }
+  ]
+}
