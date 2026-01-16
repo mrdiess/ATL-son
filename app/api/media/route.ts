@@ -2,6 +2,11 @@ import { NextResponse } from "next/server"
 
 const DRIVE_API_URL = process.env.DRIVE_API_URL!
 
+const CATEGORY_CONFIG = [
+  { key: "ferforje", label: "Ferforje", order: 1 },
+  { key: "merdiven", label: "Merdiven", order: 2 },
+]
+
 export async function GET() {
   try {
     const res = await fetch(DRIVE_API_URL, { cache: "no-store" })
@@ -17,19 +22,22 @@ export async function GET() {
 
     const galeri = data.galeri || {}
 
-    Object.keys(galeri).forEach((category: string) => {
-      const files: string[] = galeri[category]
+    // 🔹 Sabit sıraya göre dolaş
+    CATEGORY_CONFIG
+      .sort((a, b) => a.order - b.order)
+      .forEach((config) => {
+        const files: string[] = galeri[config.key] || []
 
-      files.forEach((url: string, index: number) => {
-        gallery.push({
-          id: `${category}-${index}`,
-          url,
-          category,
-          file_type: "image/jpeg",
-          created_at: new Date().toISOString(),
+        files.forEach((url: string, index: number) => {
+          gallery.push({
+            id: `${config.key}-${index}`,
+            url,
+            category: config.label, // 👈 UI'de görünen isim
+            file_type: "image/jpeg",
+            created_at: new Date().toISOString(),
+          })
         })
       })
-    })
 
     return NextResponse.json({ data: gallery })
   } catch (error) {
