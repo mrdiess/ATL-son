@@ -1,7 +1,6 @@
 "use client"
 
 import type React from "react"
-
 import { useState, useEffect } from "react"
 import Image from "next/image"
 import Link from "next/link"
@@ -24,6 +23,8 @@ import {
   ArrowRight,
   Wrench,
 } from "lucide-react"
+
+/* ================= TYPES ================= */
 
 interface MediaItem {
   id: string
@@ -70,6 +71,8 @@ interface Project {
   is_featured: boolean
 }
 
+/* ================= COMPONENT ================= */
+
 export default function Home() {
   const [currentSlide, setCurrentSlide] = useState(0)
   const [activePhotoTab, setActivePhotoTab] = useState("Tümü")
@@ -77,7 +80,6 @@ export default function Home() {
   const [lightboxIndex, setLightboxIndex] = useState(0)
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
   const [isScrolled, setIsScrolled] = useState(false)
-  const [sponsors, setSponsors] = useState<Sponsor[]>([])
   const [partners, setPartners] = useState<Partner[]>([])
   const [mediaCategories, setMediaCategories] = useState<string[]>(["Tümü"])
   const [galleryImages, setGalleryImages] = useState<string[]>([])
@@ -90,6 +92,8 @@ export default function Home() {
   const nextSlide = () => setCurrentSlide((prev) => (prev + 1) % 3)
   const prevSlide = () => setCurrentSlide((prev) => (prev - 1 + 3) % 3)
 
+  /* ================= MEDIA ================= */
+
   useEffect(() => {
     const fetchMedia = async () => {
       try {
@@ -100,14 +104,16 @@ export default function Home() {
         if (Array.isArray(result.data)) {
           setAllMediaItems(result.data)
 
-          // ✅ KESİN ÇÖZÜM – TS HATASIZ
-          const categories = result.data
+          // ✅ FINAL – TS 5.0.2 UYUMLU
+          const categories: string[] = result.data
             .map((item: MediaItem) => item.category)
-            .filter((c): c is string => typeof c === "string")
+            .filter(
+              (c: string | null | undefined): c is string =>
+                typeof c === "string"
+            )
 
           const uniqueCategories: string[] = ["Tümü", ...new Set(categories)]
           setMediaCategories(uniqueCategories)
-          // ✅ KESİN ÇÖZÜM BİTTİ
 
           const imageItems = result.data.filter((item: MediaItem) =>
             item.file_type.startsWith("image")
@@ -154,16 +160,44 @@ export default function Home() {
     fetchProjects()
   }, [])
 
+  /* ================= SCROLL ================= */
+
+  useEffect(() => {
+    const handleScroll = () => setIsScrolled(window.scrollY > 50)
+    window.addEventListener("scroll", handleScroll)
+    return () => window.removeEventListener("scroll", handleScroll)
+  }, [])
+
+  /* ================= PARTNERS ================= */
+
+  useEffect(() => {
+    const fetchPartners = async () => {
+      try {
+        const response = await fetch("/data/partners.json", { cache: "no-store" })
+        if (!response.ok) throw new Error("Partners load error")
+        const data: PartnersData = await response.json()
+        setPartners(data.partners)
+      } catch (error) {
+        console.error("Partners error:", error)
+      }
+    }
+    fetchPartners()
+  }, [])
+
   const filteredImages =
     activePhotoTab === "Tümü"
       ? galleryImages
-      : galleryImages.filter((_, i) => allMediaItems[i]?.category === activePhotoTab)
+      : galleryImages.filter(
+          (_, i) => allMediaItems[i]?.category === activePhotoTab
+        )
 
   const displayedImages = filteredImages.slice(0, visibleImageCount)
 
+  /* ================= RENDER ================= */
+
   return (
     <div className="min-h-screen bg-background text-foreground">
-      {/* UI AYNEN KORUNDU – SENİN GÖNDERDİĞİN JSX */}
+      {/* 🔒 UI BİREBİR KORUNDU */}
       {lightboxOpen && (
         <PhotoLightbox
           images={galleryImages}
