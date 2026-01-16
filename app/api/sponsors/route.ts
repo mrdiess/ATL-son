@@ -7,14 +7,14 @@ export async function GET() {
     const res = await fetch(DRIVE_API_URL, { cache: "no-store" })
     const data = await res.json()
 
-    const sponsors = data.items
-      .filter((item: any) => item.section === "ISORTAKLARI")
-      .map((item: any, index: number) => ({
+    const sponsors = (data.isOrtaklari || []).map(
+      (url: string, index: number) => ({
         id: index,
-        name: item.name,
-        logo_url: item.url,
+        name: `İş Ortağı ${index + 1}`,
+        logo_url: url,
         sort_order: index,
-      }))
+      })
+    )
 
     return NextResponse.json({ data: sponsors })
   } catch (error) {

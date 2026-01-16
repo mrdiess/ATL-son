@@ -7,16 +7,14 @@ export async function GET() {
     const res = await fetch(DRIVE_API_URL, { cache: "no-store" })
     const data = await res.json()
 
-    const projects = data.items
-      .filter((item: any) => item.section === "PROJELER")
-      .map((item: any) => ({
-        id: item.project,
-        title: item.project,
-        slug: item.project,
-        before: item.before,
-        after: item.after,
-        is_featured: true,
-      }))
+    const projects = (data.projeler || []).map((p: any) => ({
+      id: p.slug,
+      title: p.slug,
+      slug: p.slug,
+      before: p.before,
+      after: p.after,
+      is_featured: true,
+    }))
 
     return NextResponse.json({ data: projects })
   } catch (error) {
