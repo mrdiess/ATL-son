@@ -17,14 +17,11 @@ export default function RootLayout({
     <html lang="tr">
       <body className="bg-[#0a1628] text-white antialiased">
         <Header />
-        <main>{children}</main>
+        <main className="min-h-screen">
+          {children}
+        </main>
         <Footer />
       </body>
     </html>
   )
-  
-<body className="bg-[#0a1628] text-white antialiased">
-
-<body/>
-
 }
