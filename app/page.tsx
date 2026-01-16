@@ -1,8 +1,8 @@
-import Hero from "@/components/Home/Hero"
-import WhyUs from "@/components/Home/WhyUs"
-import Services from "@/components/Home/Services"
-import Contact from "@/components/Home/Contact"
-import Partners from "@/components/Home/Partners"
+import Hero from "@/components/Hero"
+import WhyUs from "@/components/WhyUs"
+import Services from "@/components/Services"
+import Contact from "@/components/Contact"
+import Partners from "@/components/Partners"
 
 export default function HomePage() {
   return (
