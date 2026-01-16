@@ -8,11 +8,10 @@ export async function GET() {
     const data = await res.json()
 
     const sponsors =
-      (data.isOrtaklari || []).map((item: any, index: number) => ({
+      (data.isOrtaklari || []).map((logoUrl: string, index: number) => ({
         id: String(index + 1),
-        name: item.name || `İş Ortağı ${index + 1}`,
-        logo_url: item.logo,          // 👈 UI bunu kullanıyor
-        website_url: item.website || undefined,
+        name: `İş Ortağı ${index + 1}`,
+        logo_url: logoUrl,          // 👈 ASIL EKSİK OLAN BUYDU
         sort_order: index + 1,
       })) || []
 
