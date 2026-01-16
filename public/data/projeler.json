@@ -1,0 +1,37 @@
+{
+  "projeler": [
+    {
+      "id": "1",
+      "slug": "fabrika-celik-yapi",
+      "title": "Fabrika Çelik Yapı Projesi",
+      "description": "12.000 m² endüstriyel fabrika binası çelik konstrüksiyon",
+      "category": "celik-yapi",
+      "image": "https://drive.google.com/uc?id=FOLDER_ID_1",
+      "location": "Düzce",
+      "building_type": "Fabrika",
+      "duration": "4 Ay"
+    },
+    {
+      "id": "2",
+      "slug": "depo-sandvic-panel",
+      "title": "Depo - Sandviç Panel Kaplama",
+      "description": "5.000 m² depo binası sandviç panel sistemi",
+      "category": "celik-yapi",
+      "image": "https://drive.google.com/uc?id=FOLDER_ID_2",
+      "location": "İstanbul",
+      "building_type": "Depo",
+      "duration": "3 Ay"
+    },
+    {
+      "id": "3",
+      "slug": "ozel-celik-merdiven",
+      "title": "Özel Tasarım Çelik Merdiven",
+      "description": "Mimari özel tasarım çelik merdiven sistemi",
+      "category": "merdiven",
+      "image": "https://drive.google.com/uc?id=FOLDER_ID_3",
+      "location": "Ankara",
+      "building_type": "İç Dekorasyon",
+      "duration": "1.5 Ay"
+    }
+  ]
+}
