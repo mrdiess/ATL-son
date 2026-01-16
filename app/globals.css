@@ -2,20 +2,34 @@
 @tailwind components;
 @tailwind utilities;
 
-/* ===== ATL DARK THEME ===== */
-:root {
-  --background: #071829;
-  --foreground: #f8fafc;
+/* RESET */
+* {
+  box-sizing: border-box;
 }
 
 html,
 body {
-  height: 100%;
+  width: 100%;
+  min-height: 100%;
+  margin: 0;
+  padding: 0;
 }
 
+/* BODY */
 body {
-  background-color: var(--background);
-  color: var(--foreground);
+  background-color: #071829;
+  color: #f8fafc;
   font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont,
     "Segoe UI", Roboto, Helvetica, Arial;
+}
+
+/* FLEX COLLAPSE FIX */
+.flex {
+  min-height: 0;
+}
+
+/* SECTION FIX */
+section {
+  position: relative;
+  width: 100%;
 }
