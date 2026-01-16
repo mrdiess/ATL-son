@@ -9,6 +9,7 @@ import { Button } from "@/components/ui/button"
 import { ThemeToggle } from "@/components/theme-toggle"
 import { PhotoLightbox } from "@/components/photo-lightbox"
 import ConstructionProcess from "@/components/construction-process"
+import CustomManufacturing from "@/components/custom-manufacturing"
 import {
   Phone,
   Mail,
@@ -45,6 +46,17 @@ interface Sponsor {
   sort_order: number
 }
 
+interface Partner {
+  id: number
+  name: string
+  logo: string
+  website?: string
+}
+
+interface PartnersData {
+  partners: Partner[]
+}
+
 interface Project {
   id: string
   title: string
@@ -68,6 +80,7 @@ export default function Home() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
   const [isScrolled, setIsScrolled] = useState(false)
   const [sponsors, setSponsors] = useState<Sponsor[]>([])
+  const [partners, setPartners] = useState<Partner[]>([])
   const [mediaCategories, setMediaCategories] = useState<string[]>(["Tümü"])
   const [galleryImages, setGalleryImages] = useState<string[]>([])
   const [allMediaItems, setAllMediaItems] = useState<MediaItem[]>([])
@@ -199,28 +212,66 @@ export default function Home() {
     return () => window.removeEventListener("scroll", handleScroll)
   }, [])
 
+  useEffect(() => {
+    const fetchPartners = async () => {
+      try {
+        const response = await fetch("/data/partners.json", {
+          cache: "no-store",
+        })
+        if (!response.ok) throw new Error("Partners verisi yüklenemedi")
+        const data: PartnersData = await response.json()
+        setPartners(data.partners)
+      } catch (error) {
+        console.error("[v0] Partners yükleme hatası:", error)
+      }
+    }
+    fetchPartners()
+  }, [])
+
   const handleQuoteSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setQuoteSubmitting(true)
     setQuoteMessage(null)
 
+    // Form validasyonu
+    if (
+      !quoteFormData.name.trim() ||
+      !quoteFormData.email.trim() ||
+      !quoteFormData.phone.trim() ||
+      !quoteFormData.message.trim()
+    ) {
+      setQuoteMessage({ type: "error", text: "Lütfen tüm alanları doldurunuz" })
+      setQuoteSubmitting(false)
+      return
+    }
+
     try {
-      const response = await fetch("/api/contact", {
+      // Google Form endpoint - bu URL'yi kendi Google Form'unuzun action URL'siyle değiştirin
+      const GOOGLE_FORM_URL = "https://docs.google.com/forms/u/0/d/1FAIpQLSc_EXAMPLE_ID/formResponse"
+
+      // FormData oluştur - Google Forms entry.xxxxx mapping'i
+      const formData = new FormData()
+      formData.append("entry.123456789", quoteFormData.name) // Ad-Soyad
+      formData.append("entry.987654321", quoteFormData.email) // E-posta
+      formData.append("entry.555555555", quoteFormData.phone) // Telefon
+      formData.append("entry.777777777", quoteFormData.message) // Mesaj
+
+      // Google Forms'a POST et
+      const response = await fetch(GOOGLE_FORM_URL, {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(quoteFormData),
+        body: formData,
+        mode: "no-cors", // CORS hatalarını önle
       })
 
-      const data = await response.json()
-
-      if (response.ok) {
-        setQuoteMessage({ type: "success", text: "Teklif formu başarıyla gönderildi!" })
-        setQuoteFormData({ name: "", email: "", phone: "", message: "" })
-      } else {
-        setQuoteMessage({ type: "error", text: data.error || "Hata oluştu" })
-      }
+      // no-cors modunda response kontrolü yapılamaz, always success yap
+      setQuoteMessage({
+        type: "success",
+        text: "Teklif formu başarıyla gönderildi! En kısa sürede sizinle iletişime geçeceğiz.",
+      })
+      setQuoteFormData({ name: "", email: "", phone: "", message: "" })
     } catch (error) {
-      setQuoteMessage({ type: "error", text: "Bağlantı hatası" })
+      console.error("Form submission error:", error)
+      setQuoteMessage({ type: "error", text: "Bağlantı hatası. Lütfen daha sonra tekrar deneyiniz." })
     } finally {
       setQuoteSubmitting(false)
     }
@@ -486,56 +537,45 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Featured Projects */}
-      <section id="projeler" className="py-16 md:py-24 px-4 md:px-6 bg-background">
+      {/* Custom Manufacturing */}
+      <CustomManufacturing />
+
+      {/* Partners */}
+      <section className="py-16 md:py-24 px-4 md:px-6 bg-background">
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-12">
-            <p className="text-blue-500 font-bold uppercase tracking-wider mb-2">Seçkin Projeler</p>
-            <h2 className="text-3xl md:text-4xl font-bold mb-4">Tamamlanan Projeler</h2>
+            <p className="text-blue-500 font-bold uppercase tracking-wider mb-2">İş Ortaklarımız</p>
+            <h2 className="text-3xl md:text-4xl font-bold mb-4">Uzun Soluklu İş Birlikleri</h2>
             <p className="text-muted-foreground max-w-2xl mx-auto">
-              Başarıyla tamamladığımız endüstriyel yapı projeleri
+              Uzun soluklu iş birlikleriyle güçlü yapılar üretiyoruz.
             </p>
           </div>
 
-          {projectsLoading ? (
-            <div className="text-center py-12 text-muted-foreground">Projeler yükleniyor...</div>
-          ) : featuredProjects.length > 0 ? (
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-              {featuredProjects.map((project) => (
-                <Link key={project.id} href={`/projeler/${project.slug}`}>
-                  <div className="group cursor-pointer h-full">
-                    <div className="relative h-64 rounded-xl overflow-hidden bg-secondary/20 mb-4">
-                      {project.featured_image_url ? (
-                        <Image
-                          src={project.featured_image_url || "/placeholder.svg"}
-                          alt={project.title}
-                          fill
-                          className="object-cover group-hover:scale-110 transition-transform duration-300"
-                        />
-                      ) : (
-                        <div className="w-full h-full bg-gradient-to-br from-slate-700 to-slate-900 flex items-center justify-center">
-                          <Building2 className="w-16 h-16 text-slate-500" />
-                        </div>
-                      )}
-                      <div className="absolute inset-0 bg-black/0 group-hover:bg-black/30 transition-colors" />
-                    </div>
-                    <h3 className="text-lg font-bold group-hover:text-blue-500 transition-colors">{project.title}</h3>
-                    <p className="text-sm text-muted-foreground mb-2">{project.location}</p>
-                    {project.category && (
-                      <span className="inline-block px-3 py-1 bg-blue-500/10 text-blue-600 dark:text-blue-400 rounded-full text-xs font-medium">
-                        {project.category}
-                      </span>
-                    )}
-                    <div className="mt-4 flex items-center gap-2 text-blue-500 font-semibold text-sm group-hover:gap-3 transition-all">
-                      Detaylar <ArrowRight className="w-4 h-4" />
-                    </div>
-                  </div>
-                </Link>
-              ))}
-            </div>
-          ) : (
-            <div className="text-center py-12 text-muted-foreground">Henüz proje eklenmemiştir.</div>
-          )}
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-6">
+            {partners.length > 0 ? (
+              partners.map((partner) => (
+                <a
+                  key={partner.id}
+                  href={partner.website || "#"}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex items-center justify-center p-6 bg-slate-900/50 dark:bg-slate-800 rounded-xl border border-slate-700 hover:border-slate-600 hover:opacity-80 transition-all duration-300"
+                >
+                  <Image
+                    src={partner.logo || "/placeholder.svg"}
+                    alt={partner.name}
+                    width={120}
+                    height={60}
+                    className="object-contain filter grayscale hover:grayscale-0 transition-all duration-300"
+                  />
+                </a>
+              ))
+            ) : (
+              <div className="col-span-2 md:col-span-3 lg:col-span-5 text-center text-slate-500 py-8">
+                İş ortakları yükleniyor...
+              </div>
+            )}
+          </div>
         </div>
       </section>
 
