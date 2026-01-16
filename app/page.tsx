@@ -34,17 +34,6 @@ interface MediaItem {
   category: string
   size: number
   created_at: string
-  title?: string
-  stage?: string
-  project_slug?: string
-}
-
-interface Sponsor {
-  id: string
-  name: string
-  logo_url: string
-  website_url?: string
-  sort_order: number
 }
 
 interface Partner {
@@ -62,12 +51,6 @@ interface Project {
   id: string
   title: string
   slug: string
-  description?: string
-  category: string
-  location: string
-  building_type?: string
-  project_duration?: string
-  featured_image_url?: string
   is_featured: boolean
 }
 
@@ -80,31 +63,30 @@ export default function Home() {
   const [lightboxIndex, setLightboxIndex] = useState(0)
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
   const [isScrolled, setIsScrolled] = useState(false)
-  const [partners, setPartners] = useState<Partner[]>([])
+
   const [mediaCategories, setMediaCategories] = useState<string[]>(["Tümü"])
   const [galleryImages, setGalleryImages] = useState<string[]>([])
   const [allMediaItems, setAllMediaItems] = useState<MediaItem[]>([])
-  const [mediaLoading, setMediaLoading] = useState(true)
-  const [visibleImageCount, setVisibleImageCount] = useState(8)
+  const [partners, setPartners] = useState<Partner[]>([])
   const [projects, setProjects] = useState<Project[]>([])
-  const [projectsLoading, setProjectsLoading] = useState(true)
 
-  const nextSlide = () => setCurrentSlide((prev) => (prev + 1) % 3)
-  const prevSlide = () => setCurrentSlide((prev) => (prev - 1 + 3) % 3)
+  /* ================= SLIDER ================= */
+
+  const nextSlide = () => setCurrentSlide((p) => (p + 1) % 3)
+  const prevSlide = () => setCurrentSlide((p) => (p - 1 + 3) % 3)
 
   /* ================= MEDIA ================= */
 
   useEffect(() => {
     const fetchMedia = async () => {
       try {
-        const response = await fetch("/api/media")
-        if (!response.ok) throw new Error("Media fetch error")
-        const result = await response.json()
+        const res = await fetch("/api/media")
+        const result = await res.json()
 
         if (Array.isArray(result.data)) {
           setAllMediaItems(result.data)
 
-          // ✅ FINAL – TS 5.0.2 UYUMLU
+          // ✅ FINAL TS FIX
           const categories: string[] = result.data
             .map((item: MediaItem) => item.category)
             .filter(
@@ -112,16 +94,14 @@ export default function Home() {
                 typeof c === "string"
             )
 
-          const uniqueCategories: string[] = ["Tümü", ...new Set(categories)]
-          setMediaCategories(uniqueCategories)
+          setMediaCategories(["Tümü", ...new Set(categories)])
 
-          const imageItems = result.data.filter((item: MediaItem) =>
-            item.file_type.startsWith("image")
-          )
-          const images = imageItems.map((item: MediaItem) => item.url)
+          const images = result.data
+            .filter((i: MediaItem) => i.file_type.startsWith("image"))
+            .map((i: MediaItem) => i.url)
 
           setGalleryImages(
-            images.length > 0
+            images.length
               ? images
               : [
                   "/steel-construction-industrial-factory-building.jpg",
@@ -130,74 +110,142 @@ export default function Home() {
                 ]
           )
         }
-      } catch (error) {
-        console.error("Media fetch error:", error)
-        setGalleryImages([
-          "/steel-construction-industrial-factory-building.jpg",
-          "/industrial-steel-factory-workers-warehouse.jpg",
-          "/sandwich-panel-building-construction-modern.jpg",
-        ])
-      } finally {
-        setMediaLoading(false)
+      } catch (e) {
+        console.error(e)
+      }
+    }
+
+    const fetchPartners = async () => {
+      try {
+        const res = await fetch("/data/partners.json", { cache: "no-store" })
+        const data: PartnersData = await res.json()
+        setPartners(data.partners)
+      } catch (e) {
+        console.error(e)
       }
     }
 
     const fetchProjects = async () => {
       try {
-        const response = await fetch("/api/projects")
-        if (response.ok) {
-          const result = await response.json()
-          setProjects(result.data || [])
-        }
-      } catch (error) {
-        console.error("Projects fetch error:", error)
-      } finally {
-        setProjectsLoading(false)
+        const res = await fetch("/api/projects")
+        const data = await res.json()
+        setProjects(data.data || [])
+      } catch (e) {
+        console.error(e)
       }
     }
 
     fetchMedia()
+    fetchPartners()
     fetchProjects()
   }, [])
 
-  /* ================= SCROLL ================= */
-
   useEffect(() => {
-    const handleScroll = () => setIsScrolled(window.scrollY > 50)
-    window.addEventListener("scroll", handleScroll)
-    return () => window.removeEventListener("scroll", handleScroll)
+    const onScroll = () => setIsScrolled(window.scrollY > 50)
+    window.addEventListener("scroll", onScroll)
+    return () => window.removeEventListener("scroll", onScroll)
   }, [])
-
-  /* ================= PARTNERS ================= */
-
-  useEffect(() => {
-    const fetchPartners = async () => {
-      try {
-        const response = await fetch("/data/partners.json", { cache: "no-store" })
-        if (!response.ok) throw new Error("Partners load error")
-        const data: PartnersData = await response.json()
-        setPartners(data.partners)
-      } catch (error) {
-        console.error("Partners error:", error)
-      }
-    }
-    fetchPartners()
-  }, [])
-
-  const filteredImages =
-    activePhotoTab === "Tümü"
-      ? galleryImages
-      : galleryImages.filter(
-          (_, i) => allMediaItems[i]?.category === activePhotoTab
-        )
-
-  const displayedImages = filteredImages.slice(0, visibleImageCount)
 
   /* ================= RENDER ================= */
 
   return (
     <div className="min-h-screen bg-background text-foreground">
-      {/* 🔒 UI BİREBİR KORUNDU */}
+      {/* HEADER */}
+      <header
+        className={`fixed top-0 left-0 right-0 z-50 transition-all ${
+          isScrolled ? "bg-background/90 backdrop-blur border-b" : ""
+        }`}
+      >
+        <div className="max-w-7xl mx-auto px-4 h-16 flex items-center justify-between">
+          <Link href="/">
+            <img src="/lightmodelogo.png" className="h-12 dark:hidden" />
+            <img src="/darkmodelogo.png" className="h-12 hidden dark:block" />
+          </Link>
+
+          <nav className="hidden md:flex gap-6 font-medium">
+            <a href="#anasayfa">Ana Sayfa</a>
+            <a href="#hizmetler">Hizmetler</a>
+            <a href="#projeler">Projeler</a>
+            <Link href="/galeri">Galeri</Link>
+            <a href="#iletisim">İletişim</a>
+          </nav>
+
+          <div className="flex items-center gap-3">
+            <ThemeToggle />
+            <a
+              href="tel:+905373393947"
+              className="bg-blue-500 text-white px-4 py-2 rounded-lg font-semibold"
+            >
+              <Phone className="inline w-4 h-4 mr-1" /> Ara
+            </a>
+            <button
+              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+              className="md:hidden"
+            >
+              {mobileMenuOpen ? <X /> : <Menu />}
+            </button>
+          </div>
+        </div>
+      </header>
+
+      {/* HERO */}
+      <section id="anasayfa" className="h-screen relative pt-16">
+        {[0, 1, 2].map((i) => (
+          <div
+            key={i}
+            className={`absolute inset-0 transition-opacity duration-1000 ${
+              currentSlide === i ? "opacity-100" : "opacity-0"
+            }`}
+          >
+            <Image
+              src={[
+                "/steel-construction-industrial-factory-building.jpg",
+                "/sandwich-panel-building-construction-modern.jpg",
+                "/industrial-steel-factory-workers-warehouse.jpg",
+              ][i]}
+              alt="ATL Çelik Yapı"
+              fill
+              className="object-cover"
+              priority={i === 0}
+            />
+            <div className="absolute inset-0 bg-black/60" />
+          </div>
+        ))}
+
+        <div className="relative z-10 h-full flex flex-col justify-center max-w-7xl mx-auto px-4 text-white">
+          <h1 className="text-5xl md:text-7xl font-bold mb-6">
+            Çelik Yapıda Güven
+          </h1>
+          <Button className="bg-blue-500 w-fit">
+            Teklif Al <ArrowRight className="ml-2 w-4 h-4" />
+          </Button>
+        </div>
+
+        <button
+          onClick={prevSlide}
+          className="absolute left-4 top-1/2 z-20 text-white"
+        >
+          <ChevronLeft />
+        </button>
+        <button
+          onClick={nextSlide}
+          className="absolute right-4 top-1/2 z-20 text-white"
+        >
+          <ChevronRight />
+        </button>
+      </section>
+
+      {/* PROCESS */}
+      <ConstructionProcess />
+
+      {/* CUSTOM */}
+      <CustomManufacturing />
+
+      {/* FOOTER */}
+      <footer className="bg-slate-900 text-white py-10 text-center">
+        © 2025 ATL Çelik Yapı
+      </footer>
+
       {lightboxOpen && (
         <PhotoLightbox
           images={galleryImages}
