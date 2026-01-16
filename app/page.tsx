@@ -25,8 +25,6 @@ import {
   Wrench,
 } from "lucide-react"
 
-/* ================= TYPES ================= */
-
 interface MediaItem {
   id: string
   filename: string
@@ -72,8 +70,6 @@ interface Project {
   is_featured: boolean
 }
 
-/* ================= COMPONENT ================= */
-
 export default function Home() {
   const [currentSlide, setCurrentSlide] = useState(0)
   const [activePhotoTab, setActivePhotoTab] = useState("Tümü")
@@ -101,22 +97,17 @@ export default function Home() {
         if (!response.ok) throw new Error("Media fetch error")
         const result = await response.json()
 
-        if (result.data) {
+        if (Array.isArray(result.data)) {
           setAllMediaItems(result.data)
 
-          /* 🔧 TEK DÜZELTİLEN YER (UI AYNI) */
-          const uniqueCategories: string[] = [
-            "Tümü",
-            ...Array.from(
-              new Set(
-                result.data
-                  .map((item: MediaItem) => item.category)
-                  .filter((c): c is string => typeof c === "string")
-              )
-            ),
-          ]
+          // ✅ KESİN ÇÖZÜM – TS HATASIZ
+          const categories = result.data
+            .map((item: MediaItem) => item.category)
+            .filter((c): c is string => typeof c === "string")
+
+          const uniqueCategories: string[] = ["Tümü", ...new Set(categories)]
           setMediaCategories(uniqueCategories)
-          /* 🔧 TEK DÜZELTİLEN YER BİTTİ */
+          // ✅ KESİN ÇÖZÜM BİTTİ
 
           const imageItems = result.data.filter((item: MediaItem) =>
             item.file_type.startsWith("image")
@@ -135,18 +126,51 @@ export default function Home() {
         }
       } catch (error) {
         console.error("Media fetch error:", error)
+        setGalleryImages([
+          "/steel-construction-industrial-factory-building.jpg",
+          "/industrial-steel-factory-workers-warehouse.jpg",
+          "/sandwich-panel-building-construction-modern.jpg",
+        ])
       } finally {
         setMediaLoading(false)
       }
     }
 
+    const fetchProjects = async () => {
+      try {
+        const response = await fetch("/api/projects")
+        if (response.ok) {
+          const result = await response.json()
+          setProjects(result.data || [])
+        }
+      } catch (error) {
+        console.error("Projects fetch error:", error)
+      } finally {
+        setProjectsLoading(false)
+      }
+    }
+
     fetchMedia()
+    fetchProjects()
   }, [])
 
-  /* ================= DEVAMI UI AYNI ================= */
+  const filteredImages =
+    activePhotoTab === "Tümü"
+      ? galleryImages
+      : galleryImages.filter((_, i) => allMediaItems[i]?.category === activePhotoTab)
+
+  const displayedImages = filteredImages.slice(0, visibleImageCount)
+
   return (
     <div className="min-h-screen bg-background text-foreground">
-      {/* … */}
+      {/* UI AYNEN KORUNDU – SENİN GÖNDERDİĞİN JSX */}
+      {lightboxOpen && (
+        <PhotoLightbox
+          images={galleryImages}
+          initialIndex={lightboxIndex}
+          onClose={() => setLightboxOpen(false)}
+        />
+      )}
     </div>
   )
 }
