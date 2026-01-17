@@ -27,10 +27,7 @@ export default function ConstructionProcess() {
         const data = await res.json()
 
         if (Array.isArray(data.projeler)) {
-          const cleaned = data.projeler.filter(
-            (p: ProjectStep) => p.before && p.after,
-          )
-          setSteps(cleaned)
+          setSteps(data.projeler)
         }
       } catch (e) {
         console.error("ConstructionProcess fetch error:", e)
@@ -42,59 +39,53 @@ export default function ConstructionProcess() {
     fetchSteps()
   }, [])
 
-  const openLightbox = (images: string[], index = 0) => {
+  const openLightbox = (images: string[]) => {
     setLightboxImages(images)
-    setLightboxIndex(index)
+    setLightboxIndex(0)
     setLightboxOpen(true)
   }
 
   if (loading) {
-    return (
-      <div className="text-center text-slate-400 py-12">
-        Yükleniyor…
-      </div>
-    )
-  }
-
-  if (!steps.length) {
-    return (
-      <div className="text-center text-slate-400 py-12">
-        Henüz proje bulunamadı.
-      </div>
-    )
+    return <div className="text-center text-slate-400 py-12">Yükleniyor…</div>
   }
 
   return (
     <>
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-        {steps.map((step, index) => (
-          <button
-            key={step.slug}
-            onClick={() =>
-              openLightbox([step.before!, step.after!], 0)
-            }
-            className="group relative rounded-2xl overflow-hidden border border-slate-700 hover:border-slate-500 transition-all"
-          >
-            <div className="absolute inset-0 z-10 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity" />
+      <div className="flex flex-wrap justify-center gap-4">
+        {Array.from({ length: 20 }).map((_, index) => {
+          const step = steps[index]
+          const hasImage = step?.before && step?.after
 
-            <Image
-              src={step.before!}
-              alt={`Adım ${index + 1}`}
-              width={600}
-              height={400}
-              className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-            />
+          return (
+            <button
+              key={index}
+              disabled={!hasImage}
+              onClick={() =>
+                hasImage && openLightbox([step.before!, step.after!])
+              }
+              className={`relative w-[120px] h-[120px] rounded-xl overflow-hidden transition-all
+                ${
+                  hasImage
+                    ? "bg-black/10 hover:scale-105"
+                    : "bg-slate-300 cursor-default"
+                }`}
+            >
+              {hasImage ? (
+                <Image
+                  src={step.before!}
+                  alt={`Adım ${index + 1}`}
+                  fill
+                  className="object-cover"
+                />
+              ) : null}
 
-            <div className="absolute bottom-4 left-4 right-4 z-20 text-left">
-              <div className="text-sm text-blue-400 font-semibold">
-                Adım {index + 1}
+              {/* Numara Badge */}
+              <div className="absolute bottom-2 right-2 bg-blue-500 text-white text-xs font-bold px-2 py-1 rounded">
+                {String(index + 1).padStart(2, "0")}
               </div>
-              <div className="text-white font-bold">
-                Yapım Süreci – {step.slug}
-              </div>
-            </div>
-          </button>
-        ))}
+            </button>
+          )
+        })}
       </div>
 
       {lightboxOpen && (
