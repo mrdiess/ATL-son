@@ -5,7 +5,6 @@ import Image from "next/image"
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { ThemeToggle } from "@/components/theme-toggle"
-import { PhotoLightbox } from "@/components/photo-lightbox"
 import ConstructionProcess from "@/components/construction-process"
 import {
   Phone,
@@ -34,7 +33,6 @@ export default function Home() {
   const [isScrolled, setIsScrolled] = useState(false)
 
   /* ================= HERO (DRIVE) ================= */
-
   useEffect(() => {
     const fetchHero = async () => {
       try {
@@ -71,20 +69,15 @@ export default function Home() {
     )
 
   /* ================= UI HELPERS ================= */
-
   useEffect(() => {
     const handleScroll = () => setIsScrolled(window.scrollY > 50)
     window.addEventListener("scroll", handleScroll)
     return () => window.removeEventListener("scroll", handleScroll)
   }, [])
 
-  const handleNavClick = () => setMobileMenuOpen(false)
-
-  /* ================= RENDER ================= */
-
   return (
     <div className="min-h-screen bg-background text-foreground">
-      {/* Header */}
+      {/* ================= HEADER ================= */}
       <header
         className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
           isScrolled
@@ -108,9 +101,9 @@ export default function Home() {
             <nav className="hidden md:flex gap-8">
               {[
                 ["#anasayfa", "Ana Sayfa"],
+                ["#hakkimizda", "Hakkımızda"],
                 ["#hizmetler", "Hizmetler"],
                 ["#projeler", "Projeler"],
-                ["#hakkimizda", "Hakkımızda"],
                 ["#iletisim", "İletişim"],
               ].map(([href, label]) => (
                 <a
@@ -143,7 +136,7 @@ export default function Home() {
         </div>
       </header>
 
-      {/* Hero */}
+      {/* ================= HERO ================= */}
       <section id="anasayfa" className="relative h-screen pt-20">
         <div className="absolute inset-0">
           {heroImages.map((img, i) => (
@@ -197,7 +190,60 @@ export default function Home() {
         </button>
       </section>
 
-      {/* Services */}
+      {/* ================= HAKKIMIZDA ================= */}
+      <section
+        id="hakkimizda"
+        className="relative py-24 overflow-hidden"
+      >
+        <div className="absolute inset-0">
+          <Image
+            src="/images/hakkimizda-bg.jpg"
+            alt="ATL Çelik Yapı"
+            fill
+            className="object-cover"
+          />
+          <div className="absolute inset-0 bg-black/60" />
+        </div>
+
+        <div className="relative z-10 max-w-7xl mx-auto px-6 grid md:grid-cols-2 gap-12 items-center text-white">
+          <div />
+
+          <div>
+            <span className="text-blue-400 font-semibold uppercase text-sm">
+              Hakkımızda
+            </span>
+            <h2 className="text-3xl md:text-4xl font-bold mt-3 mb-6">
+              Çelik Sektöründe Güvenilir Çözüm Ortağı
+            </h2>
+            <p className="text-white/85 mb-6 leading-relaxed">
+              Düzce merkezli olmakla birlikte 81 ilde profesyonel hizmet
+              vermekteyiz. Sandviç Panel, Sac Kesme–Bükme, Demir Çelik Profil,
+              Soğuk Hava Deposu ve her türlü kaynaklı yapılar konusunda
+              uzman ekibimizle yanınızdayız.
+            </p>
+
+            <ul className="grid grid-cols-2 gap-3 mb-8 text-sm">
+              {[
+                "ISO 9001 Belgeli",
+                "CE Sertifikalı",
+                "Zamanında Teslimat",
+                "Garantili İşçilik",
+              ].map((item) => (
+                <li key={item} className="flex items-center gap-2">
+                  <span className="w-2 h-2 bg-blue-400 rounded-full" />
+                  {item}
+                </li>
+              ))}
+            </ul>
+
+            <Button className="bg-blue-500 hover:bg-blue-600">
+              Daha Fazla Bilgi
+            </Button>
+          </div>
+        </div>
+      </section>
+
+      {/* ================= SERVICES ================= */}
       <section id="hizmetler" className="py-24">
         <div className="max-w-7xl mx-auto px-6 grid md:grid-cols-4 gap-6">
           {[
@@ -217,7 +263,7 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Construction Process */}
+      {/* ================= PROJECTS ================= */}
       <section
         id="projeler"
         className="py-24 bg-gradient-to-b from-slate-900 to-slate-800 text-white"
@@ -235,7 +281,7 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Contact */}
+      {/* ================= CONTACT ================= */}
       <section id="iletisim" className="py-24 bg-secondary/10">
         <div className="max-w-7xl mx-auto px-6 grid md:grid-cols-2 gap-12">
           <div>
