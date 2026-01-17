@@ -4,7 +4,6 @@ import { useEffect, useState } from "react"
 import Image from "next/image"
 import Link from "next/link"
 import { ThemeToggle } from "@/components/theme-toggle"
-import { PhotoLightbox } from "@/components/photo-lightbox"
 import {
   Phone,
   ChevronLeft,
@@ -15,14 +14,6 @@ import {
 
 /* ================= TYPES ================= */
 
-interface MediaItem {
-  id: string
-  url: string
-  category?: string
-  file_type: string
-  created_at: string
-}
-
 interface Sponsor {
   id: string
   name: string
@@ -30,12 +21,10 @@ interface Sponsor {
   sort_order: number
 }
 
-interface Project {
-  id: string
-  title: string
+interface BeforeAfterProject {
   slug: string
-  location?: string
-  featured_image_url?: string
+  before: string | null
+  after: string | null
 }
 
 /* ================= PAGE ================= */
@@ -44,40 +33,18 @@ export default function Home() {
   const [currentSlide, setCurrentSlide] = useState(0)
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
 
-  const [galleryImages, setGalleryImages] = useState<string[]>([])
-  const [lightboxOpen, setLightboxOpen] = useState(false)
-  const [lightboxIndex, setLightboxIndex] = useState(0)
-
   const [sponsors, setSponsors] = useState<Sponsor[]>([])
 
-  const [projects, setProjects] = useState<Project[]>([])
+  const [projects, setProjects] = useState<BeforeAfterProject[]>([])
   const [projectsLoading, setProjectsLoading] = useState(true)
 
-  /* ================= MEDIA ================= */
+  /* ================= SLIDER ================= */
 
   useEffect(() => {
-    const fetchMedia = async () => {
-      try {
-        const res = await fetch("/api/media", { cache: "no-store" })
-        const result = await res.json()
-
-        if (!Array.isArray(result.data)) return
-
-        const images = result.data
-          .filter(
-            (item: MediaItem) =>
-              typeof item.file_type === "string" &&
-              item.file_type.startsWith("image")
-          )
-          .map((item: MediaItem) => item.url)
-
-        setGalleryImages(images)
-      } catch {
-        setGalleryImages([])
-      }
-    }
-
-    fetchMedia()
+    const interval = setInterval(() => {
+      setCurrentSlide((prev) => (prev + 1) % 3)
+    }, 5000)
+    return () => clearInterval(interval)
   }, [])
 
   /* ================= SPONSORS ================= */
@@ -98,7 +65,7 @@ export default function Home() {
     fetchSponsors()
   }, [])
 
-  /* ================= PROJECTS ================= */
+  /* ================= PROJECTS (BEFORE / AFTER) ================= */
 
   useEffect(() => {
     const fetchProjects = async () => {
@@ -119,15 +86,6 @@ export default function Home() {
     }
 
     fetchProjects()
-  }, [])
-
-  /* ================= SLIDER ================= */
-
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setCurrentSlide((prev) => (prev + 1) % 3)
-    }, 5000)
-    return () => clearInterval(interval)
   }, [])
 
   /* ================= RENDER ================= */
@@ -221,64 +179,66 @@ export default function Home() {
         </div>
       </section>
 
-      {/* ================= PROJECTS ================= */}
-      <section id="projeler" className="py-16 md:py-24 bg-background">
-        <div className="max-w-7xl mx-auto px-4 md:px-6">
+      {/* ================= BEFORE / AFTER ================= */}
+      <section id="projeler" className="py-20 bg-background">
+        <div className="max-w-7xl mx-auto px-4">
           <div className="text-center mb-12">
             <p className="text-blue-500 font-bold uppercase tracking-wider mb-2">
               Projelerimiz
             </p>
-            <h2 className="text-3xl md:text-4xl font-bold mb-4">
-              Tamamlanan Çalışmalar
+            <h2 className="text-3xl md:text-4xl font-bold">
+              Öncesi / Sonrası
             </h2>
-            <p className="text-muted-foreground max-w-2xl mx-auto">
-              Çelik yapı, ferforje ve endüstriyel projelerimizden bazıları
-            </p>
           </div>
 
           {projectsLoading ? (
-            <div className="text-center py-12 text-muted-foreground">
+            <div className="text-center text-muted-foreground py-12">
               Projeler yükleniyor...
             </div>
-          ) : projects.length === 0 ? (
-            <div className="text-center py-12 text-muted-foreground">
-              Henüz proje eklenmemiştir.
-            </div>
           ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            <div className="space-y-20">
               {projects.map((project) => (
-                <div
-                  key={project.id}
-                  className="rounded-2xl border bg-card overflow-hidden hover:shadow-lg transition-all"
-                >
-                  <div className="relative h-56 bg-muted">
-                    <img
-                      src={
-                        project.featured_image_url ||
-                        "/steel-construction-industrial-factory-building.jpg"
-                      }
-                      alt={project.title}
-                      className="w-full h-full object-cover"
-                    />
-                  </div>
+                <div key={project.slug}>
+                  <h3 className="text-xl font-bold mb-6 text-center">
+                    {project.slug}
+                  </h3>
 
-                  <div className="p-6">
-                    <h3 className="text-lg font-bold mb-2">
-                      {project.title}
-                    </h3>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    {/* BEFORE */}
+                    <div className="relative rounded-xl overflow-hidden border">
+                      {project.before ? (
+                        <img
+                          src={project.before}
+                          alt={`${project.slug} Öncesi`}
+                          className="w-full h-80 object-cover"
+                        />
+                      ) : (
+                        <div className="h-80 flex items-center justify-center text-muted-foreground">
+                          Öncesi görseli yok
+                        </div>
+                      )}
+                      <span className="absolute top-3 left-3 bg-black/70 text-white text-xs px-3 py-1 rounded">
+                        Öncesi
+                      </span>
+                    </div>
 
-                    {project.location && (
-                      <p className="text-sm text-muted-foreground mb-4">
-                        {project.location}
-                      </p>
-                    )}
-
-                    <a
-                      href={`/projeler/${project.slug}`}
-                      className="inline-flex items-center text-blue-500 hover:text-blue-600 font-semibold text-sm"
-                    >
-                      Projeyi İncele →
-                    </a>
+                    {/* AFTER */}
+                    <div className="relative rounded-xl overflow-hidden border">
+                      {project.after ? (
+                        <img
+                          src={project.after}
+                          alt={`${project.slug} Sonrası`}
+                          className="w-full h-80 object-cover"
+                        />
+                      ) : (
+                        <div className="h-80 flex items-center justify-center text-muted-foreground">
+                          Sonrası görseli yok
+                        </div>
+                      )}
+                      <span className="absolute top-3 left-3 bg-blue-600 text-white text-xs px-3 py-1 rounded">
+                        Sonrası
+                      </span>
+                    </div>
                   </div>
                 </div>
               ))}
@@ -286,15 +246,7 @@ export default function Home() {
           )}
         </div>
       </section>
-
-      {/* ================= LIGHTBOX ================= */}
-      {lightboxOpen && (
-        <PhotoLightbox
-          images={galleryImages}
-          initialIndex={lightboxIndex}
-          onClose={() => setLightboxOpen(false)}
-        />
-      )}
     </div>
   )
 }
+
