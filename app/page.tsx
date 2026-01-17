@@ -9,7 +9,6 @@ import { Button } from "@/components/ui/button"
 import { ThemeToggle } from "@/components/theme-toggle"
 import { PhotoLightbox } from "@/components/photo-lightbox"
 import ConstructionProcess from "@/components/construction-process"
-import CustomManufacturing from "@/components/custom-manufacturing"
 import {
   Phone,
   Mail,
@@ -537,8 +536,7 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Custom Manufacturing */}
-      <CustomManufacturing />
+      
 
       {/* Partners */}
       <section className="py-16 md:py-24 px-4 md:px-6 bg-background">
