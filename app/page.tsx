@@ -199,6 +199,70 @@ export default function Home() {
           </div>
         </div>
       </section>
+      {/* Projects */}
+<section id="projeler" className="py-16 md:py-24 bg-background">
+  <div className="max-w-7xl mx-auto px-4 md:px-6">
+    <div className="text-center mb-12">
+      <p className="text-blue-500 font-bold uppercase tracking-wider mb-2">
+        Projelerimiz
+      </p>
+      <h2 className="text-3xl md:text-4xl font-bold mb-4">
+        Tamamlanan Çalışmalar
+      </h2>
+      <p className="text-muted-foreground max-w-2xl mx-auto">
+        Çelik yapı, ferforje ve endüstriyel projelerimizden bazıları
+      </p>
+    </div>
+
+    {projectsLoading ? (
+      <div className="text-center py-12 text-muted-foreground">
+        Projeler yükleniyor...
+      </div>
+    ) : projects.length === 0 ? (
+      <div className="text-center py-12 text-muted-foreground">
+        Henüz proje eklenmemiştir.
+      </div>
+    ) : (
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+        {projects.map((project) => (
+          <div
+            key={project.id}
+            className="rounded-2xl border bg-card overflow-hidden hover:shadow-lg transition-all"
+          >
+            <div className="relative h-56 bg-muted">
+              <img
+                src={
+                  project.featured_image_url ||
+                  "/steel-construction-industrial-factory-building.jpg"
+                }
+                alt={project.title}
+                className="w-full h-full object-cover"
+              />
+            </div>
+
+            <div className="p-6">
+              <h3 className="text-lg font-bold mb-2">
+                {project.title}
+              </h3>
+
+              <p className="text-sm text-muted-foreground mb-4">
+                {project.location}
+              </p>
+
+              <a
+                href={`/projeler/${project.slug}`}
+                className="inline-flex items-center text-blue-500 hover:text-blue-600 font-semibold text-sm"
+              >
+                Projeyi İncele →
+              </a>
+            </div>
+          </div>
+        ))}
+      </div>
+    )}
+  </div>
+</section>
+
 
       {/* ================= LIGHTBOX ================= */}
       {lightboxOpen && (
