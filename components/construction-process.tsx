@@ -1,175 +1,107 @@
 "use client"
 
-import type React from "react"
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import Image from "next/image"
-import { X } from "lucide-react"
+import { PhotoLightbox } from "@/components/photo-lightbox"
 
-interface ProcessStep {
-  id: number
-  label: string
+const DRIVE_API =
+  "https://script.google.com/macros/s/AKfycbz6KD5v8emprNcAvzqvzlsqXSCmArK17wwumahmm04h8E1MivpdKUQDVTGytqiXXmPl/exec"
+
+type ProjectStep = {
+  slug: string
+  before: string | null
+  after: string | null
 }
 
-const STEPS: ProcessStep[] = Array.from({ length: 20 }, (_, i) => ({
-  id: i + 1,
-  label: `${String(i + 1).padStart(2, "0")}`,
-}))
-
 export default function ConstructionProcess() {
-  const [selectedStep, setSelectedStep] = useState<number | null>(null)
-  const [sliderPosition, setSliderPosition] = useState(50)
-  const [isDragging, setIsDragging] = useState(false)
+  const [steps, setSteps] = useState<ProjectStep[]>([])
+  const [loading, setLoading] = useState(true)
+  const [lightboxOpen, setLightboxOpen] = useState(false)
+  const [lightboxImages, setLightboxImages] = useState<string[]>([])
+  const [lightboxIndex, setLightboxIndex] = useState(0)
 
-  const handleMouseDown = () => setIsDragging(true)
-  const handleMouseUp = () => setIsDragging(false)
-  const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
-    if (!isDragging) return
-    const rect = e.currentTarget.getBoundingClientRect()
-    const x = e.clientX - rect.left
-    const percentage = Math.max(0, Math.min(100, (x / rect.width) * 100))
-    setSliderPosition(percentage)
+  useEffect(() => {
+    const fetchSteps = async () => {
+      try {
+        const res = await fetch(DRIVE_API, { cache: "no-store" })
+        const data = await res.json()
+
+        if (Array.isArray(data.projeler)) {
+          const cleaned = data.projeler.filter(
+            (p: ProjectStep) => p.before && p.after,
+          )
+          setSteps(cleaned)
+        }
+      } catch (e) {
+        console.error("ConstructionProcess fetch error:", e)
+      } finally {
+        setLoading(false)
+      }
+    }
+
+    fetchSteps()
+  }, [])
+
+  const openLightbox = (images: string[], index = 0) => {
+    setLightboxImages(images)
+    setLightboxIndex(index)
+    setLightboxOpen(true)
   }
 
-  const currentStep = selectedStep ? STEPS.find((s) => s.id === selectedStep) : null
+  if (loading) {
+    return (
+      <div className="text-center text-slate-400 py-12">
+        Yükleniyor…
+      </div>
+    )
+  }
+
+  if (!steps.length) {
+    return (
+      <div className="text-center text-slate-400 py-12">
+        Henüz proje bulunamadı.
+      </div>
+    )
+  }
 
   return (
     <>
-      <div className="grid grid-cols-5 md:grid-cols-10 gap-2 md:gap-3 max-w-6xl mx-auto">
-        {STEPS.map((step) => (
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+        {steps.map((step, index) => (
           <button
-            key={step.id}
-            onClick={() => {
-              setSelectedStep(step.id)
-              setSliderPosition(50)
-            }}
-            className="group relative aspect-square rounded-lg overflow-hidden transition-all duration-300 hover:scale-105 hover:shadow-lg hover:shadow-blue-500/30"
-            aria-label={`Adım ${step.label}`}
-            title={`Adım ${step.label}`}
+            key={step.slug}
+            onClick={() =>
+              openLightbox([step.before!, step.after!], 0)
+            }
+            className="group relative rounded-2xl overflow-hidden border border-slate-700 hover:border-slate-500 transition-all"
           >
-            {/* AFTER görselini arka plan olarak kullan */}
+            <div className="absolute inset-0 z-10 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity" />
+
             <Image
-              src={`/process/after-${step.id}.jpg`}
-              alt={`Yapım Adımı ${step.label}`}
-              fill
-              className="object-cover select-none pointer-events-none"
-              onError={(e) => {
-                e.currentTarget.src = `/placeholder.svg?height=300&width=300&query=construction-process-${step.id}`
-              }}
+              src={step.before!}
+              alt={`Adım ${index + 1}`}
+              width={600}
+              height={400}
+              className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
             />
 
-            {/* Hafif dark overlay - numarayı oku yapmak için */}
-            <div className="absolute inset-0 bg-black/20 group-hover:bg-black/10 transition-all duration-300" />
-
-            <div className="absolute bottom-2 right-2 bg-blue-600/80 backdrop-blur px-2 py-1 rounded text-xs md:text-sm font-bold text-white">
-              {step.label}
+            <div className="absolute bottom-4 left-4 right-4 z-20 text-left">
+              <div className="text-sm text-blue-400 font-semibold">
+                Adım {index + 1}
+              </div>
+              <div className="text-white font-bold">
+                Yapım Süreci – {step.slug}
+              </div>
             </div>
           </button>
         ))}
       </div>
 
-      {selectedStep && currentStep && (
-        <div
-          className="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4"
-          onClick={() => setSelectedStep(null)}
-        >
-          <div
-            className="relative w-full max-w-5xl bg-slate-900 rounded-2xl overflow-hidden shadow-2xl border border-slate-700"
-            onClick={(e) => e.stopPropagation()}
-          >
-            {/* Close Button */}
-            <button
-              onClick={() => setSelectedStep(null)}
-              className="absolute top-4 right-4 z-20 p-2 rounded-lg bg-black/50 hover:bg-black/70 text-white transition-all"
-              aria-label="Kapat"
-            >
-              <X className="w-6 h-6" />
-            </button>
-
-            {/* Before/After Container */}
-            <div
-              className="relative aspect-video bg-slate-800 overflow-hidden cursor-ew-resize"
-              onMouseDown={handleMouseDown}
-              onMouseUp={handleMouseUp}
-              onMouseMove={handleMouseMove}
-              onMouseLeave={handleMouseUp}
-            >
-              {/* Before Image */}
-              <Image
-                src={`/process/before-${currentStep.id}.jpg`}
-                alt="Yapım Öncesi"
-                fill
-                priority
-                className="object-cover select-none pointer-events-none"
-                onError={(e) => {
-                  e.currentTarget.src = `/placeholder.svg?height=600&width=1000&query=construction-before`
-                }}
-              />
-
-              {/* After Image - Clipped */}
-              <div
-                className="absolute inset-0 overflow-hidden transition-all duration-75"
-                style={{ width: `${sliderPosition}%` }}
-              >
-                <Image
-                  src={`/process/after-${currentStep.id}.jpg`}
-                  alt="Yapım Sonrası"
-                  fill
-                  className="object-cover select-none pointer-events-none"
-                  onError={(e) => {
-                    e.currentTarget.src = `/placeholder.svg?height=600&width=1000&query=construction-after`
-                  }}
-                />
-              </div>
-
-              {/* Divider Line */}
-              <div
-                className="absolute inset-y-0 w-1.5 bg-gradient-to-b from-transparent via-blue-400 to-transparent shadow-lg"
-                style={{ left: `${sliderPosition}%`, transform: "translateX(-50%)" }}
-                onMouseDown={(e) => {
-                  e.stopPropagation()
-                  setIsDragging(true)
-                }}
-              />
-
-              {/* Before/After Labels */}
-              <div className="absolute bottom-4 left-4 bg-black/60 backdrop-blur px-4 py-2 rounded-lg text-sm font-semibold text-white">
-                Öncesi
-              </div>
-              <div className="absolute bottom-4 right-4 bg-black/60 backdrop-blur px-4 py-2 rounded-lg text-sm font-semibold text-white">
-                Sonrası
-              </div>
-            </div>
-
-            {/* Info Bar */}
-            <div className="bg-slate-800 border-t border-slate-700 px-6 py-4 flex items-center justify-between">
-              <div>
-                <p className="text-blue-400 font-semibold text-sm">Adım {currentStep.label}</p>
-                <p className="text-white font-bold text-lg">Yapım Süreci - Faz {currentStep.id}</p>
-              </div>
-              <input
-                type="range"
-                min="0"
-                max="100"
-                value={sliderPosition}
-                onChange={(e) => setSliderPosition(Number(e.target.value))}
-                className="w-32 h-2 bg-slate-700 rounded-full appearance-none cursor-pointer accent-blue-500"
-                aria-label="Slider"
-              />
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* ESC Key Handler */}
-      {typeof window !== "undefined" && selectedStep && (
-        <script
-          dangerouslySetInnerHTML={{
-            __html: `
-              document.addEventListener('keydown', (e) => {
-                if (e.key === 'Escape') window.location.reload();
-              });
-            `,
-          }}
+      {lightboxOpen && (
+        <PhotoLightbox
+          images={lightboxImages}
+          initialIndex={lightboxIndex}
+          onClose={() => setLightboxOpen(false)}
         />
       )}
     </>
