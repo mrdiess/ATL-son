@@ -10,7 +10,20 @@ import { ThemeToggle } from "@/components/theme-toggle"
 import { PhotoLightbox } from "@/components/photo-lightbox"
 import ConstructionProcess from "@/components/construction-process"
 import CustomManufacturing from "@/components/custom-manufacturing"
-import { Phone, Mail, MapPin, Building2, Building, Shield, Menu, X, Wrench } from "lucide-react"
+import {
+  Phone,
+  Mail,
+  MapPin,
+  ChevronLeft,
+  ChevronRight,
+  Building2,
+  Building,
+  Shield,
+  Menu,
+  X,
+  ArrowRight,
+  Wrench,
+} from "lucide-react"
 
 interface MediaItem {
   id: string
@@ -57,13 +70,6 @@ interface Project {
   is_featured: boolean
 }
 
-interface HeroImage {
-  id: string
-  name: string
-  url: string
-  createdAt: string
-}
-
 const GOOGLE_MAPS_EMBED = `https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d753!2d31.1240669!3d40.8522558!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x409d9f3269fc678f%3A0xcd0d2bf0971b8ae4!2sATL%20%C3%87elik%20ve%20Metal%20%C4%B0%C5%9Fleme!5e0!3m2!1str!2str!4v1736012345678!5m2!1str!2str`
 
 export default function Home() {
@@ -93,11 +99,9 @@ export default function Home() {
   })
   const [quoteSubmitting, setQuoteSubmitting] = useState(false)
   const [quoteMessage, setQuoteMessage] = useState<{ type: "success" | "error"; text: string } | null>(null)
-  const [heroImages, setHeroImages] = useState<HeroImage[]>([])
-  const [heroLoading, setHeroLoading] = useState(true)
 
-  const nextSlide = () => setCurrentSlide((prev) => (prev + 1) % (heroImages.length || 1))
-  const prevSlide = () => setCurrentSlide((prev) => (prev - 1 + (heroImages.length || 1)) % (heroImages.length || 1))
+  const nextSlide = () => setCurrentSlide((prev) => (prev + 1) % 3)
+  const prevSlide = () => setCurrentSlide((prev) => (prev - 1 + 3) % 3)
 
   const openLightbox = (index: number) => {
     setLightboxIndex(index)
@@ -133,11 +137,23 @@ export default function Home() {
           setMediaCategories(uniqueCategories)
           const imageItems = result.data.filter((item: MediaItem) => item.file_type.startsWith("image"))
           const images = imageItems.map((item: MediaItem) => item.url)
-          setGalleryImages(images.length > 0 ? images : [])
+          setGalleryImages(
+            images.length > 0
+              ? images
+              : [
+                  "/steel-construction-industrial-factory-building.jpg",
+                  "/industrial-steel-factory-workers-warehouse.jpg",
+                  "/sandwich-panel-building-construction-modern.jpg",
+                ],
+          )
         }
       } catch (error) {
         console.error("Media fetch error:", error)
-        setGalleryImages([])
+        setGalleryImages([
+          "/steel-construction-industrial-factory-building.jpg",
+          "/industrial-steel-factory-workers-warehouse.jpg",
+          "/sandwich-panel-building-construction-modern.jpg",
+        ])
       } finally {
         setMediaLoading(false)
       }
@@ -182,43 +198,11 @@ export default function Home() {
   }, [])
 
   useEffect(() => {
-    const fetchHeroImages = async () => {
-      try {
-        const response = await fetch("/api/media")
-        if (!response.ok) throw new Error("Hero images fetch failed")
-        const result = await response.json()
-
-        if (result.data && Array.isArray(result.data)) {
-          const heroImageUrls = result.data
-            .filter((item: MediaItem) => item.file_type.startsWith("image"))
-            .slice(0, 5)
-            .map((item: MediaItem, index: number) => ({
-              id: `hero-${index}`,
-              name: `Hero ${index + 1}`,
-              url: item.url,
-              createdAt: item.created_at,
-            }))
-          setHeroImages(heroImageUrls.length > 0 ? heroImageUrls : [])
-        } else {
-          setHeroImages([])
-        }
-      } catch (error) {
-        console.error("[v0] Hero images fetch error:", error)
-        setHeroImages([])
-      } finally {
-        setHeroLoading(false)
-      }
-    }
-    fetchHeroImages()
-  }, [])
-
-  useEffect(() => {
-    if (heroImages.length === 0) return
     const timer = setInterval(() => {
-      setCurrentSlide((prev) => (prev + 1) % heroImages.length)
+      setCurrentSlide((prev) => (prev + 1) % 3)
     }, 5000)
     return () => clearInterval(timer)
-  }, [heroImages.length])
+  }, [3])
 
   useEffect(() => {
     const handleScroll = () => {
@@ -395,88 +379,83 @@ export default function Home() {
         </div>
       </header>
 
-      <section
-        id="anasayfa"
-        className="relative pt-32 pb-16 md:pt-40 md:pb-24 bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950"
-      >
-        {/* Slider container */}
-        {heroImages.length > 0 && (
-          <div className="absolute inset-0 overflow-hidden">
-            {heroImages[currentSlide]?.url && (
+      {/* Hero */}
+      <section id="anasayfa" className="relative h-screen pt-16 md:pt-20">
+        <div className="absolute inset-0">
+          {[0, 1, 2].map((i) => (
+            <div
+              key={i}
+              className={`absolute inset-0 transition-opacity duration-1000 ${currentSlide === i ? "opacity-100" : "opacity-0"}`}
+            >
               <Image
-                src={heroImages[currentSlide].url || "/placeholder.svg"}
-                alt={heroImages[currentSlide].name || "Hero"}
+                src={
+                  [
+                    "/steel-construction-industrial-factory-building.jpg",
+                    "/sandwich-panel-building-construction-modern.jpg",
+                    "/industrial-steel-factory-workers-warehouse.jpg",
+                  ][i] || "/placeholder.svg"
+                }
+                alt={["Çelik Konstrüksiyon", "Sandviç Panel", "Metal İşleme"][i]}
                 fill
                 className="object-cover"
-                priority={currentSlide === 0}
+                priority={i === 0}
               />
-            )}
-            <div className="absolute inset-0 bg-black/50"></div>
-          </div>
-        )}
-
-        {/* Gradient overlays */}
-        <div className="absolute inset-0 overflow-hidden pointer-events-none">
-          <div className="absolute top-20 left-10 w-72 h-72 bg-blue-500 rounded-full mix-blend-multiply filter blur-3xl opacity-20"></div>
-          <div className="absolute -bottom-8 right-10 w-72 h-72 bg-cyan-500 rounded-full mix-blend-multiply filter blur-3xl opacity-20"></div>
+              <div className="absolute inset-0 bg-gradient-to-r from-black/60 via-black/30 to-transparent" />
+            </div>
+          ))}
         </div>
 
-        {/* Content */}
-        <div className="container mx-auto px-4 relative z-10">
-          <div className="max-w-3xl">
-            <h1 className="text-4xl md:text-6xl font-bold text-white mb-6 leading-tight">ATL Çelik Yapı</h1>
-            <p className="text-xl md:text-2xl text-slate-300 mb-8 leading-relaxed">
-              Endüstriyel çelik yapı, metal işleme ve özel üretim hizmetleri ile 20 yılın tecrübesi.
-            </p>
-            <div className="flex flex-wrap gap-4">
-              <Button
-                size="lg"
-                onClick={() => document.getElementById("iletisim")?.scrollIntoView({ behavior: "smooth" })}
-                className="bg-blue-600 hover:bg-blue-700 text-white px-8"
-              >
-                Teklif Al
-              </Button>
-              <Button
-                size="lg"
-                variant="outline"
-                onClick={() => document.getElementById("projeler")?.scrollIntoView({ behavior: "smooth" })}
-                className="border-slate-400 text-white hover:bg-slate-800 px-8"
-              >
-                Projelerimiz
-              </Button>
+        <div className="relative z-10 h-full flex flex-col justify-center px-4 md:px-12 max-w-7xl mx-auto">
+          <p className="text-blue-400 text-sm mb-2 md:mb-4 tracking-wider font-bold md:text-lg">
+            {
+              [
+                "Endüstriyel tesis ve depo çözümleriniz için",
+                "Profesyonel üretim ve montaj hizmetleri",
+                "Kaliteli ve hızlı metal işleme çözümleri",
+              ][currentSlide]
+            }
+          </p>
+          <h1 className="text-4xl sm:text-5xl md:text-7xl font-bold mb-6 md:mb-8 leading-tight text-white">
+            {["Çelik Konstrüksiyon", "Sandviç Panel", "Metal İşleme"][currentSlide]}
+          </h1>
+
+          <div className="flex gap-8 mb-8 text-white/90">
+            <div>
+              <span className="text-3xl md:text-4xl font-bold text-blue-400">12+</span>
+              <p className="text-sm">Yıl Tecrübe</p>
             </div>
+            <div>
+              <span className="text-3xl md:text-4xl font-bold text-blue-400">1000+</span>
+              <p className="text-sm">Proje</p>
+            </div>
+            <div>
+              <span className="text-3xl md:text-4xl font-bold text-blue-400">81</span>
+              <p className="text-sm">İl</p>
+            </div>
+          </div>
+
+          <div className="flex gap-4 flex-wrap">
+            <Button className="bg-blue-500 hover:bg-blue-600 text-white px-6 md:px-8 py-3 md:py-6 text-sm md:text-lg font-semibold">
+              Teklif Al <ArrowRight className="ml-2 w-4 md:w-5 h-4 md:h-5" />
+            </Button>
+            <Button className="bg-transparent border border-white text-white hover:bg-white/10 px-6 md:px-8 py-3 md:py-6 text-sm md:text-lg font-semibold">
+              Projelerimiz
+            </Button>
           </div>
         </div>
 
-        {heroImages.length > 1 && (
-          <>
-            <button
-              onClick={prevSlide}
-              className="absolute left-4 top-1/2 -translate-y-1/2 z-20 p-2 bg-white/30 hover:bg-white/50 rounded-full transition-colors"
-            >
-              <span className="text-white">←</span>
-            </button>
-            <button
-              onClick={nextSlide}
-              className="absolute right-4 top-1/2 -translate-y-1/2 z-20 p-2 bg-white/30 hover:bg-white/50 rounded-full transition-colors"
-            >
-              <span className="text-white">→</span>
-            </button>
-
-            {/* Dots indicator */}
-            <div className="absolute bottom-6 left-1/2 -translate-x-1/2 z-20 flex gap-2">
-              {heroImages.map((_, idx) => (
-                <button
-                  key={idx}
-                  onClick={() => setCurrentSlide(idx)}
-                  className={`w-2 h-2 rounded-full transition-all ${
-                    idx === currentSlide ? "bg-white w-6" : "bg-white/50"
-                  }`}
-                />
-              ))}
-            </div>
-          </>
-        )}
+        <button
+          onClick={prevSlide}
+          className="absolute left-4 top-1/2 -translate-y-1/2 z-20 p-3 bg-black/50 hover:bg-black/70 rounded-full"
+        >
+          <ChevronLeft className="w-6 h-6 text-white" />
+        </button>
+        <button
+          onClick={nextSlide}
+          className="absolute right-4 top-1/2 -translate-y-1/2 z-20 p-3 bg-black/50 hover:bg-black/70 rounded-full"
+        >
+          <ChevronRight className="w-6 h-6 text-white" />
+        </button>
       </section>
 
       {/* Services */}

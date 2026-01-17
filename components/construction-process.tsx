@@ -1,78 +1,24 @@
 "use client"
 
 import type React from "react"
-import { useState, useEffect } from "react"
+import { useState } from "react"
 import Image from "next/image"
 import { X } from "lucide-react"
 
-interface ProjectStep {
-  id: string
-  slug: string
-  before?: string
-  after?: string
-  title?: string
+interface ProcessStep {
+  id: number
+  label: string
 }
 
-const FALLBACK_STEPS: ProjectStep[] = [
-  {
-    id: "demo-1",
-    slug: "step-1",
-    title: "Hazırlık ve Planlama",
-    before: null,
-    after: null,
-  },
-  {
-    id: "demo-2",
-    slug: "step-2",
-    title: "Temel ve Altyapı",
-    before: null,
-    after: null,
-  },
-  {
-    id: "demo-3",
-    slug: "step-3",
-    title: "Yapı Kurulumu",
-    before: null,
-    after: null,
-  },
-]
+const STEPS: ProcessStep[] = Array.from({ length: 20 }, (_, i) => ({
+  id: i + 1,
+  label: `${String(i + 1).padStart(2, "0")}`,
+}))
 
 export default function ConstructionProcess() {
-  const [steps, setSteps] = useState<ProjectStep[]>([])
-  const [selectedStep, setSelectedStep] = useState<ProjectStep | null>(null)
+  const [selectedStep, setSelectedStep] = useState<number | null>(null)
   const [sliderPosition, setSliderPosition] = useState(50)
   const [isDragging, setIsDragging] = useState(false)
-  const [loading, setLoading] = useState(true)
-
-  useEffect(() => {
-    const fetchProjects = async () => {
-      try {
-        const response = await fetch("/api/projects")
-        const result = await response.json()
-
-        if (result.success && Array.isArray(result.data)) {
-          const validSteps = result.data.filter((project: any) => project.before && project.after)
-          if (validSteps.length > 0) {
-            setSteps(validSteps)
-            console.log("[v0] Construction process steps loaded:", validSteps.length)
-          } else {
-            setSteps(FALLBACK_STEPS)
-            console.log("[v0] Using fallback construction steps")
-          }
-        } else {
-          setSteps(FALLBACK_STEPS)
-          console.log("[v0] Using fallback construction steps")
-        }
-      } catch (error) {
-        console.error("[v0] Failed to fetch construction steps:", error)
-        setSteps(FALLBACK_STEPS)
-      } finally {
-        setLoading(false)
-      }
-    }
-
-    fetchProjects()
-  }, [])
 
   const handleMouseDown = () => setIsDragging(true)
   const handleMouseUp = () => setIsDragging(false)
@@ -84,47 +30,44 @@ export default function ConstructionProcess() {
     setSliderPosition(percentage)
   }
 
-  if (loading) {
-    return null
-  }
-
-  if (steps.length === 0) {
-    return null
-  }
+  const currentStep = selectedStep ? STEPS.find((s) => s.id === selectedStep) : null
 
   return (
     <>
       <div className="grid grid-cols-5 md:grid-cols-10 gap-2 md:gap-3 max-w-6xl mx-auto">
-        {steps.map((step, index) => (
+        {STEPS.map((step) => (
           <button
-            key={step.id || index}
+            key={step.id}
             onClick={() => {
-              setSelectedStep(step)
+              setSelectedStep(step.id)
               setSliderPosition(50)
             }}
             className="group relative aspect-square rounded-lg overflow-hidden transition-all duration-300 hover:scale-105 hover:shadow-lg hover:shadow-blue-500/30"
-            aria-label={`Adım ${index + 1}`}
-            title={step.title || `Adım ${index + 1}`}
+            aria-label={`Adım ${step.label}`}
+            title={`Adım ${step.label}`}
           >
-            {step.after && (
-              <Image
-                src={step.after || "/placeholder.svg"}
-                alt={`Yapım Adımı ${index + 1}`}
-                fill
-                className="object-cover select-none pointer-events-none"
-              />
-            )}
+            {/* AFTER görselini arka plan olarak kullan */}
+            <Image
+              src={`/process/after-${step.id}.jpg`}
+              alt={`Yapım Adımı ${step.label}`}
+              fill
+              className="object-cover select-none pointer-events-none"
+              onError={(e) => {
+                e.currentTarget.src = `/placeholder.svg?height=300&width=300&query=construction-process-${step.id}`
+              }}
+            />
 
+            {/* Hafif dark overlay - numarayı oku yapmak için */}
             <div className="absolute inset-0 bg-black/20 group-hover:bg-black/10 transition-all duration-300" />
 
             <div className="absolute bottom-2 right-2 bg-blue-600/80 backdrop-blur px-2 py-1 rounded text-xs md:text-sm font-bold text-white">
-              {String(index + 1).padStart(2, "0")}
+              {step.label}
             </div>
           </button>
         ))}
       </div>
 
-      {selectedStep && selectedStep.before && selectedStep.after && (
+      {selectedStep && currentStep && (
         <div
           className="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4"
           onClick={() => setSelectedStep(null)}
@@ -133,6 +76,7 @@ export default function ConstructionProcess() {
             className="relative w-full max-w-5xl bg-slate-900 rounded-2xl overflow-hidden shadow-2xl border border-slate-700"
             onClick={(e) => e.stopPropagation()}
           >
+            {/* Close Button */}
             <button
               onClick={() => setSelectedStep(null)}
               className="absolute top-4 right-4 z-20 p-2 rounded-lg bg-black/50 hover:bg-black/70 text-white transition-all"
@@ -141,6 +85,7 @@ export default function ConstructionProcess() {
               <X className="w-6 h-6" />
             </button>
 
+            {/* Before/After Container */}
             <div
               className="relative aspect-video bg-slate-800 overflow-hidden cursor-ew-resize"
               onMouseDown={handleMouseDown}
@@ -148,30 +93,35 @@ export default function ConstructionProcess() {
               onMouseMove={handleMouseMove}
               onMouseLeave={handleMouseUp}
             >
-              {selectedStep.before && (
-                <Image
-                  src={selectedStep.before || "/placeholder.svg"}
-                  alt="Yapım Öncesi"
-                  fill
-                  priority
-                  className="object-cover select-none pointer-events-none"
-                />
-              )}
+              {/* Before Image */}
+              <Image
+                src={`/process/before-${currentStep.id}.jpg`}
+                alt="Yapım Öncesi"
+                fill
+                priority
+                className="object-cover select-none pointer-events-none"
+                onError={(e) => {
+                  e.currentTarget.src = `/placeholder.svg?height=600&width=1000&query=construction-before`
+                }}
+              />
 
+              {/* After Image - Clipped */}
               <div
                 className="absolute inset-0 overflow-hidden transition-all duration-75"
                 style={{ width: `${sliderPosition}%` }}
               >
-                {selectedStep.after && (
-                  <Image
-                    src={selectedStep.after || "/placeholder.svg"}
-                    alt="Yapım Sonrası"
-                    fill
-                    className="object-cover select-none pointer-events-none"
-                  />
-                )}
+                <Image
+                  src={`/process/after-${currentStep.id}.jpg`}
+                  alt="Yapım Sonrası"
+                  fill
+                  className="object-cover select-none pointer-events-none"
+                  onError={(e) => {
+                    e.currentTarget.src = `/placeholder.svg?height=600&width=1000&query=construction-after`
+                  }}
+                />
               </div>
 
+              {/* Divider Line */}
               <div
                 className="absolute inset-y-0 w-1.5 bg-gradient-to-b from-transparent via-blue-400 to-transparent shadow-lg"
                 style={{ left: `${sliderPosition}%`, transform: "translateX(-50%)" }}
@@ -181,6 +131,7 @@ export default function ConstructionProcess() {
                 }}
               />
 
+              {/* Before/After Labels */}
               <div className="absolute bottom-4 left-4 bg-black/60 backdrop-blur px-4 py-2 rounded-lg text-sm font-semibold text-white">
                 Öncesi
               </div>
@@ -189,10 +140,11 @@ export default function ConstructionProcess() {
               </div>
             </div>
 
+            {/* Info Bar */}
             <div className="bg-slate-800 border-t border-slate-700 px-6 py-4 flex items-center justify-between">
               <div>
-                <p className="text-blue-400 font-semibold text-sm">{selectedStep.title || "Yapım Adımı"}</p>
-                <p className="text-white font-bold text-lg">Yapım Süreci</p>
+                <p className="text-blue-400 font-semibold text-sm">Adım {currentStep.label}</p>
+                <p className="text-white font-bold text-lg">Yapım Süreci - Faz {currentStep.id}</p>
               </div>
               <input
                 type="range"
@@ -208,6 +160,7 @@ export default function ConstructionProcess() {
         </div>
       )}
 
+      {/* ESC Key Handler */}
       {typeof window !== "undefined" && selectedStep && (
         <script
           dangerouslySetInnerHTML={{
