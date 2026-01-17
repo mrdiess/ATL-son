@@ -95,19 +95,13 @@ export default function CustomManufacturing() {
                 {/* Card */}
                 <div className="rounded-xl overflow-hidden border border-slate-700 hover:border-slate-500 transition-all duration-300">
                   <div className="relative h-48 bg-slate-800 overflow-hidden">
-                    <Image
-                      src={item.after || "/placeholder.svg"}
-                      alt={item.title}
-                      fill
-                      className="object-cover group-hover:scale-105 transition-transform duration-300"
-                    />
-                    <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors" />
-                    {/* Hover Icon */}
-                    <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
-                      <div className="w-12 h-12 bg-white/20 backdrop-blur rounded-full flex items-center justify-center">
-                        <ChevronRight className="w-6 h-6 text-white" />
-                      </div>
-                    </div>
+                    {item.after ? (
+                      <img
+                        src={item.after || "/placeholder.svg"}
+                        alt={item.title}
+                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                      />
+                    ) : null}
                   </div>
 
                   {/* Content */}
@@ -170,12 +164,14 @@ export default function CustomManufacturing() {
             </button>
 
             <div className="relative h-96 bg-slate-800">
-              <Image
-                src={selectedItem.after || "/placeholder.svg"}
-                alt={selectedItem.title}
-                fill
-                className="object-cover"
-              />
+              {selectedItem.after ? (
+                <Image
+                  src={selectedItem.after || "/placeholder.svg"}
+                  alt={selectedItem.title}
+                  fill
+                  className="object-cover"
+                />
+              ) : null}
             </div>
 
             {/* Content */}

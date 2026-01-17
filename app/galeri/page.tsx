@@ -6,6 +6,10 @@ import Link from "next/link"
 import { ThemeToggle } from "@/components/theme-toggle"
 import { Menu, X, Phone } from "lucide-react"
 
+const GOOGLE_APPS_SCRIPT_URL =
+  "https://script.google.com/macros/s/AKfycbzawjpexOQS2hitiOskEHmmbJ2jPWA5XGo6c0yle0eax8kxmwa3-Oe5PVYoGO6Vt38L/exec"
+const GOOGLE_DRIVE_FOLDER_ID = "1GW8qZlj1sACTzRxqOIU4plz14gZ1tT2M"
+
 const CATEGORIES = [
   { id: "tumu", label: "Tümü", slug: "tumu" },
   { id: "celik-yapi", label: "Çelik Yapı", slug: "celik-yapi" },
@@ -20,6 +24,7 @@ interface GalleryItem {
   src: string
   title: string
   alt: string
+  category: string
 }
 
 interface GalleryData {
@@ -38,14 +43,47 @@ export default function GaleriPage() {
   useEffect(() => {
     const fetchGallery = async () => {
       try {
-        const response = await fetch("/data/galeri.json", {
+        const response = await fetch(GOOGLE_APPS_SCRIPT_URL, {
           cache: "no-store",
         })
         if (!response.ok) throw new Error("Galeri verisi yüklenemedi")
         const data = await response.json()
-        setGalleryData(data)
+
+        // Process gallery data and organize by category
+        const organizedData: GalleryData = {}
+        organizedData["tumu"] = []
+
+        if (data.gallery && Array.isArray(data.gallery)) {
+          data.gallery.forEach((item: any) => {
+            if (!item.src) return
+
+            const galleryItem: GalleryItem = {
+              src: item.src,
+              title: item.title || "Proje Görseli",
+              alt: item.alt || "Galeri Görseli",
+              category: item.category || "diger",
+            }
+
+            organizedData["tumu"].push(galleryItem)
+            if (!organizedData[galleryItem.category]) {
+              organizedData[galleryItem.category] = []
+            }
+            organizedData[galleryItem.category].push(galleryItem)
+          })
+        }
+
+        setGalleryData(organizedData)
       } catch (error) {
         console.error("Galeri yükleme hatası:", error)
+        setGalleryData({
+          tumu: [],
+          "celik-yapi": [],
+          merdiven: [],
+          korkuluk: [],
+          ferforje: [],
+          "kamyon-kasa": [],
+          diger: [],
+        })
       } finally {
         setIsLoading(false)
       }
