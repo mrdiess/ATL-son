@@ -39,7 +39,7 @@ export default function CustomManufacturing() {
               before: project.before || null,
               after: project.after || null,
             }))
-            .filter((item) => item.before || item.after) // Only show if has images
+            .filter((item) => item.before && item.after)
 
           setCustomItems(items)
         }
@@ -94,24 +94,21 @@ export default function CustomManufacturing() {
               <div key={item.id} onClick={() => openModal(item)} className="cursor-pointer group">
                 {/* Card */}
                 <div className="rounded-xl overflow-hidden border border-slate-700 hover:border-slate-500 transition-all duration-300">
-                  {/* Image - Render only after image, no fallback */}
-                  {item.after && (
-                    <div className="relative h-48 bg-slate-800 overflow-hidden">
-                      <Image
-                        src={item.after || "/placeholder.svg"}
-                        alt={item.title}
-                        fill
-                        className="object-cover group-hover:scale-105 transition-transform duration-300"
-                      />
-                      <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors" />
-                      {/* Hover Icon */}
-                      <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
-                        <div className="w-12 h-12 bg-white/20 backdrop-blur rounded-full flex items-center justify-center">
-                          <ChevronRight className="w-6 h-6 text-white" />
-                        </div>
+                  <div className="relative h-48 bg-slate-800 overflow-hidden">
+                    <Image
+                      src={item.after || "/placeholder.svg"}
+                      alt={item.title}
+                      fill
+                      className="object-cover group-hover:scale-105 transition-transform duration-300"
+                    />
+                    <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors" />
+                    {/* Hover Icon */}
+                    <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                      <div className="w-12 h-12 bg-white/20 backdrop-blur rounded-full flex items-center justify-center">
+                        <ChevronRight className="w-6 h-6 text-white" />
                       </div>
                     </div>
-                  )}
+                  </div>
 
                   {/* Content */}
                   <div className="p-4">
@@ -172,17 +169,14 @@ export default function CustomManufacturing() {
               <X className="w-6 h-6" />
             </button>
 
-            {/* Image - Show after image, or before if after is missing */}
-            {(selectedItem.after || selectedItem.before) && (
-              <div className="relative h-96 bg-slate-800">
-                <Image
-                  src={selectedItem.after || selectedItem.before!}
-                  alt={selectedItem.title}
-                  fill
-                  className="object-cover"
-                />
-              </div>
-            )}
+            <div className="relative h-96 bg-slate-800">
+              <Image
+                src={selectedItem.after || "/placeholder.svg"}
+                alt={selectedItem.title}
+                fill
+                className="object-cover"
+              />
+            </div>
 
             {/* Content */}
             <div className="p-8">
