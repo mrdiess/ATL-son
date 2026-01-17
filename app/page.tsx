@@ -134,18 +134,10 @@ export default function Home() {
           const imageItems = result.data.filter((item: MediaItem) => item.file_type.startsWith("image"))
           const images = imageItems.map((item: MediaItem) => item.url)
           setGalleryImages(images.length > 0 ? images : [])
-          const heroSliderImages = imageItems.slice(0, 3).map((item: MediaItem) => ({
-            id: item.id,
-            name: item.title || item.filename,
-            url: item.url,
-            createdAt: item.created_at,
-          }))
-          setHeroImages(heroSliderImages.length > 0 ? heroSliderImages : [])
         }
       } catch (error) {
         console.error("Media fetch error:", error)
         setGalleryImages([])
-        setHeroImages([])
       } finally {
         setMediaLoading(false)
       }
@@ -187,6 +179,37 @@ export default function Home() {
     fetchMedia()
     fetchSponsors()
     fetchProjects()
+  }, [])
+
+  useEffect(() => {
+    const fetchHeroImages = async () => {
+      try {
+        const response = await fetch("/api/media")
+        if (!response.ok) throw new Error("Hero images fetch failed")
+        const result = await response.json()
+
+        if (result.data && Array.isArray(result.data)) {
+          const heroImageUrls = result.data
+            .filter((item: MediaItem) => item.file_type.startsWith("image"))
+            .slice(0, 5)
+            .map((item: MediaItem, index: number) => ({
+              id: `hero-${index}`,
+              name: `Hero ${index + 1}`,
+              url: item.url,
+              createdAt: item.created_at,
+            }))
+          setHeroImages(heroImageUrls.length > 0 ? heroImageUrls : [])
+        } else {
+          setHeroImages([])
+        }
+      } catch (error) {
+        console.error("[v0] Hero images fetch error:", error)
+        setHeroImages([])
+      } finally {
+        setHeroLoading(false)
+      }
+    }
+    fetchHeroImages()
   }, [])
 
   useEffect(() => {

@@ -96,10 +96,11 @@ export default function CustomManufacturing() {
                 <div className="rounded-xl overflow-hidden border border-slate-700 hover:border-slate-500 transition-all duration-300">
                   <div className="relative h-48 bg-slate-800 overflow-hidden">
                     {item.after ? (
-                      <img
+                      <Image
                         src={item.after || "/placeholder.svg"}
                         alt={item.title}
-                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                        fill
+                        className="object-cover group-hover:scale-105 transition-transform duration-300"
                       />
                     ) : null}
                   </div>

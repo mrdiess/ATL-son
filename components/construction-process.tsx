@@ -18,22 +18,22 @@ const FALLBACK_STEPS: ProjectStep[] = [
     id: "demo-1",
     slug: "step-1",
     title: "Hazırlık ve Planlama",
-    before: "https://images.unsplash.com/photo-1581092918056-0c4c3acd3789?w=1000&h=600&fit=crop",
-    after: "https://images.unsplash.com/photo-1581092160562-40fed08d04ac?w=1000&h=600&fit=crop",
+    before: null,
+    after: null,
   },
   {
     id: "demo-2",
     slug: "step-2",
     title: "Temel ve Altyapı",
-    before: "https://images.unsplash.com/photo-1581092162562-40fed08d04ac?w=1000&h=600&fit=crop",
-    after: "https://images.unsplash.com/photo-1581092918056-0c4c3acd3789?w=1000&h=600&fit=crop",
+    before: null,
+    after: null,
   },
   {
     id: "demo-3",
     slug: "step-3",
     title: "Yapı Kurulumu",
-    before: "https://images.unsplash.com/photo-1581092160562-40fed08d04ac?w=1000&h=600&fit=crop",
-    after: "https://images.unsplash.com/photo-1581092918056-0c4c3acd3789?w=1000&h=600&fit=crop",
+    before: null,
+    after: null,
   },
 ]
 

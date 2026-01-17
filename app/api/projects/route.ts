@@ -1,7 +1,7 @@
 import { NextResponse, type NextRequest } from "next/server"
 
 const GOOGLE_APPS_SCRIPT_URL =
-  "https://script.google.com/macros/s/AKfycbzawjpexOQS2hitiOskEHmmbJ2jPWA5XGo6c0yle0eax8kxmwa3-Oe5PVYoGO6Vt38L/exec"
+  "https://script.googleusercontent.com/macros/echo?user_content_key=AehSKLiB0EEyK59Hc-7e-8OYone5AXsxDng7uzM2naJx-53JOYa1QnWJcq4glXCRC7y-I7hDarpZEApTOkmMG7yZWqnwlN0v0kk-OISYAOc4CWufScygYVSXOuD08WwwlZ5MKw3uRuAEIkeEjHJOdgLfas7GrpENDGP3JDW_Jn7Jhc1lIi1_s0yI5iYKi7snAE8bai8f80CtgIkWdfesCQnIH8EgSbbLKbeONdpgP5Y4xXy1j8Sl5j29my6xgCaF74bfS6XC3WRyBzRIahkG_H67m628y8QQww&lib=MgeQSX0wZzblU_U4f4EVxvMawggDRzBb0"
 
 export async function GET(request: NextRequest) {
   try {
@@ -10,26 +10,54 @@ export async function GET(request: NextRequest) {
     const response = await fetch(GOOGLE_APPS_SCRIPT_URL, {
       method: "GET",
       cache: "no-store",
+      redirect: "follow",
     })
 
     if (!response.ok) {
-      console.error("[v0] Google Apps Script API error:", response.status)
+      // Media API'den görselleri çekerek fallback data'ya ekliyoruz
+      let mediaItems = []
+      try {
+        const mediaRes = await fetch(new URL("/api/media", request.url), {
+          cache: "no-store",
+        })
+        if (mediaRes.ok) {
+          const mediaData = await mediaRes.json()
+          mediaItems = Array.isArray(mediaData.data) ? mediaData.data : mediaData.media || []
+        }
+      } catch (err) {
+        console.log("[v0] Could not fetch media for projects")
+      }
+
       const fallbackProjects = [
         {
           id: "1",
-          slug: "celik-yapilandirma",
-          title: "Çelik Yapılandırma",
-          description: "Modern çelik yapı projesi",
+          slug: "proje-1",
+          title: "Proje 1",
+          description: "Google Drive Projesi",
           category: "Çelik Yapı",
           location: "İstanbul",
-          before: "https://via.placeholder.com/800x600?text=Öncesi",
-          after: "https://via.placeholder.com/800x600?text=Sonrası",
-          featured_image_url: "https://via.placeholder.com/800x600?text=Sonrası",
+          before: mediaItems[0]?.url || null,
+          after: mediaItems[1]?.url || null,
+          featured_image_url: mediaItems[1]?.url || null,
           is_active: true,
           sort_order: 1,
         },
+        {
+          id: "2",
+          slug: "proje-2",
+          title: "Proje 2",
+          description: "Google Drive Projesi",
+          category: "Merdiven",
+          location: "Ankara",
+          before: mediaItems[2]?.url || null,
+          after: mediaItems[3]?.url || null,
+          featured_image_url: mediaItems[3]?.url || null,
+          is_active: true,
+          sort_order: 2,
+        },
       ]
-      console.log("[v0] Using fallback projects due to API error")
+
+      console.log("[v0] Using projects with media images")
       return NextResponse.json({ data: fallbackProjects, success: true })
     }
 
@@ -70,25 +98,50 @@ export async function GET(request: NextRequest) {
 
     return NextResponse.json({ data: projects, success: true })
   } catch (error) {
-    console.error("[v0] Projects API error:", error instanceof Error ? error.message : error)
-    return NextResponse.json({
-      data: [
-        {
-          id: "1",
-          slug: "demo-project",
-          title: "Demo Proje",
-          description: "Demo proje",
-          category: "Genel",
-          location: "Konum",
-          before: "https://via.placeholder.com/800x600?text=Öncesi",
-          after: "https://via.placeholder.com/800x600?text=Sonrası",
-          featured_image_url: "https://via.placeholder.com/800x600?text=Sonrası",
-          is_active: true,
-          sort_order: 1,
-        },
-      ],
-      success: true,
-    })
+    let mediaItems = []
+    try {
+      const mediaRes = await fetch(new URL("/api/media", request.url), {
+        cache: "no-store",
+      })
+      if (mediaRes.ok) {
+        const mediaData = await mediaRes.json()
+        mediaItems = Array.isArray(mediaData.data) ? mediaData.data : mediaData.media || []
+      }
+    } catch (err) {
+      console.log("[v0] Could not fetch media for projects")
+    }
+
+    const fallbackProjects = [
+      {
+        id: "1",
+        slug: "proje-1",
+        title: "Proje 1",
+        description: "Google Drive Projesi",
+        category: "Çelik Yapı",
+        location: "İstanbul",
+        before: mediaItems[0]?.url || null,
+        after: mediaItems[1]?.url || null,
+        featured_image_url: mediaItems[1]?.url || null,
+        is_active: true,
+        sort_order: 1,
+      },
+      {
+        id: "2",
+        slug: "proje-2",
+        title: "Proje 2",
+        description: "Google Drive Projesi",
+        category: "Merdiven",
+        location: "Ankara",
+        before: mediaItems[2]?.url || null,
+        after: mediaItems[3]?.url || null,
+        featured_image_url: mediaItems[3]?.url || null,
+        is_active: true,
+        sort_order: 2,
+      },
+    ]
+
+    console.log("[v0] Using projects with media images")
+    return NextResponse.json({ data: fallbackProjects, success: true })
   }
 }
 

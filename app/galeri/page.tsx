@@ -7,7 +7,7 @@ import { ThemeToggle } from "@/components/theme-toggle"
 import { Menu, X, Phone } from "lucide-react"
 
 const GOOGLE_APPS_SCRIPT_URL =
-  "https://script.google.com/macros/s/AKfycbzawjpexOQS2hitiOskEHmmbJ2jPWA5XGo6c0yle0eax8kxmwa3-Oe5PVYoGO6Vt38L/exec"
+  "https://script.google.com/macros/s/AKfycbz6KD5v8emprNcAvzqvzlsqXSCmArK17wwumahmm04h8E1MivpdKUQDVTGytqiXXmPl/exec"
 const GOOGLE_DRIVE_FOLDER_ID = "1GW8qZlj1sACTzRxqOIU4plz14gZ1tT2M"
 
 const CATEGORIES = [
@@ -45,6 +45,7 @@ export default function GaleriPage() {
       try {
         const response = await fetch(GOOGLE_APPS_SCRIPT_URL, {
           cache: "no-store",
+          redirect: "follow",
         })
         if (!response.ok) throw new Error("Galeri verisi yüklenemedi")
         const data = await response.json()
@@ -53,8 +54,8 @@ export default function GaleriPage() {
         const organizedData: GalleryData = {}
         organizedData["tumu"] = []
 
-        if (data.gallery && Array.isArray(data.gallery)) {
-          data.gallery.forEach((item: any) => {
+        if (data.galeri && Array.isArray(data.galeri)) {
+          data.galeri.forEach((item: any) => {
             if (!item.src) return
 
             const galleryItem: GalleryItem = {
