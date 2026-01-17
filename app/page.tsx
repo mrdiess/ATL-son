@@ -32,142 +32,93 @@ export default function Home() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
   const [isScrolled, setIsScrolled] = useState(false)
 
-  /* ================= HERO (DRIVE) ================= */
+  /* ================= HERO ================= */
   useEffect(() => {
     const fetchHero = async () => {
-      try {
-        const res = await fetch(DRIVE_API, { cache: "no-store" })
-        const data = await res.json()
-        if (Array.isArray(data.hero)) {
-          setHeroImages(data.hero)
-        }
-      } catch (e) {
-        console.error("Hero fetch error:", e)
-      }
+      const res = await fetch(DRIVE_API, { cache: "no-store" })
+      const data = await res.json()
+      if (Array.isArray(data.hero)) setHeroImages(data.hero)
     }
     fetchHero()
   }, [])
 
   useEffect(() => {
     if (!heroImages.length) return
-    const timer = setInterval(() => {
-      setCurrentSlide((prev) => (prev + 1) % heroImages.length)
-    }, 5000)
+    const timer = setInterval(
+      () => setCurrentSlide((p) => (p + 1) % heroImages.length),
+      5000,
+    )
     return () => clearInterval(timer)
   }, [heroImages])
 
-  const nextSlide = () =>
-    setCurrentSlide((prev) =>
-      heroImages.length ? (prev + 1) % heroImages.length : 0,
-    )
-
-  const prevSlide = () =>
-    setCurrentSlide((prev) =>
-      heroImages.length
-        ? (prev - 1 + heroImages.length) % heroImages.length
-        : 0,
-    )
-
-  /* ================= UI HELPERS ================= */
   useEffect(() => {
-    const handleScroll = () => setIsScrolled(window.scrollY > 50)
-    window.addEventListener("scroll", handleScroll)
-    return () => window.removeEventListener("scroll", handleScroll)
+    const onScroll = () => setIsScrolled(window.scrollY > 50)
+    window.addEventListener("scroll", onScroll)
+    return () => window.removeEventListener("scroll", onScroll)
   }, [])
 
   return (
-    <div className="min-h-screen bg-background text-foreground">
+    <div className="bg-background text-foreground">
       {/* ================= HEADER ================= */}
       <header
-        className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
+        className={`fixed top-0 left-0 right-0 z-50 transition-all ${
           isScrolled
-            ? "bg-background/95 backdrop-blur-md border-b shadow-sm"
+            ? "bg-background/95 backdrop-blur border-b"
             : "bg-transparent"
         }`}
       >
-        <div className="max-w-7xl mx-auto px-4 md:px-6">
-          <div className="flex items-center justify-between h-16 md:h-20">
-            <Link href="/">
-              <img
-                src="/lightmodelogo.png"
-                className="h-12 md:h-16 dark:hidden"
-              />
-              <img
-                src="/darkmodelogo.png"
-                className="h-12 md:h-16 hidden dark:block"
-              />
-            </Link>
+        <div className="max-w-7xl mx-auto px-6 h-20 flex items-center justify-between">
+          <Link href="/">
+            <img src="/lightmodelogo.png" className="h-12 dark:hidden" />
+            <img src="/darkmodelogo.png" className="h-12 hidden dark:block" />
+          </Link>
 
-            <nav className="hidden md:flex gap-8">
-              {[
-                ["#anasayfa", "Ana Sayfa"],
-                ["#hakkimizda", "Hakkımızda"],
-                ["#hizmetler", "Hizmetler"],
-                ["#projeler", "Projeler"],
-                ["#iletisim", "İletişim"],
-              ].map(([href, label]) => (
-                <a
-                  key={href}
-                  href={href}
-                  className="font-medium hover:text-blue-500"
-                >
-                  {label}
-                </a>
-              ))}
-            </nav>
+          <nav className="hidden md:flex gap-8 font-medium">
+            <a href="#anasayfa">Ana Sayfa</a>
+            <a href="#hakkimizda">Hakkımızda</a>
+            <a href="#hizmetler">Hizmetler</a>
+            <a href="#projeler">Projeler</a>
+            <a href="#iletisim">İletişim</a>
+          </nav>
 
-            <div className="flex items-center gap-3">
-              <ThemeToggle />
-              <a
-                href="tel:+905373393947"
-                className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg text-sm font-semibold flex items-center gap-2"
-              >
-                <Phone className="w-4 h-4" />
-                <span className="hidden sm:inline">Hemen Ara</span>
-              </a>
-              <button
-                onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-                className="md:hidden"
-              >
-                {mobileMenuOpen ? <X /> : <Menu />}
-              </button>
-            </div>
+          <div className="flex items-center gap-3">
+            <ThemeToggle />
+            <a
+              href="tel:+905373393947"
+              className="bg-blue-500 text-white px-4 py-2 rounded-lg flex gap-2"
+            >
+              <Phone className="w-4 h-4" /> Hemen Ara
+            </a>
+            <button onClick={() => setMobileMenuOpen(!mobileMenuOpen)}>
+              {mobileMenuOpen ? <X /> : <Menu />}
+            </button>
           </div>
         </div>
       </header>
 
       {/* ================= HERO ================= */}
       <section id="anasayfa" className="relative h-screen pt-20">
-        <div className="absolute inset-0">
-          {heroImages.map((img, i) => (
-            <div
-              key={i}
-              className={`absolute inset-0 transition-opacity duration-1000 ${
-                currentSlide === i ? "opacity-100" : "opacity-0"
-              }`}
-            >
-              <Image
-                src={img}
-                alt={`Hero ${i + 1}`}
-                fill
-                className="object-cover"
-                priority={i === 0}
-              />
-              <div className="absolute inset-0 bg-gradient-to-r from-black/60 via-black/30 to-transparent" />
-            </div>
-          ))}
-        </div>
+        {heroImages.map((img, i) => (
+          <div
+            key={i}
+            className={`absolute inset-0 transition-opacity duration-1000 ${
+              currentSlide === i ? "opacity-100" : "opacity-0"
+            }`}
+          >
+            <Image src={img} alt="" fill className="object-cover" />
+            <div className="absolute inset-0 bg-black/60" />
+          </div>
+        ))}
 
         <div className="relative z-10 h-full flex flex-col justify-center max-w-7xl mx-auto px-6 text-white">
           <p className="text-blue-400 font-bold mb-4">
             Endüstriyel çelik yapı çözümleri
           </p>
-          <h1 className="text-4xl md:text-7xl font-bold mb-8">
+          <h1 className="text-5xl md:text-7xl font-bold mb-8">
             ATL Çelik Yapı
           </h1>
-
           <div className="flex gap-4">
-            <Button className="bg-blue-500 hover:bg-blue-600">
+            <Button className="bg-blue-500">
               Teklif Al <ArrowRight className="ml-2 w-4 h-4" />
             </Button>
             <Button variant="outline" className="border-white text-white">
@@ -177,73 +128,67 @@ export default function Home() {
         </div>
 
         <button
-          onClick={prevSlide}
-          className="absolute left-4 top-1/2 -translate-y-1/2 bg-black/50 p-3 rounded-full"
+          onClick={() =>
+            setCurrentSlide(
+              (p) => (p - 1 + heroImages.length) % heroImages.length,
+            )
+          }
+          className="absolute left-4 top-1/2 bg-black/50 p-3 rounded-full"
         >
           <ChevronLeft className="text-white" />
         </button>
         <button
-          onClick={nextSlide}
-          className="absolute right-4 top-1/2 -translate-y-1/2 bg-black/50 p-3 rounded-full"
+          onClick={() =>
+            setCurrentSlide((p) => (p + 1) % heroImages.length)
+          }
+          className="absolute right-4 top-1/2 bg-black/50 p-3 rounded-full"
         >
           <ChevronRight className="text-white" />
         </button>
       </section>
 
       {/* ================= HAKKIMIZDA ================= */}
-      <section
-        id="hakkimizda"
-        className="relative py-24 overflow-hidden"
-      >
-        <div className="absolute inset-0">
-          <Image
-            src="/images/hakkimizda-bg.jpg"
-            alt="ATL Çelik Yapı"
-            fill
-            className="object-cover"
-          />
-          <div className="absolute inset-0 bg-black/60" />
-        </div>
+      <section id="hakkimizda" className="relative py-28">
+        <Image
+          src="/images/hakkimizda-bg.jpg"
+          alt=""
+          fill
+          className="object-cover"
+        />
+        <div className="absolute inset-0 bg-black/65" />
 
-        <div className="relative z-10 max-w-7xl mx-auto px-6 grid md:grid-cols-2 gap-12 items-center text-white">
+        <div className="relative z-10 max-w-7xl mx-auto px-6 grid md:grid-cols-2 gap-12 text-white">
           <div />
-
           <div>
-            <span className="text-blue-400 font-semibold uppercase text-sm">
+            <span className="text-blue-400 uppercase text-sm font-semibold">
               Hakkımızda
             </span>
-            <h2 className="text-3xl md:text-4xl font-bold mt-3 mb-6">
+            <h2 className="text-4xl font-bold my-6">
               Çelik Sektöründe Güvenilir Çözüm Ortağı
             </h2>
-            <p className="text-white/85 mb-6 leading-relaxed">
+            <p className="mb-6 text-white/85">
               Düzce merkezli olmakla birlikte 81 ilde profesyonel hizmet
-              vermekteyiz. Sandviç Panel, Sac Kesme–Bükme, Demir Çelik Profil,
-              Soğuk Hava Deposu ve her türlü kaynaklı yapılar konusunda
-              uzman ekibimizle yanınızdayız.
+              vermekteyiz.
             </p>
-
             <ul className="grid grid-cols-2 gap-3 mb-8 text-sm">
               {[
                 "ISO 9001 Belgeli",
                 "CE Sertifikalı",
                 "Zamanında Teslimat",
                 "Garantili İşçilik",
-              ].map((item) => (
-                <li key={item} className="flex items-center gap-2">
+              ].map((i) => (
+                <li key={i} className="flex gap-2 items-center">
                   <span className="w-2 h-2 bg-blue-400 rounded-full" />
-                  {item}
+                  {i}
                 </li>
               ))}
             </ul>
-
-            <Button className="bg-blue-500 hover:bg-blue-600">
-              Daha Fazla Bilgi
-            </Button>
+            <Button className="bg-blue-500">Daha Fazla Bilgi</Button>
           </div>
         </div>
       </section>
 
-      {/* ================= SERVICES ================= */}
+      {/* ================= HİZMETLER ================= */}
       <section id="hizmetler" className="py-24">
         <div className="max-w-7xl mx-auto px-6 grid md:grid-cols-4 gap-6">
           {[
@@ -254,7 +199,7 @@ export default function Home() {
           ].map(([Icon, title], i) => (
             <div
               key={i}
-              className="p-6 border rounded-xl text-center hover:shadow-lg"
+              className="p-6 border rounded-xl text-center hover:shadow"
             >
               <Icon className="w-12 h-12 mx-auto mb-4 text-blue-500" />
               <h3 className="font-bold">{title}</h3>
@@ -263,49 +208,94 @@ export default function Home() {
         </div>
       </section>
 
-      {/* ================= PROJECTS ================= */}
+      {/* ================= PROJELER ================= */}
       <section
         id="projeler"
         className="py-24 bg-gradient-to-b from-slate-900 to-slate-800 text-white"
       >
-        <div className="max-w-7xl mx-auto px-6">
-          <div className="text-center mb-12">
-            <h2 className="text-3xl md:text-4xl font-bold">
-              Yapım Süreci
-            </h2>
-            <p className="text-slate-300 mt-4">
-              Projelerimiz nasıl hayata geçiyor?
-            </p>
-          </div>
-          <ConstructionProcess />
+        <div className="max-w-7xl mx-auto px-6 text-center mb-12">
+          <h2 className="text-4xl font-bold">Yapım Süreci</h2>
+          <p className="text-slate-300 mt-4">
+            Projelerimiz nasıl hayata geçiyor?
+          </p>
         </div>
+        <ConstructionProcess />
       </section>
 
-      {/* ================= CONTACT ================= */}
+      {/* ================= İLETİŞİM ================= */}
       <section id="iletisim" className="py-24 bg-secondary/10">
         <div className="max-w-7xl mx-auto px-6 grid md:grid-cols-2 gap-12">
           <div>
             <h2 className="text-3xl font-bold mb-6">İletişim</h2>
-            <div className="space-y-4">
-              <p className="flex items-center gap-3">
-                <Phone className="text-blue-500" /> +90 537 339 39 47
-              </p>
-              <p className="flex items-center gap-3">
-                <Mail className="text-blue-500" /> info@atlcelikyapi.com
-              </p>
-              <p className="flex items-center gap-3">
-                <MapPin className="text-blue-500" /> Düzce
-              </p>
-            </div>
+            <p className="flex gap-3 mb-2">
+              <Phone /> +90 537 339 39 47
+            </p>
+            <p className="flex gap-3 mb-2">
+              <Mail /> info@atlcelikyapi.com
+            </p>
+            <p className="flex gap-3">
+              <MapPin /> Düzce
+            </p>
           </div>
 
           <iframe
             src={GOOGLE_MAPS_EMBED}
-            className="w-full h-[400px] rounded-xl border"
+            className="w-full h-[350px] rounded-xl border"
             loading="lazy"
           />
         </div>
       </section>
+
+      {/* ================= MAP ================= */}
+      <iframe
+        src={GOOGLE_MAPS_EMBED}
+        className="w-full h-[280px] border-0"
+        loading="lazy"
+      />
+
+      {/* ================= FOOTER ================= */}
+      <footer className="bg-slate-900 text-white">
+        <div className="max-w-7xl mx-auto px-6 py-16 grid md:grid-cols-4 gap-10">
+          <div>
+            <img src="/darkmodelogo.png" className="h-12 mb-4" />
+            <p className="text-slate-300 text-sm">
+              Düzce'de 12+ yıllık tecrübeyle profesyonel çelik yapı çözümleri.
+            </p>
+          </div>
+
+          <div>
+            <h3 className="font-semibold mb-4">Hizmetler</h3>
+            <ul className="space-y-2 text-sm text-slate-300">
+              <li>Çelik Konstrüksiyon</li>
+              <li>Sandviç Panel</li>
+              <li>Metal İşleme</li>
+              <li>Özel Üretim</li>
+            </ul>
+          </div>
+
+          <div>
+            <h3 className="font-semibold mb-4">Kurumsal</h3>
+            <ul className="space-y-2 text-sm text-slate-300">
+              <li>Hakkımızda</li>
+              <li>Projeler</li>
+              <li>Referanslar</li>
+            </ul>
+          </div>
+
+          <div>
+            <h3 className="font-semibold mb-4">Destek</h3>
+            <ul className="space-y-2 text-sm text-slate-300">
+              <li>Teklif Al</li>
+              <li>SSS</li>
+              <li>İletişim</li>
+            </ul>
+          </div>
+        </div>
+
+        <div className="border-t border-slate-700 py-6 text-center text-sm text-slate-400">
+          © 2025 ATL Çelik Yapı · Tasarım: rootbarann
+        </div>
+      </footer>
     </div>
   )
 }
