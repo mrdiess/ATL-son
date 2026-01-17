@@ -30,6 +30,14 @@ interface Sponsor {
   sort_order: number
 }
 
+interface Project {
+  id: string
+  title: string
+  slug: string
+  location?: string
+  featured_image_url?: string
+}
+
 /* ================= PAGE ================= */
 
 export default function Home() {
@@ -41,6 +49,9 @@ export default function Home() {
   const [lightboxIndex, setLightboxIndex] = useState(0)
 
   const [sponsors, setSponsors] = useState<Sponsor[]>([])
+
+  const [projects, setProjects] = useState<Project[]>([])
+  const [projectsLoading, setProjectsLoading] = useState(true)
 
   /* ================= MEDIA ================= */
 
@@ -87,6 +98,29 @@ export default function Home() {
     fetchSponsors()
   }, [])
 
+  /* ================= PROJECTS ================= */
+
+  useEffect(() => {
+    const fetchProjects = async () => {
+      try {
+        const res = await fetch("/api/projects", { cache: "no-store" })
+        const result = await res.json()
+
+        if (Array.isArray(result.data)) {
+          setProjects(result.data)
+        } else {
+          setProjects([])
+        }
+      } catch {
+        setProjects([])
+      } finally {
+        setProjectsLoading(false)
+      }
+    }
+
+    fetchProjects()
+  }, [])
+
   /* ================= SLIDER ================= */
 
   useEffect(() => {
@@ -100,20 +134,12 @@ export default function Home() {
 
   return (
     <div className="min-h-screen bg-background text-foreground">
-      {/* ================= HEADER (STABLE) ================= */}
+      {/* ================= HEADER ================= */}
       <header className="fixed top-0 left-0 right-0 z-50 bg-background/95 backdrop-blur-md border-b">
         <div className="max-w-7xl mx-auto px-4 h-16 flex items-center justify-between">
           <Link href="/">
-            <img
-              src="/lightmodelogo.png"
-              alt="ATL"
-              className="h-10 dark:hidden"
-            />
-            <img
-              src="/darkmodelogo.png"
-              alt="ATL"
-              className="h-10 hidden dark:block"
-            />
+            <img src="/lightmodelogo.png" alt="ATL" className="h-10 dark:hidden" />
+            <img src="/darkmodelogo.png" alt="ATL" className="h-10 hidden dark:block" />
           </Link>
 
           <div className="flex items-center gap-4">
@@ -124,10 +150,7 @@ export default function Home() {
             >
               <Phone className="w-4 h-4" /> Hemen Ara
             </a>
-            <button
-              className="md:hidden"
-              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-            >
+            <button className="md:hidden" onClick={() => setMobileMenuOpen(!mobileMenuOpen)}>
               {mobileMenuOpen ? <X /> : <Menu />}
             </button>
           </div>
@@ -159,9 +182,7 @@ export default function Home() {
         ))}
 
         <button
-          onClick={() =>
-            setCurrentSlide((prev) => (prev - 1 + 3) % 3)
-          }
+          onClick={() => setCurrentSlide((prev) => (prev - 1 + 3) % 3)}
           className="absolute left-4 top-1/2 z-10"
         >
           <ChevronLeft className="text-white w-8 h-8" />
@@ -199,70 +220,72 @@ export default function Home() {
           </div>
         </div>
       </section>
-      {/* Projects */}
-<section id="projeler" className="py-16 md:py-24 bg-background">
-  <div className="max-w-7xl mx-auto px-4 md:px-6">
-    <div className="text-center mb-12">
-      <p className="text-blue-500 font-bold uppercase tracking-wider mb-2">
-        Projelerimiz
-      </p>
-      <h2 className="text-3xl md:text-4xl font-bold mb-4">
-        Tamamlanan Çalışmalar
-      </h2>
-      <p className="text-muted-foreground max-w-2xl mx-auto">
-        Çelik yapı, ferforje ve endüstriyel projelerimizden bazıları
-      </p>
-    </div>
 
-    {projectsLoading ? (
-      <div className="text-center py-12 text-muted-foreground">
-        Projeler yükleniyor...
-      </div>
-    ) : projects.length === 0 ? (
-      <div className="text-center py-12 text-muted-foreground">
-        Henüz proje eklenmemiştir.
-      </div>
-    ) : (
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-        {projects.map((project) => (
-          <div
-            key={project.id}
-            className="rounded-2xl border bg-card overflow-hidden hover:shadow-lg transition-all"
-          >
-            <div className="relative h-56 bg-muted">
-              <img
-                src={
-                  project.featured_image_url ||
-                  "/steel-construction-industrial-factory-building.jpg"
-                }
-                alt={project.title}
-                className="w-full h-full object-cover"
-              />
-            </div>
-
-            <div className="p-6">
-              <h3 className="text-lg font-bold mb-2">
-                {project.title}
-              </h3>
-
-              <p className="text-sm text-muted-foreground mb-4">
-                {project.location}
-              </p>
-
-              <a
-                href={`/projeler/${project.slug}`}
-                className="inline-flex items-center text-blue-500 hover:text-blue-600 font-semibold text-sm"
-              >
-                Projeyi İncele →
-              </a>
-            </div>
+      {/* ================= PROJECTS ================= */}
+      <section id="projeler" className="py-16 md:py-24 bg-background">
+        <div className="max-w-7xl mx-auto px-4 md:px-6">
+          <div className="text-center mb-12">
+            <p className="text-blue-500 font-bold uppercase tracking-wider mb-2">
+              Projelerimiz
+            </p>
+            <h2 className="text-3xl md:text-4xl font-bold mb-4">
+              Tamamlanan Çalışmalar
+            </h2>
+            <p className="text-muted-foreground max-w-2xl mx-auto">
+              Çelik yapı, ferforje ve endüstriyel projelerimizden bazıları
+            </p>
           </div>
-        ))}
-      </div>
-    )}
-  </div>
-</section>
 
+          {projectsLoading ? (
+            <div className="text-center py-12 text-muted-foreground">
+              Projeler yükleniyor...
+            </div>
+          ) : projects.length === 0 ? (
+            <div className="text-center py-12 text-muted-foreground">
+              Henüz proje eklenmemiştir.
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+              {projects.map((project) => (
+                <div
+                  key={project.id}
+                  className="rounded-2xl border bg-card overflow-hidden hover:shadow-lg transition-all"
+                >
+                  <div className="relative h-56 bg-muted">
+                    <img
+                      src={
+                        project.featured_image_url ||
+                        "/steel-construction-industrial-factory-building.jpg"
+                      }
+                      alt={project.title}
+                      className="w-full h-full object-cover"
+                    />
+                  </div>
+
+                  <div className="p-6">
+                    <h3 className="text-lg font-bold mb-2">
+                      {project.title}
+                    </h3>
+
+                    {project.location && (
+                      <p className="text-sm text-muted-foreground mb-4">
+                        {project.location}
+                      </p>
+                    )}
+
+                    <a
+                      href={`/projeler/${project.slug}`}
+                      className="inline-flex items-center text-blue-500 hover:text-blue-600 font-semibold text-sm"
+                    >
+                      Projeyi İncele →
+                    </a>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+      </section>
 
       {/* ================= LIGHTBOX ================= */}
       {lightboxOpen && (
